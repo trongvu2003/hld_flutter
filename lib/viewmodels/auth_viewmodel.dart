@@ -5,7 +5,9 @@ import '../repositories/user_repository.dart';
 
 class AuthViewModel extends ChangeNotifier {
   final UserRepository repository;
+
   AuthViewModel(this.repository);
+
   String email = '';
   String password = '';
   bool isLoading = false;
@@ -24,15 +26,16 @@ class AuthViewModel extends ChangeNotifier {
     errorMessage = null;
     notifyListeners();
 
-    final result = await repository.login(email.trim(), password.trim());
+    final result = await repository.login(email, password);
 
     isLoading = false;
 
     if (result != null) {
-      final token = result['accessToken'];
+      final token = result.accessToken;
       await _saveToken(token);
       role = _extractRole(token);
       isAuthenticated = true;
+
       notifyListeners();
       return true;
     } else {

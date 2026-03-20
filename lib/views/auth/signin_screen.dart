@@ -11,6 +11,7 @@ class SignInScreen extends StatefulWidget {
 }
 
 class _SignInScreenState extends State<SignInScreen> {
+  // Quản lý form + validate
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
@@ -18,7 +19,7 @@ class _SignInScreenState extends State<SignInScreen> {
 
   @override
   void dispose() {
-    // Luôn dispose controller để tránh memory leak
+    // Luôn dispose controller để tránh memory leak( rò rỉ bộ nhớ vì TextEditingController lưu vào ram)
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
@@ -28,16 +29,16 @@ class _SignInScreenState extends State<SignInScreen> {
     setState(() => _obscurePassword = !_obscurePassword);
   }
 
-  // Tách hàm xử lý đăng nhập ra riêng cho dễ đọc
   Future<void> _handleSignIn(AuthViewModel viewModel) async {
     if (!_formKey.currentState!.validate()) return;
 
-    // GÁN GIÁ TRỊ VÀO VIEWMODEL trước khi gọi API — đây là bug chính
+    // GÁN GIÁ TRỊ VÀO VIEWMODEL trước khi gọi API
     viewModel.email = _emailController.text.trim();
     viewModel.password = _passwordController.text.trim();
 
     final success = await viewModel.signIn();
 
+    // Nếu user đã rời màn hình khi API chưa xong → dừng=> tránh crash
     if (!mounted) return;
 
     if (success) {
