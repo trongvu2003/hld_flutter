@@ -7,4 +7,5 @@ class AppRoutes {
   static const home = '/home';
   static const profile = '/profile';
   static const splash = '/';
+  static const main = '/main';
 }

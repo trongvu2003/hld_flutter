@@ -59,7 +59,7 @@ class _SignInScreenState extends State<SignInScreen> {
           );
           break;
         default:
-          Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+          Navigator.pushNamedAndRemoveUntil(context, '/main', (route) => false);
       }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hld_flutter/views/auth/intro1_screen.dart';
 import 'package:hld_flutter/views/auth/start_screen.dart';
 import 'package:hld_flutter/views/user/home/home_screen.dart';
+import 'package:hld_flutter/views/user/main_screen.dart';
 import '../views/auth/signin_screen.dart';
 import '../views/auth/signup_screen.dart';
 import 'app_routes.dart';
@@ -14,6 +15,7 @@ class AppPages {
     AppRoutes.startScreen:(context)=>const StartScreen(),
     AppRoutes.signin:(context)=> const SignInScreen(),
     AppRoutes.signup:(context)=>const SignupScreen(),
-    AppRoutes.home:(context)=>const HomeScreen()
+    AppRoutes.home:(context)=>const HomeScreen(),
+    AppRoutes.main:(context)=>const MainScreen(),
   };
 }
