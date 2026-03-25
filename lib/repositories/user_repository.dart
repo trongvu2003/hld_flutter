@@ -1,12 +1,12 @@
-import '../models/responsemodel/login_response.dart';
-import '../services/auth_service.dart';
+import 'package:hld_flutter/models/responsemodel/user_response.dart';
+import 'package:hld_flutter/services/user_service.dart';
 
 class UserRepository {
-  final AuthService authService;
+  final UserService userService;
 
-  UserRepository(this.authService);
+  UserRepository(this.userService);
 
-  Future<LoginResponse?> login(String email, String password) async {
-    return await authService.login(email, password);
+  Future<User> getUser(String id) {
+    return userService.getUser(id);
   }
 }

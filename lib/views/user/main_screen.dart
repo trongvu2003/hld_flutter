@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hld_flutter/views/user/home/home_screen.dart';
+import 'package:provider/provider.dart';
+import '../../viewmodels/user_viewmodel.dart';
 import 'fooder_bar.dart';
 import 'header_bar.dart';
 
@@ -13,6 +15,14 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
   int _currentIndex = 0;
   bool _barsVisible = true;
+  @override
+  void initState() {
+    super.initState();
+    Future.microtask(() {
+      context.read<UserViewModel>().loadUser();
+    });
+  }
+
 
   static const _screens = [
     HomeScreen(),
@@ -33,6 +43,8 @@ class _MainScreenState extends State<MainScreen> {
   @override
   Widget build(BuildContext context) {
     final isHome = _currentIndex == 0;
+    final userViewModel= context.watch<UserViewModel>();
+    final user= userViewModel.user;
 
     return Material(
       color: Theme.of(context).colorScheme.surface,
@@ -54,7 +66,7 @@ class _MainScreenState extends State<MainScreen> {
               top: (isHome && _barsVisible) ? 0 : -100,
               left: 0,
               right: 0,
-              child: const HeadBar(userName: 'Bùi Trọng Vũ'),
+              child: HeadBar(userName: user?.name),
             ),
 
             // ── 3. FootBar - luôn hiện, ẩn khi scroll xuống

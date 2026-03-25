@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../repositories/user_repository.dart';
+import '../repositories/auth_repository.dart';
 
 class AuthViewModel extends ChangeNotifier {
-  final UserRepository repository;
+  final AuthRepository repository;
 
   AuthViewModel(this.repository);
 
@@ -14,6 +14,24 @@ class AuthViewModel extends ChangeNotifier {
   bool isAuthenticated = false;
   String? role;
   String? errorMessage;
+  Map<String, dynamic>? currentUser;
+
+  Future<void> fetchCurrentUser() async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('accessToken');
+
+    print("TOKEN: $token");
+
+    if (token == null) return;
+
+    final decoded = JwtDecoder.decode(token);
+
+    print("DECODED: $decoded");
+
+    currentUser = decoded;
+
+    notifyListeners();
+  }
 
   Future<bool> signIn() async {
     if (email.trim().isEmpty || password.trim().isEmpty) {
@@ -35,6 +53,7 @@ class AuthViewModel extends ChangeNotifier {
       await _saveToken(token);
       role = _extractRole(token);
       isAuthenticated = true;
+      await fetchCurrentUser();
 
       notifyListeners();
       return true;

@@ -36,12 +36,6 @@ class _FootBarState extends State<FootBar> with SingleTickerProviderStateMixin {
     super.dispose();
   }
 
-  static const _tabs = [
-    {'label': 'Trang chủ', 'icon': Icons.home},
-    {'label': 'Lịch hẹn', 'icon': Icons.calendar_today},
-    {'label': 'Thông báo', 'icon': Icons.notifications},
-    {'label': 'Cá nhân', 'icon': Icons.person},
-  ];
 
   @override
   Widget build(BuildContext context) {

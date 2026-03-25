@@ -2,7 +2,10 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:hld_flutter/theme/app_colors.dart';
 import 'package:hld_flutter/views/user/home/widgets/ai_search_bar.dart';
+import 'package:provider/provider.dart';
+import '../../../viewmodels/user_viewmodel.dart';
 import '../../skeleton/skeleton_box.dart';
+import '../../widgets/app_dialog.dart';
 import 'widgets/back_to_top_button.dart';
 import 'widgets/doctor_list.dart';
 import 'widgets/news_ticker.dart';
@@ -12,10 +15,6 @@ import 'widgets/service_grid.dart';
 import 'widgets/specialty_list.dart';
 import 'widgets/welcome_banner.dart';
 
-const _mockUser = {
-  'name': 'Bùi Trọng Vũ',
-  'avatarURL': 'assets/images/avatar_doctor.jpg',
-};
 
 const _mockNews = [
   {'id': '1', 'title': 'Cập nhật vaccine Covid-19 mới nhất 2026'},
@@ -114,6 +113,9 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     _scrollController.addListener(_onScroll);
+    Future.microtask(() {
+      context.read<UserViewModel>().loadUser();
+    });
 
     // Simulate loading - xoá khi kết nối API
     Future.delayed(const Duration(seconds: 1), () {
@@ -229,9 +231,33 @@ class _HomeScreenState extends State<HomeScreen> {
                   delegate: SliverChildBuilderDelegate(
                     (context, i) => PostCard(
                       post: _posts[i],
-                      currentUserId: _mockUser['id'] ?? '',
-                      onReport: () => _showReportDialog(context),
-                      onDelete: () => _showDeleteDialog(context, i),
+                      currentUserId:  '',
+                      // currentUserId: _mockUser['id'] ?? '',
+                      onReport: () {
+                        AppDialog.show(
+                          context: context,
+                          title: 'Báo cáo bài viết',
+                          content: 'Chọn lý do báo cáo',
+                          confirmText: 'Gửi',
+                          onConfirm: () {
+                            // TODO: handle report
+                          },
+                        );
+                      },
+
+                      onDelete: () {
+                        AppDialog.show(
+                          context: context,
+                          title: 'Xoá bài viết',
+                          content: 'Bạn có chắc muốn xoá?',
+                          confirmText: 'Xoá',
+                          confirmColor: Colors.red,
+                          onConfirm: () {
+                            setState(() => _posts.removeAt(i));
+                          },
+                        );
+                      },
+
                       onNavigateToDetail:
                           () => Navigator.pushNamed(
                             context,
@@ -313,7 +339,9 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildGreetingRow(BuildContext context) {
-    final avatarUrl = _mockUser['avatarURL'] ?? '';
+    final vm = context.watch<UserViewModel>();
+    final user = vm.user;
+
     return Padding(
       padding: const EdgeInsets.only(bottom: 16),
       child: Row(
@@ -329,13 +357,17 @@ class _HomeScreenState extends State<HomeScreen> {
                   color: Colors.black.withOpacity(0.8),
                 ),
               ),
+
               Text(
-                _mockUser['name'] ?? 'Người dùng',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 28),
+                user?.name ?? 'Người dùng',
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 28,
+                ),
               ),
             ],
           ),
-          // Avatar
+
           Container(
             width: 50,
             height: 50,
@@ -351,11 +383,14 @@ class _HomeScreenState extends State<HomeScreen> {
               ],
             ),
             child: ClipOval(
-              child: Image.asset(
-                avatarUrl ?? 'assets/images/default_avatar.png',
+              child: user?.avatarURL != null && user!.avatarURL!.isNotEmpty
+                  ? Image.asset(
+                user.avatarURL!,
                 fit: BoxFit.cover,
-                width: 50,
-                height: 50,
+              )
+                  : Image.asset(
+                'assets/images/avatar_doctor.jpg',
+                fit: BoxFit.cover,
               ),
             ),
           ),
@@ -378,51 +413,6 @@ class _HomeScreenState extends State<HomeScreen> {
       );
     }
     return const SizedBox.shrink();
-  }
-
-  void _showReportDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder:
-          (_) => AlertDialog(
-            title: const Text('Báo cáo bài viết'),
-            content: const Text('Chọn lý do báo cáo'),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text('Huỷ'),
-              ),
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text('Gửi'),
-              ),
-            ],
-          ),
-    );
-  }
-
-  void _showDeleteDialog(BuildContext context, int index) {
-    showDialog(
-      context: context,
-      builder:
-          (_) => AlertDialog(
-            title: const Text('Xoá bài viết'),
-            content: const Text('Bạn có chắc muốn xoá?'),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text('Huỷ'),
-              ),
-              TextButton(
-                onPressed: () {
-                  setState(() => _posts.removeAt(index));
-                  Navigator.pop(context);
-                },
-                child: const Text('Xoá', style: TextStyle(color: Colors.red)),
-              ),
-            ],
-          ),
-    );
   }
 }
 
