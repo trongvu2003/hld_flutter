@@ -1,7 +1,3 @@
-
-// ═══════════════════════════════════════════════════════════════
-// POST CARD - tương đương Post() composable
-// ═══════════════════════════════════════════════════════════════
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
@@ -23,8 +19,9 @@ class PostCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final userInfo = post['userInfo'] as Map? ?? {};
-    final images = post['images'] as List? ?? [];
+    final images = post['media'] as List? ?? [];
     final isOwner = currentUserId == userInfo['id'];
+    final avatar = userInfo['avatarURL'];
 
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 4),
@@ -32,32 +29,40 @@ class PostCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header
           Padding(
             padding: const EdgeInsets.fromLTRB(12, 12, 4, 8),
             child: Row(
               children: [
                 ClipOval(
-                  child: Container(
+                  child: SizedBox(
                     width: 45,
                     height: 45,
-                    color: Theme.of(context).colorScheme.secondaryContainer,
-                    child: const Icon(Icons.person),
+                    child:
+                        avatar != null
+                            ? CachedNetworkImage(
+                              imageUrl: avatar,
+                              fit: BoxFit.cover,
+                            )
+                            : Image.asset(
+                              'assets/images/default_avatar.png',
+                              fit: BoxFit.cover,
+                            ),
                   ),
                 ),
                 const SizedBox(width: 10),
+
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
                         userInfo['name'] ?? 'Người dùng',
-                        style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                        style: TextStyle(fontSize: 15,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                       Text(
-                        post['createdAt'] ?? '',
+                        formatTime(post['createdAt']),
                         style: Theme.of(context).textTheme.labelSmall?.copyWith(
                           color: Theme.of(context).colorScheme.onSurfaceVariant,
                         ),
@@ -72,22 +77,22 @@ class PostCard extends StatelessWidget {
                   },
                   itemBuilder:
                       (_) =>
-                  isOwner
-                      ? [
-                    const PopupMenuItem(
-                      value: 'delete',
-                      child: Text(
-                        'Xoá',
-                        style: TextStyle(color: Colors.red),
-                      ),
-                    ),
-                  ]
-                      : [
-                    const PopupMenuItem(
-                      value: 'report',
-                      child: Text('Báo cáo'),
-                    ),
-                  ],
+                          isOwner
+                              ? [
+                                const PopupMenuItem(
+                                  value: 'delete',
+                                  child: Text(
+                                    'Xoá',
+                                    style: TextStyle(color: Colors.red),
+                                  ),
+                                ),
+                              ]
+                              : [
+                                const PopupMenuItem(
+                                  value: 'report',
+                                  child: Text('Báo cáo'),
+                                ),
+                              ],
                 ),
               ],
             ),
@@ -103,13 +108,14 @@ class PostCard extends StatelessWidget {
           // Images
           if (images.isNotEmpty) ...[
             const SizedBox(height: 8),
-            AspectRatio(
-              aspectRatio: 16 / 9,
+            Container(
+              width: double.infinity,
+              constraints: const BoxConstraints(maxHeight: 400),
               child: CachedNetworkImage(
                 imageUrl: images.first.toString(),
                 fit: BoxFit.cover,
-                errorWidget:
-                    (_, __, ___) => Container(
+                errorWidget: (_, __, ___) => Container(
+                  height: 200,
                   color: Theme.of(context).colorScheme.secondaryContainer,
                   child: const Icon(Icons.broken_image),
                 ),
@@ -147,4 +153,19 @@ class PostCard extends StatelessWidget {
       ),
     );
   }
+}
+
+String formatTime(String? dateStr) {
+  if (dateStr == null || dateStr.isEmpty) return '';
+
+  final date = DateTime.parse(dateStr).toLocal();
+  final now = DateTime.now();
+  final diff = now.difference(date);
+
+  if (diff.inSeconds < 60) return 'Vừa xong';
+  if (diff.inMinutes < 60) return '${diff.inMinutes} phút trước';
+  if (diff.inHours < 24) return '${diff.inHours} giờ trước';
+  if (diff.inDays < 7) return '${diff.inDays} ngày trước';
+
+  return '${date.day}/${date.month}/${date.year}';
 }

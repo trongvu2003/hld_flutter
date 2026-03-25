@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:hld_flutter/theme/app_colors.dart';
+import 'package:hld_flutter/viewmodels/post_viewmodel.dart';
 import 'package:hld_flutter/views/user/home/widgets/ai_search_bar.dart';
 import 'package:provider/provider.dart';
 import '../../../viewmodels/user_viewmodel.dart';
@@ -14,7 +15,6 @@ import 'widgets/section_header.dart';
 import 'widgets/service_grid.dart';
 import 'widgets/specialty_list.dart';
 import 'widgets/welcome_banner.dart';
-
 
 const _mockNews = [
   {'id': '1', 'title': 'Cập nhật vaccine Covid-19 mới nhất 2026'},
@@ -66,29 +66,6 @@ const _mockDoctors = [
   },
 ];
 
-const _mockPosts = [
-  {
-    'id': '1',
-    'userInfo': {'id': 'u1', 'name': 'Trần Thị A', 'avatarURL': ''},
-    'content':
-        'Hôm nay thời tiết thay đổi, mọi người nhớ giữ ấm và uống nhiều nước nhé!',
-    'images': [],
-    'likesCount': 12,
-    'commentsCount': 3,
-    'createdAt': '2 giờ trước',
-  },
-  {
-    'id': '2',
-    'userInfo': {'id': 'u2', 'name': 'Lê Văn B', 'avatarURL': ''},
-    'content':
-        'Chia sẻ bài tập thể dục buổi sáng giúp tăng sức đề kháng hiệu quả.',
-    'images': [],
-    'likesCount': 24,
-    'commentsCount': 8,
-    'createdAt': '5 giờ trước',
-  },
-];
-
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -104,17 +81,15 @@ class _HomeScreenState extends State<HomeScreen> {
   bool _isLoadingSpecialties = true;
   bool _isLoadingDoctors = true;
   bool _isLoadingNews = true;
-  bool _isLoadingMore = false;
-  bool _hasMorePosts = true;
-
-  List<Map<String, dynamic>> _posts = [];
 
   @override
   void initState() {
     super.initState();
     _scrollController.addListener(_onScroll);
-    Future.microtask(() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
       context.read<UserViewModel>().loadUser();
+      context.read<PostViewModel>().fetchPosts();
     });
 
     // Simulate loading - xoá khi kết nối API
@@ -124,36 +99,24 @@ class _HomeScreenState extends State<HomeScreen> {
           _isLoadingSpecialties = false;
           _isLoadingDoctors = false;
           _isLoadingNews = false;
-          _posts = List<Map<String, dynamic>>.from(_mockPosts);
         });
       }
     });
   }
 
   void _onScroll() {
-    // Tương đương firstVisibleItemIndex > 3
+    if (!mounted) return;
+    // Hiển thị nút cuộn lên đầu
     final show = _scrollController.offset > 400;
-    if (show != _showBackToTop) setState(() => _showBackToTop = show);
+    if (show != _showBackToTop) {
+      setState(() => _showBackToTop = show);
+    }
 
-    // Tương đương lastVisible >= total - 3
+    // Load more gọi trực tiếp logic từ ViewModel
     if (_scrollController.position.pixels >=
         _scrollController.position.maxScrollExtent - 300) {
-      _loadMorePosts();
+      context.read<PostViewModel>().loadMorePosts();
     }
-  }
-
-  void _loadMorePosts() {
-    if (_isLoadingMore || !_hasMorePosts) return;
-    setState(() => _isLoadingMore = true);
-
-    Future.delayed(const Duration(seconds: 1), () {
-      if (mounted) {
-        setState(() {
-          _isLoadingMore = false;
-          _hasMorePosts = false;
-        });
-      }
-    });
   }
 
   @override
@@ -176,7 +139,6 @@ class _HomeScreenState extends State<HomeScreen> {
               slivers: [
                 //  HEADER
                 SliverToBoxAdapter(child: _buildHeader(context)),
-
                 //  SERVICES
                 SliverToBoxAdapter(
                   child: Column(
@@ -189,7 +151,6 @@ class _HomeScreenState extends State<HomeScreen> {
                     ],
                   ),
                 ),
-
                 //  SPECIALTIES
                 SliverToBoxAdapter(
                   child:
@@ -225,51 +186,104 @@ class _HomeScreenState extends State<HomeScreen> {
                                 ),
                           ),
                 ),
-
                 //  POSTS
-                SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                    (context, i) => PostCard(
-                      post: _posts[i],
-                      currentUserId:  '',
-                      // currentUserId: _mockUser['id'] ?? '',
-                      onReport: () {
-                        AppDialog.show(
-                          context: context,
-                          title: 'Báo cáo bài viết',
-                          content: 'Chọn lý do báo cáo',
-                          confirmText: 'Gửi',
-                          onConfirm: () {
-                            // TODO: handle report
-                          },
-                        );
-                      },
+                Consumer<PostViewModel>(
+                  builder: (context, vm, child) {
+                    if (vm.isLoading && vm.posts.isEmpty) {
+                      return SliverList(
+                        delegate: SliverChildBuilderDelegate(
+                              (context, index) => const _PostSkeleton(),
+                          childCount: 3,
+                        ),
+                      );
+                    }
 
-                      onDelete: () {
-                        AppDialog.show(
-                          context: context,
-                          title: 'Xoá bài viết',
-                          content: 'Bạn có chắc muốn xoá?',
-                          confirmText: 'Xoá',
-                          confirmColor: Colors.red,
-                          onConfirm: () {
-                            setState(() => _posts.removeAt(i));
-                          },
-                        );
-                      },
-
-                      onNavigateToDetail:
-                          () => Navigator.pushNamed(
-                            context,
-                            '/post-detail/${_posts[i]['id']}',
+                    // Lỗi
+                    if (vm.isError && vm.posts.isEmpty) {
+                      return SliverToBoxAdapter(
+                        child: Center(
+                          child: Padding(
+                            padding: const EdgeInsets.all(20),
+                            child: Text("Lỗi: ${vm.error}"),
                           ),
-                    ),
-                    childCount: _posts.length,
-                  ),
+                        ),
+                      );
+                    }
+
+                    // Render danh sách post
+                    return SliverList(
+                      delegate: SliverChildBuilderDelegate((context, i) {
+                        final post = vm.posts[i];
+                        return PostCard(
+                          post: {
+                            'id': post.id,
+                            'content': post.content,
+                            'media': post.media,
+                            'userInfo':
+                                post.userInfo != null
+                                    ? {
+                                      '_id': post.userInfo!.id,
+                                      'name': post.userInfo!.name,
+                                      'avatarURL': post.userInfo!.avatarUrl,
+                                    }
+                                    : null,
+                            'createdAt': post.createdAt,
+                          },
+                          currentUserId: '',
+                          // Bạn có thể truyền User ID từ UserViewModel vào đây
+                          onReport: () {
+                            AppDialog.show(
+                              context: context,
+                              title: 'Báo cáo bài viết',
+                              content: 'Chọn lý do báo cáo',
+                              confirmText: 'Gửi',
+                              onConfirm: () {},
+                            );
+                          },
+                          onDelete: () {
+                            AppDialog.show(
+                              context: context,
+                              title: 'Xoá bài viết',
+                              content: 'Bạn có chắc muốn xoá?',
+                              confirmText: 'Xoá',
+                              confirmColor: Colors.red,
+                              onConfirm: () {},
+                            );
+                          },
+                          onNavigateToDetail: () {
+                            Navigator.pushNamed(
+                              context,
+                              '/post-detail/${post.id}',
+                            );
+                          },
+                        );
+                      }, childCount: vm.posts.length),
+                    );
+                  },
                 ),
 
-                SliverToBoxAdapter(child: _buildLoadMoreIndicator(context)),
-
+                // LOAD MORE INDICATOR
+                Consumer<PostViewModel>(
+                  builder: (context, postViewModel, child) {
+                    if (postViewModel.isLoadingMore) {
+                      return const SliverToBoxAdapter(
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(vertical: 16.0),
+                          child: Center(child: CircularProgressIndicator()),
+                        ),
+                      );
+                    } else if (!postViewModel.hasMore &&
+                        postViewModel.posts.isNotEmpty) {
+                      return const SliverToBoxAdapter(
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(vertical: 16.0),
+                          child: Center(child: Text("Đã hết bài viết")),
+                        ),
+                      );
+                    }
+                    return const SliverToBoxAdapter(child: SizedBox.shrink());
+                  },
+                ),
                 // Bottom padding
                 const SliverToBoxAdapter(child: SizedBox(height: 90)),
               ],
@@ -383,36 +397,18 @@ class _HomeScreenState extends State<HomeScreen> {
               ],
             ),
             child: ClipOval(
-              child: user?.avatarURL != null && user!.avatarURL!.isNotEmpty
-                  ? Image.asset(
-                user.avatarURL!,
-                fit: BoxFit.cover,
-              )
-                  : Image.asset(
-                'assets/images/avatar_doctor.jpg',
-                fit: BoxFit.cover,
-              ),
+              child:
+                  user?.avatarURL != null && user!.avatarURL!.isNotEmpty
+                      ? Image.asset(user.avatarURL!, fit: BoxFit.cover)
+                      : Image.asset(
+                        'assets/images/avatar_doctor.jpg',
+                        fit: BoxFit.cover,
+                      ),
             ),
           ),
         ],
       ),
     );
-  }
-
-  Widget _buildLoadMoreIndicator(BuildContext context) {
-    if (_isLoadingMore) {
-      return const Padding(
-        padding: EdgeInsets.all(16),
-        child: Center(child: CircularProgressIndicator()),
-      );
-    }
-    if (!_hasMorePosts && _posts.isNotEmpty) {
-      return const Padding(
-        padding: EdgeInsets.all(16),
-        child: Center(child: Text('Đã hết bài viết')),
-      );
-    }
-    return const SizedBox.shrink();
   }
 }
 
@@ -548,6 +544,73 @@ class _NewsSkeletonList extends StatelessWidget {
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+// POST SKELETON
+class _PostSkeleton extends StatelessWidget {
+  const _PostSkeleton();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Theme.of(context).dividerColor.withOpacity(0.1)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.03),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Header: Avatar & Info
+          Row(
+            children: [
+              Skeleton(width: 45, height: 45, radius: 25), // Avatar
+              const SizedBox(width: 12),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Skeleton(width: 120, height: 16, radius: 4), // Tên
+                  const SizedBox(height: 6),
+                  Skeleton(width: 80, height: 12, radius: 4), // Thời gian
+                ],
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+
+          Skeleton(width: double.infinity, height: 14, radius: 4),
+          const SizedBox(height: 6),
+          Skeleton(width: double.infinity, height: 14, radius: 4),
+          const SizedBox(height: 6),
+          Skeleton(width: 200, height: 14, radius: 4),
+          const SizedBox(height: 16),
+
+          // Media Box (Ảnh bài viết)
+          Skeleton(width: double.infinity, height: 200, radius: 10),
+          const SizedBox(height: 16),
+
+          // Footer Actions (Like, Comment, Share)
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              Skeleton(width: 40, height: 20, radius: 4),
+              Skeleton(width: 40, height: 20, radius: 4),
+              Skeleton(width: 40, height: 20, radius: 4),
+            ],
+          )
+        ],
       ),
     );
   }
