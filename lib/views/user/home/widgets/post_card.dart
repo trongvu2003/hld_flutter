@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:hld_flutter/views/user/home/widgets/video_thumbnail_only.dart';
 
 class PostCard extends StatelessWidget {
   final Map<String, dynamic> post;
@@ -57,7 +58,8 @@ class PostCard extends StatelessWidget {
                     children: [
                       Text(
                         userInfo['name'] ?? 'Người dùng',
-                        style: TextStyle(fontSize: 15,
+                        style: TextStyle(
+                          fontSize: 15,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -105,21 +107,13 @@ class PostCard extends StatelessWidget {
               child: Text(post['content']),
             ),
 
-          // Images
+          // Media (Hỗ trợ cả Ảnh và Video)
           if (images.isNotEmpty) ...[
             const SizedBox(height: 8),
             Container(
               width: double.infinity,
-              constraints: const BoxConstraints(maxHeight: 400),
-              child: CachedNetworkImage(
-                imageUrl: images.first.toString(),
-                fit: BoxFit.cover,
-                errorWidget: (_, __, ___) => Container(
-                  height: 200,
-                  color: Theme.of(context).colorScheme.secondaryContainer,
-                  child: const Icon(Icons.broken_image),
-                ),
-              ),
+              // Lấy link media đầu tiên
+              child: _buildMediaItem(images.first.toString(), context),
             ),
           ],
 
@@ -151,6 +145,28 @@ class PostCard extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildMediaItem(String url, BuildContext context) {
+    bool isVideo(String url) {
+      final u = url.toLowerCase();
+      return u.endsWith('.mp4') || u.endsWith('.mov') || u.endsWith('.avi');
+    }
+
+    if (isVideo(url)) {
+      return VideoThumbnailOnly(videoUrl: url);
+    }
+
+    return CachedNetworkImage(
+      imageUrl: url,
+      fit: BoxFit.cover,
+      errorWidget:
+          (_, __, ___) => Container(
+            height: 200,
+            color: Theme.of(context).colorScheme.secondaryContainer,
+            child: const Icon(Icons.broken_image),
+          ),
     );
   }
 }

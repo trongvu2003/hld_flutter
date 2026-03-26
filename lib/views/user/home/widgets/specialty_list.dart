@@ -60,7 +60,7 @@ class SpecialtyItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final iconUrl = specialty.icon ?? '';
-    print("Icon Chuyen Khoa day"+iconUrl);
+    print("Icon Chuyen Khoa day" + iconUrl);
     return ScaleButton(
       onTap: onTap,
       child: Container(
@@ -93,26 +93,18 @@ class SpecialtyItem extends StatelessWidget {
                           height: 45,
                           fit: BoxFit.contain,
                           errorBuilder:
-                              (_, __, ___) => Icon(
-                                Icons.medical_services,
-                                size: 36,
-                                color: Theme.of(context).colorScheme.primary,
-                              ),
+                              (_, __, ___) =>
+                                  Image.asset("assets/images/heart.png"),
                         )
-                        : Icon(
-                          Icons.medical_services,
-                          size: 36,
-                          color: Theme.of(context).colorScheme.primary,
-                        ),
+                        : Image.asset("assets/images/heart.png"),
               ),
             ),
             const SizedBox(height: 14),
             Text(
               specialty.name ?? '',
-              style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                fontWeight: FontWeight.w900,
-                fontSize: 12,
-                height: 1.3,
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 14,
               ),
               textAlign: TextAlign.center,
               maxLines: 2,
