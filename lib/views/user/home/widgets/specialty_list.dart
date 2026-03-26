@@ -1,15 +1,11 @@
-
-// ═══════════════════════════════════════════════════════════════
-// SPECIALTY LIST - tương đương SpecialtyList + SpecialtyItem
-// ═══════════════════════════════════════════════════════════════
 import 'package:flutter/material.dart';
-
+import 'package:hld_flutter/models/responsemodel/specialty.dart';
 import '../../../../theme/app_colors.dart';
 import 'scale_button.dart';
 import 'section_header.dart';
 
 class SpecialtyList extends StatefulWidget {
-  final List<Map<String, dynamic>> specialties;
+  final List<GetSpecialtyResponse> specialties;
   final void Function(Map<String, dynamic>) onTap;
 
   const SpecialtyList({required this.specialties, required this.onTap});
@@ -24,7 +20,7 @@ class _SpecialtyListState extends State<SpecialtyList> {
   @override
   Widget build(BuildContext context) {
     final displayed =
-    _showAll ? widget.specialties : widget.specialties.take(6).toList();
+        _showAll ? widget.specialties : widget.specialties.take(6).toList();
 
     return Column(
       children: [
@@ -32,9 +28,9 @@ class _SpecialtyListState extends State<SpecialtyList> {
           title: 'Chuyên khoa',
           isExpanded: _showAll,
           onSeeAllClick:
-          widget.specialties.length > 6
-              ? () => setState(() => _showAll = !_showAll)
-              : null,
+              widget.specialties.length > 6
+                  ? () => setState(() => _showAll = !_showAll)
+                  : null,
         ),
         SizedBox(
           height: 170,
@@ -45,9 +41,9 @@ class _SpecialtyListState extends State<SpecialtyList> {
             separatorBuilder: (_, __) => const SizedBox(width: 16),
             itemBuilder:
                 (_, i) => SpecialtyItem(
-              specialty: displayed[i],
-              onTap: () => widget.onTap(displayed[i]),
-            ),
+                  specialty: displayed[i],
+                  onTap: () => widget.onTap,
+                ),
           ),
         ),
       ],
@@ -56,14 +52,15 @@ class _SpecialtyListState extends State<SpecialtyList> {
 }
 
 class SpecialtyItem extends StatelessWidget {
-  final Map<String, dynamic> specialty;
+  final GetSpecialtyResponse specialty;
   final VoidCallback onTap;
 
   const SpecialtyItem({required this.specialty, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
-    final iconUrl = specialty['image'] ?? '';
+    final iconUrl = specialty.icon ?? '';
+    print("Icon Chuyen Khoa day"+iconUrl);
     return ScaleButton(
       onTap: onTap,
       child: Container(
@@ -89,29 +86,29 @@ class SpecialtyItem extends StatelessWidget {
               height: 70,
               child: Center(
                 child:
-                iconUrl.isNotEmpty
-                    ? Image.asset(
-                  iconUrl,
-                  width: 45,
-                  height: 45,
-                  fit: BoxFit.contain,
-                  errorBuilder:
-                      (_, __, ___) => Icon(
-                    Icons.medical_services,
-                    size: 36,
-                    color: Theme.of(context).colorScheme.primary,
-                  ),
-                )
-                    : Icon(
-                  Icons.medical_services,
-                  size: 36,
-                  color: Theme.of(context).colorScheme.primary,
-                ),
+                    iconUrl.isNotEmpty
+                        ? Image.network(
+                          iconUrl,
+                          width: 45,
+                          height: 45,
+                          fit: BoxFit.contain,
+                          errorBuilder:
+                              (_, __, ___) => Icon(
+                                Icons.medical_services,
+                                size: 36,
+                                color: Theme.of(context).colorScheme.primary,
+                              ),
+                        )
+                        : Icon(
+                          Icons.medical_services,
+                          size: 36,
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
               ),
             ),
             const SizedBox(height: 14),
             Text(
-              specialty['name'] ?? '',
+              specialty.name ?? '',
               style: Theme.of(context).textTheme.labelLarge?.copyWith(
                 fontWeight: FontWeight.w900,
                 fontSize: 12,

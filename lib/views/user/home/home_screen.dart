@@ -4,6 +4,7 @@ import 'package:hld_flutter/theme/app_colors.dart';
 import 'package:hld_flutter/viewmodels/post_viewmodel.dart';
 import 'package:hld_flutter/views/user/home/widgets/ai_search_bar.dart';
 import 'package:provider/provider.dart';
+import '../../../viewmodels/specialty_viewmodel.dart';
 import '../../../viewmodels/user_viewmodel.dart';
 import '../../skeleton/skeleton_box.dart';
 import '../../widgets/app_dialog.dart';
@@ -21,16 +22,6 @@ const _mockNews = [
   {'id': '2', 'title': 'Phòng chống bệnh sốt xuất huyết mùa mưa'},
   {'id': '3', 'title': 'Chế độ dinh dưỡng cho người cao tuổi'},
   {'id': '4', 'title': 'Tầm quan trọng của giấc ngủ với sức khỏe'},
-];
-
-const _mockSpecialties = [
-  {'id': '1', 'name': 'Tim mạch', 'image': "assets/images/heart.png"},
-  {'id': '2', 'name': 'Nhi khoa', 'image': "assets/images/heart.png"},
-  {'id': '3', 'name': 'Da liễu', 'image': "assets/images/heart.png"},
-  {'id': '4', 'name': 'Thần kinh', 'image': "assets/images/heart.png"},
-  {'id': '5', 'name': 'Xương khớp', 'image': "assets/images/heart.png"},
-  {'id': '6', 'name': 'Mắt', 'image': "assets/images/heart.png"},
-  {'id': '7', 'name': 'Tai mũi họng', 'image': "assets/images/heart.png"},
 ];
 
 const _mockDoctors = [
@@ -78,7 +69,6 @@ class _HomeScreenState extends State<HomeScreen> {
   bool _showBackToTop = false;
 
   // Mock loading states - thay bằng ViewModel sau
-  bool _isLoadingSpecialties = true;
   bool _isLoadingDoctors = true;
   bool _isLoadingNews = true;
 
@@ -90,13 +80,13 @@ class _HomeScreenState extends State<HomeScreen> {
       if (!mounted) return;
       context.read<UserViewModel>().loadUser();
       context.read<PostViewModel>().fetchPosts();
+      context.read<SpecialtyViewModel>().fetchSpecialties();
     });
 
     // Simulate loading - xoá khi kết nối API
     Future.delayed(const Duration(seconds: 1), () {
       if (mounted) {
         setState(() {
-          _isLoadingSpecialties = false;
           _isLoadingDoctors = false;
           _isLoadingNews = false;
         });
@@ -151,22 +141,21 @@ class _HomeScreenState extends State<HomeScreen> {
                     ],
                   ),
                 ),
-                //  SPECIALTIES
-                SliverToBoxAdapter(
-                  child:
-                      _isLoadingSpecialties
+                Consumer<SpecialtyViewModel>(
+                  builder: (context, viewModel, child) {
+                    return SliverToBoxAdapter(
+                      child: viewModel.isLoading
                           ? const _SpecialtySkeletonList()
                           : SpecialtyList(
-                            specialties: List<Map<String, dynamic>>.from(
-                              _mockSpecialties,
-                            ),
-                            onTap:
-                                (specialty) => Navigator.pushNamed(
-                                  context,
-                                  '/doctor-list',
-                                  arguments: specialty,
-                                ),
-                          ),
+                        specialties: viewModel.specialties,
+                        onTap: (specialty) => Navigator.pushNamed(
+                          context,
+                          '/doctor-list',
+                          arguments: specialty,
+                        ),
+                      ),
+                    );
+                  },
                 ),
 
                 //  DOCTORS
@@ -197,7 +186,6 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                       );
                     }
-
                     // Lỗi
                     if (vm.isError && vm.posts.isEmpty) {
                       return SliverToBoxAdapter(
@@ -383,13 +371,13 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
 
           Container(
-            width: 50,
-            height: 50,
+            width: 55,
+            height: 55,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               color: Theme.of(context).colorScheme.primary,
               border: Border.all(
-                color: Theme.of(context).colorScheme.onBackground,
+                color: Colors.black,
                 width: 2,
               ),
               boxShadow: const [
@@ -399,7 +387,7 @@ class _HomeScreenState extends State<HomeScreen> {
             child: ClipOval(
               child:
                   user?.avatarURL != null && user!.avatarURL!.isNotEmpty
-                      ? Image.asset(user.avatarURL!, fit: BoxFit.cover)
+                      ? Image.network(user.avatarURL!, fit: BoxFit.cover)
                       : Image.asset(
                         'assets/images/avatar_doctor.jpg',
                         fit: BoxFit.cover,
