@@ -1,13 +1,13 @@
-
 import 'package:flutter/material.dart';
+import 'package:hld_flutter/models/responsemodel/doctor.dart';
 
 import '../../../../theme/app_colors.dart';
 import 'scale_button.dart';
 import 'section_header.dart';
 
 class DoctorList extends StatefulWidget {
-  final List<Map<String, dynamic>> doctors;
-  final void Function(Map<String, dynamic>) onTap;
+  final List<GetDoctorResponse> doctors;
+  final void Function(GetDoctorResponse) onTap;
 
   const DoctorList({required this.doctors, required this.onTap});
 
@@ -21,7 +21,7 @@ class DoctorListState extends State<DoctorList> {
   @override
   Widget build(BuildContext context) {
     final displayed =
-    _showAll ? widget.doctors : widget.doctors.take(6).toList();
+        _showAll ? widget.doctors : widget.doctors.take(6).toList();
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
@@ -31,9 +31,9 @@ class DoctorListState extends State<DoctorList> {
             title: 'Bác sĩ nổi bật',
             isExpanded: _showAll,
             onSeeAllClick:
-            widget.doctors.length > 6
-                ? () => setState(() => _showAll = !_showAll)
-                : null,
+                widget.doctors.length > 6
+                    ? () => setState(() => _showAll = !_showAll)
+                    : null,
           ),
           SizedBox(
             height: 190,
@@ -44,9 +44,9 @@ class DoctorListState extends State<DoctorList> {
               separatorBuilder: (_, __) => const SizedBox(width: 16),
               itemBuilder:
                   (_, i) => _DoctorItem(
-                doctor: displayed[i],
-                onTap: () => widget.onTap(displayed[i]),
-              ),
+                    doctor: displayed[i],
+                    onTap: () => widget.onTap,
+                  ),
             ),
           ),
         ],
@@ -56,15 +56,15 @@ class DoctorListState extends State<DoctorList> {
 }
 
 class _DoctorItem extends StatelessWidget {
-  final Map<String, dynamic> doctor;
+  final GetDoctorResponse doctor;
   final VoidCallback onTap;
 
   const _DoctorItem({required this.doctor, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
-    final avatarUrl = doctor['avatarURL'] ?? '';
-    final specialty = (doctor['specialty'] as Map?)?['name'] ?? '';
+    final avatarUrl = doctor.avatarURL ?? '';
+    final specialty = doctor.specialty.name ?? '';
 
     return ScaleButton(
       onTap: onTap,
@@ -103,15 +103,12 @@ class _DoctorItem extends StatelessWidget {
                 ],
               ),
               child: ClipOval(
-                child: Image.asset(
-                  doctor['avatarURL'] ?? '',
-                  fit: BoxFit.cover,
-                ),
+                child: Image.network(avatarUrl ?? '', fit: BoxFit.cover),
               ),
             ),
             const SizedBox(height: 12),
             Text(
-              doctor['name'] ?? '',
+              doctor.name ?? '',
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900),
               textAlign: TextAlign.center,
               maxLines: 1,
@@ -119,24 +116,17 @@ class _DoctorItem extends StatelessWidget {
             ),
             Text(
               specialty,
-              style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500,color:AppColors.lightTheme.withOpacity(0.8)),
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w500,
+                color: AppColors.amberCustom.withOpacity(0.8),
+              ),
               textAlign: TextAlign.center,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _defaultIcon(BuildContext context) {
-    return Container(
-      color: Theme.of(context).colorScheme.surfaceVariant,
-      child: Icon(
-        Icons.person,
-        size: 48,
-        color: Theme.of(context).colorScheme.primary,
       ),
     );
   }

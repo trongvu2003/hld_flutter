@@ -1,15 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:hld_flutter/repositories/auth_repository.dart';
+import 'package:hld_flutter/repositories/doctor_repository.dart';
 import 'package:hld_flutter/repositories/post_repository.dart';
 import 'package:hld_flutter/repositories/specialty_repository.dart';
 import 'package:hld_flutter/repositories/user_repository.dart';
 import 'package:hld_flutter/routes/app_pages.dart';
 import 'package:hld_flutter/services/auth_service.dart';
+import 'package:hld_flutter/services/doctor_service.dart';
 import 'package:hld_flutter/services/post_service.dart';
 import 'package:hld_flutter/services/specialty_service.dart';
 import 'package:hld_flutter/services/user_service.dart';
 import 'package:hld_flutter/viewmodels/auth_viewmodel.dart';
+import 'package:hld_flutter/viewmodels/doctor_viewmodel.dart';
 import 'package:hld_flutter/viewmodels/post_viewmodel.dart';
 import 'package:hld_flutter/viewmodels/specialty_viewmodel.dart';
 import 'package:hld_flutter/viewmodels/user_viewmodel.dart';
@@ -36,6 +39,10 @@ void main() async {
           create:
               (_) =>
                   SpecialtyViewModel(SpecialtyRepository(SpecialtyService())),
+        ),
+
+        ChangeNotifierProvider(
+          create: (_) => DoctorViewModel(DoctorRepository(DoctorService())),
         ),
       ],
       child: const MyApp(),

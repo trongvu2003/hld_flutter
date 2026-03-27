@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:hld_flutter/theme/app_colors.dart';
+import 'package:hld_flutter/viewmodels/doctor_viewmodel.dart';
 import 'package:hld_flutter/viewmodels/post_viewmodel.dart';
 import 'package:hld_flutter/views/user/home/widgets/ai_search_bar.dart';
 import 'package:provider/provider.dart';
@@ -22,39 +23,6 @@ const _mockNews = [
   {'id': '2', 'title': 'Phòng chống bệnh sốt xuất huyết mùa mưa'},
   {'id': '3', 'title': 'Chế độ dinh dưỡng cho người cao tuổi'},
   {'id': '4', 'title': 'Tầm quan trọng của giấc ngủ với sức khỏe'},
-];
-
-const _mockDoctors = [
-  {
-    'id': '1',
-    'name': 'BS. Trần Văn B',
-    'avatarURL': 'assets/images/avatar_doctor.jpg',
-    'specialty': {'name': 'Tim mạch'},
-  },
-  {
-    'id': '2',
-    'name': 'BS. Lê Thị C',
-    'avatarURL': 'assets/images/avatar_doctor.jpg',
-    'specialty': {'name': 'Nhi khoa'},
-  },
-  {
-    'id': '3',
-    'name': 'BS. Phạm Văn D',
-    'avatarURL': 'assets/images/avatar_doctor.jpg',
-    'specialty': {'name': 'Da liễu'},
-  },
-  {
-    'id': '4',
-    'name': 'BS. Hoàng Thị E',
-    'avatarURL': 'assets/images/avatar_doctor.jpg',
-    'specialty': {'name': 'Thần kinh'},
-  },
-  {
-    'id': '5',
-    'name': 'BS. Nguyễn Văn F',
-    'avatarURL': 'assets/images/avatar_doctor.jpg',
-    'specialty': {'name': 'Mắt'},
-  },
 ];
 
 class HomeScreen extends StatefulWidget {
@@ -81,6 +49,7 @@ class _HomeScreenState extends State<HomeScreen> {
       context.read<UserViewModel>().loadUser();
       context.read<PostViewModel>().fetchPosts();
       context.read<SpecialtyViewModel>().fetchSpecialties();
+      context.read<DoctorViewModel>().fetchDoctors();
     });
 
     // Simulate loading - xoá khi kết nối API
@@ -144,36 +113,40 @@ class _HomeScreenState extends State<HomeScreen> {
                 Consumer<SpecialtyViewModel>(
                   builder: (context, viewModel, child) {
                     return SliverToBoxAdapter(
-                      child: viewModel.isLoading
-                          ? const _SpecialtySkeletonList()
-                          : SpecialtyList(
-                        specialties: viewModel.specialties,
-                        onTap: (specialty) => Navigator.pushNamed(
-                          context,
-                          '/doctor-list',
-                          arguments: specialty,
-                        ),
-                      ),
+                      child:
+                          viewModel.isLoading
+                              ? const _SpecialtySkeletonList()
+                              : SpecialtyList(
+                                specialties: viewModel.specialties,
+                                onTap:
+                                    (specialty) => Navigator.pushNamed(
+                                      context,
+                                      '/doctor-list',
+                                      arguments: specialty,
+                                    ),
+                              ),
                     );
                   },
                 ),
 
                 //  DOCTORS
-                SliverToBoxAdapter(
-                  child:
-                      _isLoadingDoctors
-                          ? const _DoctorSkeletonList()
-                          : DoctorList(
-                            doctors: List<Map<String, dynamic>>.from(
-                              _mockDoctors,
-                            ),
-                            onTap:
-                                (doctor) => Navigator.pushNamed(
-                                  context,
-                                  '/doctor-screen',
-                                  arguments: doctor,
-                                ),
-                          ),
+                Consumer<DoctorViewModel>(
+                  builder: (context, viewModel, child) {
+                    return SliverToBoxAdapter(
+                      child:
+                          viewModel.isLoading
+                              ? const _DoctorSkeletonList()
+                              : DoctorList(
+                                doctors: viewModel.doctors,
+                                onTap:
+                                    (doctor) => Navigator.pushNamed(
+                                      context,
+                                      '/doctor-screen',
+                                      arguments: doctor,
+                                    ),
+                              ),
+                    );
+                  },
                 ),
                 //  POSTS
                 Consumer<PostViewModel>(
@@ -181,7 +154,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     if (vm.isLoading && vm.posts.isEmpty) {
                       return SliverList(
                         delegate: SliverChildBuilderDelegate(
-                              (context, index) => const _PostSkeleton(),
+                          (context, index) => const _PostSkeleton(),
                           childCount: 3,
                         ),
                       );
@@ -376,10 +349,7 @@ class _HomeScreenState extends State<HomeScreen> {
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               color: Theme.of(context).colorScheme.primary,
-              border: Border.all(
-                color: Colors.black,
-                width: 2,
-              ),
+              border: Border.all(color: Colors.black, width: 2),
               boxShadow: const [
                 BoxShadow(blurRadius: 8, color: Colors.black26),
               ],
@@ -549,7 +519,9 @@ class _PostSkeleton extends StatelessWidget {
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Theme.of(context).dividerColor.withOpacity(0.1)),
+        border: Border.all(
+          color: Theme.of(context).dividerColor.withOpacity(0.1),
+        ),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.03),
@@ -597,7 +569,7 @@ class _PostSkeleton extends StatelessWidget {
               Skeleton(width: 40, height: 20, radius: 4),
               Skeleton(width: 40, height: 20, radius: 4),
             ],
-          )
+          ),
         ],
       ),
     );
