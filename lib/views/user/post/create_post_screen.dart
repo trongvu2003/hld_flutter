@@ -1,7 +1,11 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:hld_flutter/theme/app_colors.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
+
+import '../../../viewmodels/user_viewmodel.dart';
 
 class ContainerPost {
   final String imageUrl;
@@ -32,16 +36,10 @@ class _CreatePostScreenState extends State<CreatePostScreen>
   List<XFile> _selectedMedia = [];
   bool _isLoading = false;
   bool _isUpdating = false;
-  bool _showEmptyDialog = false;
-
-  // Dummy user data – replace with real ViewModel
-  final String _userName = 'Nguyễn Văn A';
-  final String _avatarUrl =
-      'https://i.pravatar.cc/150?img=12';
-
   static const int _maxChars = 400;
 
   bool get _isEditMode => widget.postId != null;
+
   bool get _isPostEnabled =>
       _textController.text.trim().isNotEmpty || _selectedMedia.isNotEmpty;
 
@@ -51,13 +49,18 @@ class _CreatePostScreenState extends State<CreatePostScreen>
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      context.read<UserViewModel>().loadUser();
+    });
     _buttonAnimCtrl = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 200),
     );
-    _buttonScaleAnim = Tween<double>(begin: 0.95, end: 1.0).animate(
-      CurvedAnimation(parent: _buttonAnimCtrl, curve: Curves.easeOut),
-    );
+    _buttonScaleAnim = Tween<double>(
+      begin: 0.95,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _buttonAnimCtrl, curve: Curves.easeOut));
 
     _textController.addListener(() {
       setState(() {});
@@ -75,8 +78,6 @@ class _CreatePostScreenState extends State<CreatePostScreen>
     _buttonAnimCtrl.dispose();
     super.dispose();
   }
-
-  // ── Media Handling ─────────────────────────────────────────────────────────
 
   Future<void> _pickMedia() async {
     try {
@@ -99,8 +100,6 @@ class _CreatePostScreenState extends State<CreatePostScreen>
     if (!_isPostEnabled) _buttonAnimCtrl.reverse();
   }
 
-  // ── Validate & Post ────────────────────────────────────────────────────────
-
   void _validateAndPost() {
     final trimmed = _textController.text.trim();
     if (trimmed.isEmpty && _selectedMedia.isEmpty) {
@@ -115,74 +114,66 @@ class _CreatePostScreenState extends State<CreatePostScreen>
   }
 
   void _showEmptyContentDialog() {
-    showDialog(
-      context: context,
-      builder: (_) => const _EmptyContentDialog(),
-    );
+    showDialog(context: context, builder: (_) => const _EmptyContentDialog());
   }
 
   void _showSnack(String msg) {
-    ScaffoldMessenger.of(context)
-        .showSnackBar(SnackBar(content: Text(msg)));
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
   }
-
-  // ── Build ──────────────────────────────────────────────────────────────────
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final userViewModel= context.watch<UserViewModel>();
+    final user = userViewModel.user;
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle.dark,
       child: Scaffold(
         backgroundColor: theme.colorScheme.secondaryContainer,
         body: SafeArea(
-          child: _isLoading
-              ? const _LoadingOverlay()
-              : Column(
-            children: [
-              // ── Header ──────────────────────────────────────────
-              _Header(
-                isEditMode: _isEditMode,
-                isPostEnabled: _isPostEnabled,
-                buttonScaleAnim: _buttonScaleAnim,
-                onBack: () => Navigator.pop(context),
-                onPost: _validateAndPost,
-              ),
-
-              // ── Body ────────────────────────────────────────────
-              Expanded(
-                child: ListView(
-                  padding: EdgeInsets.zero,
-                  children: [
-                    _PostBody(
-                      avatarUrl: _avatarUrl,
-                      userName: _userName,
-                      controller: _textController,
-                      charCount: _textController.text.length,
-                      maxChars: _maxChars,
-                    ),
-                    if (_selectedMedia.isNotEmpty)
-                      _MediaPreviewList(
-                        media: _selectedMedia,
-                        onRemove: _removeMedia,
+          child:
+              _isLoading
+                  ? const _LoadingOverlay()
+                  : Column(
+                    children: [
+                      _Header(
+                        isEditMode: _isEditMode,
+                        isPostEnabled: _isPostEnabled,
+                        buttonScaleAnim: _buttonScaleAnim,
+                        onBack: () => Navigator.pop(context),
+                        onPost: _validateAndPost,
                       ),
-                    if (_isUpdating) const _LoadingOverlay(),
-                  ],
-                ),
-              ),
 
-              // ── Footer ──────────────────────────────────────────
-              _Footer(onTap: _pickMedia),
-            ],
-          ),
+                      // ── Body ────────────────────────────────────────────
+                      Expanded(
+                        child: ListView(
+                          padding: EdgeInsets.zero,
+                          children: [
+                            _PostBody(
+                              avatarUrl: user?.avatarURL ?? "",
+                              userName: user?.name ?? "",
+                              controller: _textController,
+                              charCount: _textController.text.length,
+                              maxChars: _maxChars,
+                            ),
+                            if (_selectedMedia.isNotEmpty)
+                              _MediaPreviewList(
+                                media: _selectedMedia,
+                                onRemove: _removeMedia,
+                              ),
+                            if (_isUpdating) const _LoadingOverlay(),
+                          ],
+                        ),
+                      ),
+                      _Footer(onTap: _pickMedia),
+                    ],
+                  ),
         ),
       ),
     );
   }
 }
-
-// ─── Header ──────────────────────────────────────────────────────────────────
 
 class _Header extends StatelessWidget {
   final bool isEditMode;
@@ -218,7 +209,7 @@ class _Header extends StatelessWidget {
                 onPressed: onBack,
                 icon: Icon(
                   Icons.arrow_back_ios_new_rounded,
-                  color: theme.colorScheme.onPrimaryContainer,
+                  color: Colors.black,
                   size: 22,
                 ),
               ),
@@ -228,10 +219,11 @@ class _Header extends StatelessWidget {
                 child: Text(
                   isEditMode ? 'Chỉnh sửa bài viết' : 'Tạo bài viết',
                   textAlign: TextAlign.center,
-                  style: theme.textTheme.titleLarge?.copyWith(
+                  style: TextStyle(
                     fontWeight: FontWeight.w800,
                     letterSpacing: 0.5,
-                    color: theme.colorScheme.onPrimaryContainer,
+                    fontSize: 25,
+                    color: AppColors.lightTheme,
                   ),
                 ),
               ),
@@ -244,22 +236,27 @@ class _Header extends StatelessWidget {
                   child: ElevatedButton(
                     onPressed: isPostEnabled ? onPost : null,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: isPostEnabled
-                          ? theme.colorScheme.primary
-                          : theme.colorScheme.surfaceVariant,
-                      foregroundColor: isPostEnabled
-                          ? theme.colorScheme.onPrimary
-                          : theme.colorScheme.onSurface.withOpacity(0.38),
+                      backgroundColor:
+                          isPostEnabled ? AppColors.lightTheme : Colors.grey,
+                      foregroundColor:
+                          isPostEnabled
+                              ? Colors.white
+                              : Colors.black.withOpacity(0.5),
                       elevation: isPostEnabled ? 4 : 0,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(16),
                       ),
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 20, vertical: 10),
+                        horizontal: 20,
+                        vertical: 10,
+                      ),
                     ),
                     child: Text(
                       isEditMode ? 'Lưu' : 'Đăng',
-                      style: const TextStyle(fontWeight: FontWeight.bold),
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
                     ),
                   ),
                 ),
@@ -271,8 +268,6 @@ class _Header extends StatelessWidget {
     );
   }
 }
-
-// ─── Post Body ────────────────────────────────────────────────────────────────
 
 class _PostBody extends StatefulWidget {
   final String avatarUrl;
@@ -300,10 +295,10 @@ class _PostBodyState extends State<_PostBody> {
   @override
   void initState() {
     super.initState();
-    _focusNode = FocusNode()
-      ..addListener(() {
-        setState(() => _isFocused = _focusNode.hasFocus);
-      });
+    _focusNode =
+        FocusNode()..addListener(() {
+          setState(() => _isFocused = _focusNode.hasFocus);
+        });
   }
 
   @override
@@ -356,30 +351,29 @@ class _PostBodyState extends State<_PostBody> {
               duration: const Duration(milliseconds: 300),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(12),
-                gradient: _isFocused
-                    ? LinearGradient(
-                  colors: [cs.primary, cs.secondary],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                )
-                    : null,
+                gradient:
+                    _isFocused
+                        ? LinearGradient(
+                          colors: [cs.primary, cs.secondary],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        )
+                        : null,
               ),
-              padding: _isFocused
-                  ? const EdgeInsets.all(2)
-                  : EdgeInsets.zero,
+              padding: _isFocused ? const EdgeInsets.all(2) : EdgeInsets.zero,
               child: Container(
                 decoration: BoxDecoration(
                   color: cs.surface,
-                  borderRadius: BorderRadius.circular(
-                      _isFocused ? 10 : 12),
+                  borderRadius: BorderRadius.circular(_isFocused ? 10 : 12),
                 ),
                 child: TextField(
                   controller: widget.controller,
                   focusNode: _focusNode,
                   maxLines: 12,
                   minLines: 5,
-                  style: theme.textTheme.bodyLarge
-                      ?.copyWith(color: cs.onSurface),
+                  style: theme.textTheme.bodyLarge?.copyWith(
+                    color: cs.onSurface,
+                  ),
                   inputFormatters: [
                     LengthLimitingTextInputFormatter(widget.maxChars),
                   ],
@@ -397,14 +391,15 @@ class _PostBodyState extends State<_PostBody> {
 
             // Character counter
             Padding(
-              padding:
-              const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               child: Align(
                 alignment: Alignment.centerRight,
                 child: AnimatedContainer(
                   duration: const Duration(milliseconds: 300),
-                  padding:
-                  const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
                     color: _counterColor(context).withOpacity(0.1),
                     borderRadius: BorderRadius.circular(8),
@@ -443,10 +438,7 @@ class _GradientAvatar extends StatelessWidget {
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         gradient: LinearGradient(
-          colors: [
-            cs.primary.withOpacity(0.5),
-            cs.secondary.withOpacity(0.5),
-          ],
+          colors: [cs.primary.withOpacity(0.5), cs.secondary.withOpacity(0.5)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -477,10 +469,8 @@ class _MediaPreviewList extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         itemCount: media.length,
         separatorBuilder: (_, __) => const SizedBox(width: 12),
-        itemBuilder: (_, i) => _MediaCard(
-          file: media[i],
-          onRemove: () => onRemove(i),
-        ),
+        itemBuilder:
+            (_, i) => _MediaCard(file: media[i], onRemove: () => onRemove(i)),
       ),
     );
   }
@@ -536,8 +526,9 @@ class _MediaCardState extends State<_MediaCard>
         width: 180,
         height: 180,
         child: Card(
-          shape:
-          RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
           elevation: 8,
           clipBehavior: Clip.antiAlias,
           child: Stack(
@@ -547,11 +538,14 @@ class _MediaCardState extends State<_MediaCard>
               Image.file(
                 File(widget.file.path),
                 fit: BoxFit.cover,
-                errorBuilder: (_, __, ___) => Container(
-                  color: theme.colorScheme.surfaceVariant,
-                  child: Icon(Icons.broken_image_rounded,
-                      color: theme.colorScheme.onSurfaceVariant),
-                ),
+                errorBuilder:
+                    (_, __, ___) => Container(
+                      color: theme.colorScheme.surfaceVariant,
+                      child: Icon(
+                        Icons.broken_image_rounded,
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                    ),
               ),
 
               // Gradient overlay for video
@@ -594,14 +588,13 @@ class _MediaCardState extends State<_MediaCard>
                     width: 32,
                     height: 32,
                     decoration: BoxDecoration(
-                      color: theme.colorScheme.errorContainer
-                          .withOpacity(0.9),
+                      color: theme.colorScheme.errorContainer.withOpacity(0.9),
                       shape: BoxShape.circle,
                       boxShadow: [
                         BoxShadow(
                           color: Colors.black.withOpacity(0.2),
                           blurRadius: 4,
-                        )
+                        ),
                       ],
                     ),
                     child: Icon(
@@ -619,8 +612,6 @@ class _MediaCardState extends State<_MediaCard>
     );
   }
 }
-
-// ─── Footer ───────────────────────────────────────────────────────────────────
 
 class _Footer extends StatelessWidget {
   final VoidCallback onTap;
@@ -642,7 +633,7 @@ class _Footer extends StatelessWidget {
           child: Column(
             children: [
               Container(
-                width: 72,
+                width: double.infinity,
                 height: 72,
                 decoration: BoxDecoration(
                   color: cs.primaryContainer,
@@ -691,10 +682,7 @@ class _LoadingOverlay extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              CircularProgressIndicator(
-                color: cs.primary,
-                strokeWidth: 4,
-              ),
+              CircularProgressIndicator(color: cs.primary, strokeWidth: 4),
               const SizedBox(height: 16),
               Text(
                 'Đang xử lý...',
@@ -733,26 +721,21 @@ class _EmptyContentDialog extends StatelessWidget {
       ),
       content: Text(
         'Vui lòng nhập nội dung hoặc chọn ít nhất một hình ảnh để đăng bài.',
-        style: theme.textTheme.bodyMedium?.copyWith(
-          color: cs.onSurfaceVariant,
-        ),
+        style: theme.textTheme.bodyMedium?.copyWith(color: cs.onSurfaceVariant),
       ),
       actions: [
         ElevatedButton(
           onPressed: () => Navigator.pop(context),
           style: ElevatedButton.styleFrom(
             backgroundColor: cs.primary,
-            shape:
-            RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-            padding:
-            const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
           ),
           child: Text(
             'Đã hiểu',
-            style: TextStyle(
-              fontWeight: FontWeight.w600,
-              color: cs.onPrimary,
-            ),
+            style: TextStyle(fontWeight: FontWeight.w600, color: cs.onPrimary),
           ),
         ),
       ],

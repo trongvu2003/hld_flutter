@@ -35,9 +35,6 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   final _scrollController = ScrollController();
   bool _showBackToTop = false;
-
-  // Mock loading states - thay bằng ViewModel sau
-  bool _isLoadingDoctors = true;
   bool _isLoadingNews = true;
 
   @override
@@ -56,7 +53,6 @@ class _HomeScreenState extends State<HomeScreen> {
     Future.delayed(const Duration(seconds: 1), () {
       if (mounted) {
         setState(() {
-          _isLoadingDoctors = false;
           _isLoadingNews = false;
         });
       }
