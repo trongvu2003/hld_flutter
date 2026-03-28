@@ -36,7 +36,6 @@ class _FootBarState extends State<FootBar> with SingleTickerProviderStateMixin {
     super.dispose();
   }
 
-
   @override
   Widget build(BuildContext context) {
     return SizedBox(
@@ -105,7 +104,9 @@ class _FootBarState extends State<FootBar> with SingleTickerProviderStateMixin {
             top: 0, // nhô lên trên bar 20dp - tương đương offset(y=-20)
             child: _RotatingFab(
               rotateCtrl: _rotateCtrl,
-              onTap: widget.onCreatePost ?? () {},
+              onTap: () {
+                Navigator.pushNamed(context, '/createpost');
+              },
             ),
           ),
         ],
@@ -130,7 +131,6 @@ class _TabItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Tương đương animateColorAsState backgroundColor
-    // Tương đương animateFloatAsState offsetY + alpha
     return GestureDetector(
       onTap: onTap,
       child: AnimatedContainer(
@@ -138,10 +138,7 @@ class _TabItem extends StatelessWidget {
         curve: Curves.fastOutSlowIn,
         padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 12),
         decoration: BoxDecoration(
-          color:
-              isSelected
-                  ? AppColors.lightTheme
-                  : Colors.transparent,
+          color: isSelected ? AppColors.lightTheme : Colors.transparent,
           borderRadius: BorderRadius.circular(100),
         ),
         child: Column(

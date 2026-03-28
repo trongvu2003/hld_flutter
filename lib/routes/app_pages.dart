@@ -3,6 +3,7 @@ import 'package:hld_flutter/views/auth/intro1_screen.dart';
 import 'package:hld_flutter/views/auth/start_screen.dart';
 import 'package:hld_flutter/views/user/home/home_screen.dart';
 import 'package:hld_flutter/views/user/main_screen.dart';
+import 'package:hld_flutter/views/user/post/create_post_screen.dart';
 import '../views/auth/signin_screen.dart';
 import '../views/auth/signup_screen.dart';
 import 'app_routes.dart';
@@ -17,5 +18,6 @@ class AppPages {
     AppRoutes.signup:(context)=>const SignupScreen(),
     AppRoutes.home:(context)=>const HomeScreen(),
     AppRoutes.main:(context)=>const MainScreen(),
+    AppRoutes.createpost:(context)=> const CreatePostScreen()
   };
 }

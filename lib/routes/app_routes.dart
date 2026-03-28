@@ -8,4 +8,5 @@ class AppRoutes {
   static const profile = '/profile';
   static const splash = '/';
   static const main = '/main';
+  static const createpost = '/createpost';
 }
