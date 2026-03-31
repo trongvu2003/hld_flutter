@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hld_flutter/theme/app_colors.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
-
 import '../../../viewmodels/user_viewmodel.dart';
 
 class ContainerPost {
@@ -53,6 +53,7 @@ class _CreatePostScreenState extends State<CreatePostScreen>
       if (!mounted) return;
       context.read<UserViewModel>().loadUser();
     });
+    
     _buttonAnimCtrl = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 200),
@@ -81,7 +82,23 @@ class _CreatePostScreenState extends State<CreatePostScreen>
 
   Future<void> _pickMedia() async {
     try {
-      final List<XFile> picked = await _picker.pickMultipleMedia(limit: 10);
+      // Xin quyền
+      PermissionStatus status;
+
+      if (Platform.isAndroid) {
+        status = await Permission.photos.request();
+      } else {
+        status = await Permission.photos.request();
+      }
+
+      if (!status.isGranted) {
+        _showSnack('Bạn cần cấp quyền truy cập ảnh');
+        return;
+      }
+
+      // Chỉ mở thư viện (KHÔNG phải Google Drive)
+      final List<XFile> picked = await _picker.pickMultiImage();
+
       if (picked.isNotEmpty) {
         setState(() {
           _selectedMedia = [..._selectedMedia, ...picked];
@@ -145,7 +162,7 @@ class _CreatePostScreenState extends State<CreatePostScreen>
                         onPost: _validateAndPost,
                       ),
 
-                      // ── Body ────────────────────────────────────────────
+                      //Body
                       Expanded(
                         child: ListView(
                           padding: EdgeInsets.zero,
@@ -197,7 +214,7 @@ class _Header extends StatelessWidget {
     return Material(
       elevation: 8,
       shadowColor: theme.colorScheme.shadow.withOpacity(0.2),
-      color: theme.colorScheme.primaryContainer,
+      color: AppColors.lightTheme,
       child: SizedBox(
         height: 64,
         child: Padding(
@@ -223,7 +240,7 @@ class _Header extends StatelessWidget {
                     fontWeight: FontWeight.w800,
                     letterSpacing: 0.5,
                     fontSize: 25,
-                    color: AppColors.lightTheme,
+                    color: Colors.black,
                   ),
                 ),
               ),
@@ -240,8 +257,8 @@ class _Header extends StatelessWidget {
                           isPostEnabled ? AppColors.lightTheme : Colors.grey,
                       foregroundColor:
                           isPostEnabled
-                              ? Colors.white
-                              : Colors.black.withOpacity(0.5),
+                              ? Colors.black
+                              : Colors.grey.withOpacity(0.5),
                       elevation: isPostEnabled ? 4 : 0,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(16),

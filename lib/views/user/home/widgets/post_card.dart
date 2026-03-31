@@ -1,7 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:hld_flutter/views/user/home/widgets/video_thumbnail_only.dart';
-
 import '../../../../theme/app_colors.dart';
 
 class PostCard extends StatelessWidget {
@@ -32,11 +31,13 @@ class PostCard extends StatelessWidget {
       child: Card(
         elevation: 2,
         borderOnForeground: true,
+        // Cần thêm clipBehavior để ảnh media không đè lên góc bo tròn của Card
+        clipBehavior: Clip.hardEdge,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
           side: BorderSide(
-            color: AppColors.lightTheme.withOpacity(0.8), // màu viền
-            width: 1, // độ dày viền
+            color: AppColors.lightTheme.withOpacity(0.8),
+            width: 1,
           ),
         ),
         child: Column(
@@ -69,15 +70,18 @@ class PostCard extends StatelessWidget {
                       children: [
                         Text(
                           userInfo['name'] ?? 'Người dùng',
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
                         Text(
                           formatTime(post['createdAt']),
-                          style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                            color: Theme.of(context).colorScheme.onSurfaceVariant,
+                          style: Theme.of(
+                            context,
+                          ).textTheme.labelSmall?.copyWith(
+                            color:
+                                Theme.of(context).colorScheme.onSurfaceVariant,
                           ),
                         ),
                       ],
@@ -114,17 +118,15 @@ class PostCard extends StatelessWidget {
             // Content
             if ((post['content'] ?? '').isNotEmpty)
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 12),
+                padding: const EdgeInsets.fromLTRB(12, 0, 12, 8),
                 child: Text(post['content']),
               ),
 
-            // Media (Hỗ trợ cả Ảnh và Video)
+            // Media Grid (Hỗ trợ nhiều Ảnh và Video)
             if (images.isNotEmpty) ...[
-              const SizedBox(height: 8),
-              Container(
+              SizedBox(
                 width: double.infinity,
-                // Lấy link media đầu tiên
-                child: _buildMediaItem(images.first.toString(), context),
+                child: _buildMediaGrid(images, context),
               ),
             ],
 
@@ -173,26 +175,146 @@ class PostCard extends StatelessWidget {
     );
   }
 
-  Widget _buildMediaItem(String url, BuildContext context) {
+  // Bố cục lưới động tùy theo số lượng media
+  Widget _buildMediaGrid(List images, BuildContext context) {
+    int count = images.length;
+
+    // 1 hình: Full width
+    if (count == 1) {
+      return SizedBox(
+        height: 250,
+        child: _buildMediaItem(images[0].toString(), context),
+      );
+    }
+
+    // 2 hình: Chia đôi chiều ngang
+    if (count == 2) {
+      return SizedBox(
+        height: 250,
+        child: Row(
+          children: [
+            Expanded(child: _buildMediaItem(images[0].toString(), context)),
+            const SizedBox(width: 2),
+            Expanded(child: _buildMediaItem(images[1].toString(), context)),
+          ],
+        ),
+      );
+    }
+
+    // 3 hình: 1 hình lớn bên trái, 2 hình nhỏ bên phải
+    if (count == 3) {
+      return SizedBox(
+        height: 250,
+        child: Row(
+          children: [
+            Expanded(child: _buildMediaItem(images[0].toString(), context)),
+            const SizedBox(width: 2),
+            Expanded(
+              child: Column(
+                children: [
+                  Expanded(
+                    child: _buildMediaItem(images[1].toString(), context),
+                  ),
+                  const SizedBox(height: 2),
+                  Expanded(
+                    child: _buildMediaItem(images[2].toString(), context),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    // 4 hình trở lên: Lưới 2x2. Nếu > 4 thì ô cuối hiện lớp phủ +N
+    return SizedBox(
+      height: 300,
+      child: Column(
+        children: [
+          Expanded(
+            child: Row(
+              children: [
+                Expanded(child: _buildMediaItem(images[0].toString(), context)),
+                const SizedBox(width: 2),
+                Expanded(child: _buildMediaItem(images[1].toString(), context)),
+              ],
+            ),
+          ),
+          const SizedBox(height: 2),
+          Expanded(
+            child: Row(
+              children: [
+                Expanded(child: _buildMediaItem(images[2].toString(), context)),
+                const SizedBox(width: 2),
+                Expanded(
+                  child: _buildMediaItem(
+                    images[3].toString(),
+                    context,
+                    remainingCount: count > 4 ? count - 4 : 0,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Render từng item, có hỗ trợ lớp phủ +N cho hình cuối
+  Widget _buildMediaItem(
+    String url,
+    BuildContext context, {
+    int remainingCount = 0,
+  }) {
     bool isVideo(String url) {
       final u = url.toLowerCase();
       return u.endsWith('.mp4') || u.endsWith('.mov') || u.endsWith('.avi');
     }
 
+    Widget mediaWidget;
+
     if (isVideo(url)) {
-      return VideoThumbnailOnly(videoUrl: url);
+      mediaWidget = SizedBox.expand(child: VideoThumbnailOnly(videoUrl: url));
+    } else {
+      mediaWidget = CachedNetworkImage(
+        imageUrl: url,
+        fit: BoxFit.cover,
+        width: double.infinity,
+        height: double.infinity,
+        errorWidget:
+            (_, __, ___) => Container(
+              color: Theme.of(context).colorScheme.secondaryContainer,
+              child: const Icon(Icons.broken_image),
+            ),
+      );
     }
 
-    return CachedNetworkImage(
-      imageUrl: url,
-      fit: BoxFit.cover,
-      errorWidget:
-          (_, __, ___) => Container(
-            height: 200,
-            color: Theme.of(context).colorScheme.secondaryContainer,
-            child: const Icon(Icons.broken_image),
+    // Lớp phủ tối màu hiển thị số lượng hình bị ẩn
+    if (remainingCount > 0) {
+      return Stack(
+        fit: StackFit.expand,
+        children: [
+          mediaWidget,
+          Container(
+            color: Colors.black.withOpacity(0.5),
+            child: Center(
+              child: Text(
+                '+$remainingCount',
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 28,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
           ),
-    );
+        ],
+      );
+    }
+
+    return mediaWidget;
   }
 }
 
