@@ -91,7 +91,7 @@ class _DoctorItem extends StatelessWidget {
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 border: Border.all(
-                  color: Theme.of(context).colorScheme.primary,
+                  color: AppColors.lightTheme,
                   width: 2,
                 ),
                 boxShadow: const [
@@ -103,7 +103,16 @@ class _DoctorItem extends StatelessWidget {
                 ],
               ),
               child: ClipOval(
-                child: Image.network(avatarUrl ?? '', fit: BoxFit.cover),
+                child: Image.network(
+                  avatarUrl ?? '',
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) {
+                    return Image.asset(
+                      'assets/images/avatar_doctor.jpg',
+                      fit: BoxFit.cover,
+                    );
+                  },
+                ),
               ),
             ),
             const SizedBox(height: 12),
@@ -119,7 +128,7 @@ class _DoctorItem extends StatelessWidget {
               style: TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w500,
-                color: AppColors.amberCustom.withOpacity(0.8),
+                color: AppColors.lightTheme.withOpacity(0.8),
               ),
               textAlign: TextAlign.center,
               maxLines: 1,

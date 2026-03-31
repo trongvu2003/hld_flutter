@@ -2,6 +2,8 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:hld_flutter/views/user/home/widgets/video_thumbnail_only.dart';
 
+import '../../../../theme/app_colors.dart';
+
 class PostCard extends StatelessWidget {
   final Map<String, dynamic> post;
   final String currentUserId;
@@ -26,124 +28,147 @@ class PostCard extends StatelessWidget {
 
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 4),
-      color: Theme.of(context).colorScheme.surface,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(12, 12, 4, 8),
-            child: Row(
-              children: [
-                ClipOval(
-                  child: SizedBox(
-                    width: 45,
-                    height: 45,
-                    child:
-                        avatar != null
-                            ? CachedNetworkImage(
-                              imageUrl: avatar,
-                              fit: BoxFit.cover,
-                            )
-                            : Image.asset(
-                              'assets/images/default_avatar.png',
-                              fit: BoxFit.cover,
-                            ),
-                  ),
-                ),
-                const SizedBox(width: 10),
-
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        userInfo['name'] ?? 'Người dùng',
-                        style: TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      Text(
-                        formatTime(post['createdAt']),
-                        style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                          color: Theme.of(context).colorScheme.onSurfaceVariant,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                PopupMenuButton<String>(
-                  onSelected: (v) {
-                    if (v == 'report') onReport();
-                    if (v == 'delete') onDelete();
-                  },
-                  itemBuilder:
-                      (_) =>
-                          isOwner
-                              ? [
-                                const PopupMenuItem(
-                                  value: 'delete',
-                                  child: Text(
-                                    'Xoá',
-                                    style: TextStyle(color: Colors.red),
-                                  ),
-                                ),
-                              ]
-                              : [
-                                const PopupMenuItem(
-                                  value: 'report',
-                                  child: Text('Báo cáo'),
-                                ),
-                              ],
-                ),
-              ],
-            ),
+      color: Colors.white,
+      child: Card(
+        elevation: 2,
+        borderOnForeground: true,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+          side: BorderSide(
+            color: AppColors.lightTheme.withOpacity(0.8), // màu viền
+            width: 1, // độ dày viền
           ),
-
-          // Content
-          if ((post['content'] ?? '').isNotEmpty)
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12),
-              child: Text(post['content']),
+              padding: const EdgeInsets.fromLTRB(12, 12, 4, 8),
+              child: Row(
+                children: [
+                  ClipOval(
+                    child: SizedBox(
+                      width: 45,
+                      height: 45,
+                      child:
+                          avatar != null
+                              ? CachedNetworkImage(
+                                imageUrl: avatar,
+                                fit: BoxFit.cover,
+                              )
+                              : Image.asset(
+                                'assets/images/avatar_doctor.jpg',
+                                fit: BoxFit.cover,
+                              ),
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          userInfo['name'] ?? 'Người dùng',
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        Text(
+                          formatTime(post['createdAt']),
+                          style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                            color: Theme.of(context).colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  PopupMenuButton<String>(
+                    onSelected: (v) {
+                      if (v == 'report') onReport();
+                      if (v == 'delete') onDelete();
+                    },
+                    itemBuilder:
+                        (_) =>
+                            isOwner
+                                ? [
+                                  const PopupMenuItem(
+                                    value: 'delete',
+                                    child: Text(
+                                      'Xoá',
+                                      style: TextStyle(color: Colors.red),
+                                    ),
+                                  ),
+                                ]
+                                : [
+                                  const PopupMenuItem(
+                                    value: 'report',
+                                    child: Text('Báo cáo'),
+                                  ),
+                                ],
+                  ),
+                ],
+              ),
             ),
 
-          // Media (Hỗ trợ cả Ảnh và Video)
-          if (images.isNotEmpty) ...[
-            const SizedBox(height: 8),
-            Container(
-              width: double.infinity,
-              // Lấy link media đầu tiên
-              child: _buildMediaItem(images.first.toString(), context),
+            // Content
+            if ((post['content'] ?? '').isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                child: Text(post['content']),
+              ),
+
+            // Media (Hỗ trợ cả Ảnh và Video)
+            if (images.isNotEmpty) ...[
+              const SizedBox(height: 8),
+              Container(
+                width: double.infinity,
+                // Lấy link media đầu tiên
+                child: _buildMediaItem(images.first.toString(), context),
+              ),
+            ],
+
+            // Actions
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        IconButton(
+                          onPressed: () {},
+                          icon: const Icon(Icons.favorite_border),
+                          iconSize: 30,
+                        ),
+                        Text('${post['likesCount'] ?? 0}'),
+                      ],
+                    ),
+                  ),
+                  Expanded(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        IconButton(
+                          onPressed: onNavigateToDetail,
+                          icon: const Icon(Icons.comment_outlined),
+                          iconSize: 30,
+                        ),
+                        Text('${post['commentsCount'] ?? 0}'),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            Divider(
+              height: 1,
+              color: Theme.of(context).colorScheme.outlineVariant,
             ),
           ],
-
-          // Actions
-          Padding(
-            padding: const EdgeInsets.fromLTRB(4, 4, 4, 4),
-            child: Row(
-              children: [
-                IconButton(
-                  onPressed: () {},
-                  icon: const Icon(Icons.favorite_border),
-                  iconSize: 22,
-                ),
-                Text('${post['likesCount'] ?? 0}'),
-                const SizedBox(width: 8),
-                IconButton(
-                  onPressed: onNavigateToDetail,
-                  icon: const Icon(Icons.comment_outlined),
-                  iconSize: 22,
-                ),
-                Text('${post['commentsCount'] ?? 0}'),
-              ],
-            ),
-          ),
-
-          Divider(
-            height: 1,
-            color: Theme.of(context).colorScheme.outlineVariant,
-          ),
-        ],
+        ),
       ),
     );
   }

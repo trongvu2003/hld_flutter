@@ -37,7 +37,7 @@ class SectionHeader extends StatelessWidget {
                   vertical: 6,
                 ),
                 decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.primaryContainer,
+                  color: AppColors.lightTheme,
                   borderRadius: BorderRadius.circular(20),
                   boxShadow: const [
                     BoxShadow(blurRadius: 4, color: Colors.black12),

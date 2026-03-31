@@ -26,7 +26,7 @@ class IntroScreen extends StatelessWidget {
                   const SizedBox(height: 8),
 
                   Text(
-                    'ĐẾN VỚI HEALTHMATE',
+                    'ĐẾN VỚI HELLODOC',
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       letterSpacing: 1,
