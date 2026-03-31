@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
-
 class Skeleton extends StatefulWidget {
   final double width;
   final double height;
   final double radius;
 
-  const Skeleton({required this.width, required this.height, this.radius = 0});
+  const Skeleton({
+    super.key,
+    required this.width,
+    required this.height,
+    this.radius = 0,
+  });
 
   @override
   State<Skeleton> createState() => SkeletonState();
@@ -21,9 +25,12 @@ class SkeletonState extends State<Skeleton>
     super.initState();
     _ctrl = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 900),
-    )..repeat(reverse: true);
-    _anim = Tween(begin: 0.4, end: 1.0).animate(_ctrl);
+      duration: const Duration(milliseconds: 1200),
+    )..repeat();
+    _anim = CurvedAnimation(
+      parent: _ctrl,
+      curve: Curves.easeInOutSine,
+    );
   }
 
   @override
@@ -34,16 +41,29 @@ class SkeletonState extends State<Skeleton>
 
   @override
   Widget build(BuildContext context) {
-    return FadeTransition(
-      opacity: _anim,
-      child: Container(
-        width: widget.width == double.infinity ? null : widget.width,
-        height: widget.height,
-        decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.secondaryContainer,
-          borderRadius: BorderRadius.circular(widget.radius),
-        ),
-      ),
+    final baseColor = Theme.of(context).colorScheme.surfaceContainerHighest.withOpacity(0.6);
+    final highlightColor = Theme.of(context).colorScheme.surface;
+    return AnimatedBuilder(
+      animation: _anim,
+      builder: (context, child) {
+        return Container(
+          width: widget.width == double.infinity ? double.infinity : widget.width,
+          height: widget.height,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(widget.radius),
+            gradient: LinearGradient(
+              begin: Alignment(-2.0 + (_anim.value * 4), 0),
+              end: Alignment(-1.0 + (_anim.value * 4), 0),
+              colors: [
+                baseColor,
+                highlightColor, // Vệt sáng nằm ở giữa
+                baseColor,
+              ],
+              stops: const [0.1, 0.5, 0.9],
+            ),
+          ),
+        );
+      },
     );
   }
 }

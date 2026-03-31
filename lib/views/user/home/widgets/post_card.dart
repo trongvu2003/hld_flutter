@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:hld_flutter/views/user/home/widgets/video_thumbnail_only.dart';
 import 'package:intl/intl.dart';
 import '../../../../theme/app_colors.dart';
+import '../../../skeleton/skeleton_box.dart';
+
 
 class PostCard extends StatelessWidget {
   final Map<String, dynamic> post;
@@ -57,6 +59,17 @@ class PostCard extends StatelessWidget {
                               ? CachedNetworkImage(
                                 imageUrl: avatar,
                                 fit: BoxFit.cover,
+                                placeholder:
+                                    (context, url) => const Skeleton(
+                                      width: 45,
+                                      height: 45,
+                                      radius: 22.5,
+                                    ),
+                                errorWidget:
+                                    (context, url, error) => Image.asset(
+                                      'assets/images/avatar_doctor.jpg',
+                                      fit: BoxFit.cover,
+                                    ),
                               )
                               : Image.asset(
                                 'assets/images/avatar_doctor.jpg',
@@ -176,11 +189,9 @@ class PostCard extends StatelessWidget {
     );
   }
 
-  // Bố cục lưới động tùy theo số lượng media
   Widget _buildMediaGrid(List images, BuildContext context) {
     int count = images.length;
 
-    // 1 hình: Full width
     if (count == 1) {
       return SizedBox(
         height: 250,
@@ -188,7 +199,6 @@ class PostCard extends StatelessWidget {
       );
     }
 
-    // 2 hình: Chia đôi chiều ngang
     if (count == 2) {
       return SizedBox(
         height: 250,
@@ -202,7 +212,6 @@ class PostCard extends StatelessWidget {
       );
     }
 
-    // 3 hình: 1 hình lớn bên trái, 2 hình nhỏ bên phải
     if (count == 3) {
       return SizedBox(
         height: 250,
@@ -227,8 +236,6 @@ class PostCard extends StatelessWidget {
         ),
       );
     }
-
-    // 4 hình trở lên: Lưới 2x2. Nếu > 4 thì ô cuối hiện lớp phủ +N
     return SizedBox(
       height: 300,
       child: Column(
@@ -262,8 +269,6 @@ class PostCard extends StatelessWidget {
       ),
     );
   }
-
-  // Render từng item, có hỗ trợ lớp phủ +N cho hình cuối
   Widget _buildMediaItem(
     String url,
     BuildContext context, {
@@ -284,6 +289,14 @@ class PostCard extends StatelessWidget {
         fit: BoxFit.cover,
         width: double.infinity,
         height: double.infinity,
+        // 2. SKELETON CHO HÌNH ẢNH TRONG LƯỚI MEDIA:
+        placeholder:
+            (context, url) => const Skeleton(
+              width: double.infinity,
+              height: double.infinity,
+              radius:
+                  0, // Card đã có thuộc tính clipBehavior nên ảnh sẽ tự bo góc theo Card, không cần bo ở đây
+            ),
         errorWidget:
             (_, __, ___) => Container(
               color: Theme.of(context).colorScheme.secondaryContainer,
@@ -292,7 +305,6 @@ class PostCard extends StatelessWidget {
       );
     }
 
-    // Lớp phủ tối màu hiển thị số lượng hình bị ẩn
     if (remainingCount > 0) {
       return Stack(
         fit: StackFit.expand,
@@ -318,12 +330,12 @@ class PostCard extends StatelessWidget {
     return mediaWidget;
   }
 }
+
 String formatTime(String? dateStr) {
   if (dateStr == null || dateStr.isEmpty) return '';
 
   final parsedDate = DateTime.tryParse(dateStr);
   if (parsedDate == null) return '';
 
-  // BỎ .toLocal() đi vì Backend đã trả về giờ VN sẵn rồi
   return DateFormat('dd/MM/yyyy HH:mm').format(parsedDate);
 }

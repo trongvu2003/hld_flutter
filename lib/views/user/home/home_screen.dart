@@ -547,10 +547,12 @@ class _PostSkeleton extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header: Avatar & Info
           Row(
             children: [
-              Skeleton(width: 45, height: 45, radius: 25), // Avatar
+              // Sử dụng ClipOval bọc ngoài Skeleton để tạo hình tròn hoàn hảo cho Avatar
+              ClipOval(
+                child: Skeleton(width: 45, height: 45, radius: 22.5),
+              ),
               const SizedBox(width: 12),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -564,6 +566,7 @@ class _PostSkeleton extends StatelessWidget {
           ),
           const SizedBox(height: 16),
 
+          // Content text placeholders (Bo góc nhẹ)
           Skeleton(width: double.infinity, height: 14, radius: 4),
           const SizedBox(height: 6),
           Skeleton(width: double.infinity, height: 14, radius: 4),
@@ -571,11 +574,8 @@ class _PostSkeleton extends StatelessWidget {
           Skeleton(width: 200, height: 14, radius: 4),
           const SizedBox(height: 16),
 
-          // Media Box (Ảnh bài viết)
-          Skeleton(width: double.infinity, height: 200, radius: 10),
+          Skeleton(width: double.infinity, height: 200, radius: 12),
           const SizedBox(height: 16),
-
-          // Footer Actions (Like, Comment, Share)
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
+import '../../../skeleton/skeleton_box.dart';
+
 
 class VideoThumbnailOnly extends StatefulWidget {
   final String videoUrl;
@@ -52,14 +54,17 @@ class _VideoThumbnailOnlyState extends State<VideoThumbnailOnly>
 
   @override
   Widget build(BuildContext context) {
+    // 1. Nếu có lỗi mạng/link hỏng
     if (_hasError) {
       return _ErrorPlaceholder();
     }
 
+    // 2. Nếu đang tải (Kế thừa xài luôn class Skeleton xịn của bác)
     if (!_isInitialized) {
-      return _ShimmerPlaceholder();
+      return const Skeleton(width: double.infinity, height: 220, radius: 0);
     }
 
+    // 3. Đã tải xong, chạy video
     final ratio = _controller.value.aspectRatio;
     final maxHeight = ratio < 1 ? 400.0 : 260.0;
 
@@ -128,61 +133,6 @@ class _PlayButton extends StatelessWidget {
     );
   }
 }
-
-// --- Shimmer loading placeholder ---
-class _ShimmerPlaceholder extends StatefulWidget {
-  @override
-  State<_ShimmerPlaceholder> createState() => _ShimmerPlaceholderState();
-}
-
-class _ShimmerPlaceholderState extends State<_ShimmerPlaceholder>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _shimmerController;
-  late Animation<double> _shimmerAnimation;
-
-  @override
-  void initState() {
-    super.initState();
-    _shimmerController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 1200),
-    )..repeat();
-    _shimmerAnimation = CurvedAnimation(
-      parent: _shimmerController,
-      curve: Curves.easeInOut,
-    );
-  }
-
-  @override
-  void dispose() {
-    _shimmerController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final base = Theme.of(context).colorScheme.surfaceContainerHighest;
-    final highlight = Theme.of(context).colorScheme.surface;
-
-    return AnimatedBuilder(
-      animation: _shimmerAnimation,
-      builder: (_, __) {
-        return Container(
-          width: double.infinity,
-          height: 220,
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment(-1.5 + _shimmerAnimation.value * 3, 0),
-              end: Alignment(-0.5 + _shimmerAnimation.value * 3, 0),
-              colors: [base, highlight, base],
-            ),
-          ),
-        );
-      },
-    );
-  }
-}
-
 
 class _ErrorPlaceholder extends StatelessWidget {
   @override
