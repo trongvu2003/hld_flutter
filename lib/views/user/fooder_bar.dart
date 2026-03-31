@@ -1,6 +1,11 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:hld_flutter/theme/app_colors.dart';
+import 'package:provider/provider.dart';
+
+import '../../routes/app_routes.dart';
+import '../../viewmodels/post_viewmodel.dart';
+import '../../viewmodels/user_viewmodel.dart';
 
 class FootBar extends StatefulWidget {
   final int currentIndex;
@@ -38,6 +43,7 @@ class _FootBarState extends State<FootBar> with SingleTickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+    final user = context.read<UserViewModel>().user;
     return SizedBox(
       height: 100, // thêm space cho FAB nhô lên
       child: Stack(
@@ -105,7 +111,17 @@ class _FootBarState extends State<FootBar> with SingleTickerProviderStateMixin {
             child: _RotatingFab(
               rotateCtrl: _rotateCtrl,
               onTap: () {
-                Navigator.pushNamed(context, '/createpost');
+                Navigator.pushNamed(
+                  context,
+                  AppRoutes.createpost,
+                  arguments: {
+                    'userId': user?.id,
+                    'userRole': user?.role,
+                  },
+                );
+                if (context.mounted) {
+                  context.read<PostViewModel>().fetchPosts(forceRefresh: true);
+                }
               },
             ),
           ),

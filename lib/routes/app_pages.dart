@@ -12,12 +12,19 @@ import '../views/auth/intro_screen.dart';
 class AppPages {
   static final routes = <String, WidgetBuilder>{
     AppRoutes.intro1: (context) => const IntroScreen(),
-    AppRoutes.intro2:(context)=> const Intro2Screen(),
-    AppRoutes.startScreen:(context)=>const StartScreen(),
-    AppRoutes.signin:(context)=> const SignInScreen(),
-    AppRoutes.signup:(context)=>const SignupScreen(),
-    AppRoutes.home:(context)=>const HomeScreen(),
-    AppRoutes.main:(context)=>const MainScreen(),
-    AppRoutes.createpost:(context)=> const CreatePostScreen()
+    AppRoutes.intro2: (context) => const Intro2Screen(),
+    AppRoutes.startScreen: (context) => const StartScreen(),
+    AppRoutes.signin: (context) => const SignInScreen(),
+    AppRoutes.signup: (context) => const SignupScreen(),
+    AppRoutes.home: (context) => const HomeScreen(),
+    AppRoutes.main: (context) => const MainScreen(),
+    AppRoutes.createpost: (context) {
+      final args =
+          ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+      return CreatePostScreen(
+        userId: args['userId'],
+        userRole: args['userRole'],
+      );
+    },
   };
 }

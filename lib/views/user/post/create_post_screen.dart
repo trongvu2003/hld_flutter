@@ -6,23 +6,18 @@ import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import '../../../viewmodels/user_viewmodel.dart';
-
-class ContainerPost {
-  final String imageUrl;
-  final String name;
-  final String label;
-
-  ContainerPost({
-    required this.imageUrl,
-    required this.name,
-    required this.label,
-  });
-}
+import '../../../viewmodels/post_viewmodel.dart';
+import '../../../models/requestmodel/post.dart';
 
 class CreatePostScreen extends StatefulWidget {
   final String? postId;
 
-  const CreatePostScreen({super.key, this.postId});
+  const CreatePostScreen({
+    super.key,
+    this.postId,
+    required userId,
+    required userRole,
+  });
 
   @override
   State<CreatePostScreen> createState() => _CreatePostScreenState();
@@ -53,7 +48,7 @@ class _CreatePostScreenState extends State<CreatePostScreen>
       if (!mounted) return;
       context.read<UserViewModel>().loadUser();
     });
-    
+
     _buttonAnimCtrl = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 200),
@@ -117,17 +112,42 @@ class _CreatePostScreenState extends State<CreatePostScreen>
     if (!_isPostEnabled) _buttonAnimCtrl.reverse();
   }
 
-  void _validateAndPost() {
+  Future<void> _validateAndPost() async {
     final trimmed = _textController.text.trim();
+
     if (trimmed.isEmpty && _selectedMedia.isEmpty) {
       _showEmptyContentDialog();
       return;
     }
-    if (trimmed.length > _maxChars) return;
 
-    // TODO: call ViewModel create/update
-    _showSnack(_isEditMode ? 'Bài viết đã được lưu!' : 'Đã đăng bài viết!');
-    Navigator.pop(context);
+    final user = context.read<UserViewModel>().user;
+    final postVM = context.read<PostViewModel>();
+
+    if (user == null) {
+      _showSnack("Không tìm thấy user");
+      return;
+    }
+
+    setState(() => _isLoading = true);
+
+    try {
+      final mediaPaths = _selectedMedia.map((e) => e.path).toList();
+
+      final request = CreatePostRequest(
+        userId: user.id,
+        userModel: user.role,
+        content: trimmed,
+        mediaPaths: mediaPaths,
+      );
+
+      postVM.createPost(request);
+
+      Navigator.pop(context);
+    } catch (e) {
+      _showSnack("Lỗi: $e");
+    } finally {
+      setState(() => _isLoading = false);
+    }
   }
 
   void _showEmptyContentDialog() {
@@ -140,52 +160,47 @@ class _CreatePostScreenState extends State<CreatePostScreen>
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final userViewModel= context.watch<UserViewModel>();
+    final userViewModel = context.watch<UserViewModel>();
     final user = userViewModel.user;
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle.dark,
       child: Scaffold(
-        backgroundColor: theme.colorScheme.secondaryContainer,
+        backgroundColor: Colors.white.withOpacity(0.9),
         body: SafeArea(
-          child:
-              _isLoading
-                  ? const _LoadingOverlay()
-                  : Column(
-                    children: [
-                      _Header(
-                        isEditMode: _isEditMode,
-                        isPostEnabled: _isPostEnabled,
-                        buttonScaleAnim: _buttonScaleAnim,
-                        onBack: () => Navigator.pop(context),
-                        onPost: _validateAndPost,
-                      ),
+          child: Column(
+            children: [
+              _Header(
+                isEditMode: _isEditMode,
+                isPostEnabled: _isPostEnabled,
+                buttonScaleAnim: _buttonScaleAnim,
+                onBack: () => Navigator.pop(context),
+                onPost: _validateAndPost,
+              ),
 
-                      //Body
-                      Expanded(
-                        child: ListView(
-                          padding: EdgeInsets.zero,
-                          children: [
-                            _PostBody(
-                              avatarUrl: user?.avatarURL ?? "",
-                              userName: user?.name ?? "",
-                              controller: _textController,
-                              charCount: _textController.text.length,
-                              maxChars: _maxChars,
-                            ),
-                            if (_selectedMedia.isNotEmpty)
-                              _MediaPreviewList(
-                                media: _selectedMedia,
-                                onRemove: _removeMedia,
-                              ),
-                            if (_isUpdating) const _LoadingOverlay(),
-                          ],
-                        ),
+              //Body
+              Expanded(
+                child: ListView(
+                  padding: EdgeInsets.zero,
+                  children: [
+                    _PostBody(
+                      avatarUrl: user?.avatarURL ?? "",
+                      userName: user?.name ?? "",
+                      controller: _textController,
+                      charCount: _textController.text.length,
+                      maxChars: _maxChars,
+                    ),
+                    if (_selectedMedia.isNotEmpty)
+                      _MediaPreviewList(
+                        media: _selectedMedia,
+                        onRemove: _removeMedia,
                       ),
-                      _Footer(onTap: _pickMedia),
-                    ],
-                  ),
+                  ],
+                ),
+              ),
+              _Footer(onTap: _pickMedia),
+            ],
+          ),
         ),
       ),
     );
@@ -306,24 +321,6 @@ class _PostBody extends StatefulWidget {
 }
 
 class _PostBodyState extends State<_PostBody> {
-  bool _isFocused = false;
-  late FocusNode _focusNode;
-
-  @override
-  void initState() {
-    super.initState();
-    _focusNode =
-        FocusNode()..addListener(() {
-          setState(() => _isFocused = _focusNode.hasFocus);
-        });
-  }
-
-  @override
-  void dispose() {
-    _focusNode.dispose();
-    super.dispose();
-  }
-
   Color _counterColor(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
     if (widget.charCount > widget.maxChars) return cs.error;
@@ -368,29 +365,17 @@ class _PostBodyState extends State<_PostBody> {
               duration: const Duration(milliseconds: 300),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(12),
-                gradient:
-                    _isFocused
-                        ? LinearGradient(
-                          colors: [cs.primary, cs.secondary],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        )
-                        : null,
               ),
-              padding: _isFocused ? const EdgeInsets.all(2) : EdgeInsets.zero,
+              padding: const EdgeInsets.all(2),
               child: Container(
                 decoration: BoxDecoration(
                   color: cs.surface,
-                  borderRadius: BorderRadius.circular(_isFocused ? 10 : 12),
+                  borderRadius: BorderRadius.circular(12),
                 ),
                 child: TextField(
                   controller: widget.controller,
-                  focusNode: _focusNode,
                   maxLines: 12,
                   minLines: 5,
-                  style: theme.textTheme.bodyLarge?.copyWith(
-                    color: cs.onSurface,
-                  ),
                   inputFormatters: [
                     LengthLimitingTextInputFormatter(widget.maxChars),
                   ],
@@ -438,8 +423,7 @@ class _PostBodyState extends State<_PostBody> {
   }
 }
 
-// ─── Gradient Avatar ──────────────────────────────────────────────────────────
-
+//  Gradient Avatar
 class _GradientAvatar extends StatelessWidget {
   final String imageUrl;
 
@@ -455,7 +439,10 @@ class _GradientAvatar extends StatelessWidget {
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         gradient: LinearGradient(
-          colors: [cs.primary.withOpacity(0.5), cs.secondary.withOpacity(0.5)],
+          colors: [
+            AppColors.lightTheme.withOpacity(0.5),
+            Colors.black.withOpacity(0.5),
+          ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -469,8 +456,7 @@ class _GradientAvatar extends StatelessWidget {
   }
 }
 
-// ─── Media Preview List ───────────────────────────────────────────────────────
-
+//  Media Preview List
 class _MediaPreviewList extends StatelessWidget {
   final List<XFile> media;
   final void Function(int) onRemove;
@@ -638,11 +624,9 @@ class _Footer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final cs = theme.colorScheme;
-
     return Material(
       elevation: 4,
-      color: cs.surface,
+      color: Colors.white,
       child: InkWell(
         onTap: onTap,
         child: Padding(
@@ -653,13 +637,13 @@ class _Footer extends StatelessWidget {
                 width: double.infinity,
                 height: 72,
                 decoration: BoxDecoration(
-                  color: cs.primaryContainer,
+                  color: AppColors.lightTheme,
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
                   Icons.image_search_rounded,
                   size: 36,
-                  color: cs.onPrimaryContainer,
+                  color: Colors.black,
                 ),
               ),
               const SizedBox(height: 12),
@@ -667,7 +651,7 @@ class _Footer extends StatelessWidget {
                 'Thêm ảnh hoặc video',
                 style: theme.textTheme.bodyLarge?.copyWith(
                   fontWeight: FontWeight.w500,
-                  color: cs.onSurface,
+                  color: Colors.black,
                 ),
               ),
             ],
@@ -677,46 +661,45 @@ class _Footer extends StatelessWidget {
     );
   }
 }
+//
+// // Loading Overlay
+// class _LoadingOverlay extends StatelessWidget {
+//   const _LoadingOverlay();
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     final theme = Theme.of(context);
+//     final cs = theme.colorScheme;
+//
+//     return Container(
+//       color: cs.surface.withOpacity(0.8),
+//       alignment: Alignment.center,
+//       child: Card(
+//         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+//         elevation: 8,
+//         child: Padding(
+//           padding: const EdgeInsets.all(32),
+//           child: Column(
+//             mainAxisSize: MainAxisSize.min,
+//             children: [
+//               CircularProgressIndicator(color: cs.primary, strokeWidth: 4),
+//               const SizedBox(height: 16),
+//               Text(
+//                 'Đang xử lý...',
+//                 style: theme.textTheme.bodyLarge?.copyWith(
+//                   fontWeight: FontWeight.w500,
+//                   color: cs.onSurface,
+//                 ),
+//               ),
+//             ],
+//           ),
+//         ),
+//       ),
+//     );
+//   }
+// }
 
-// ─── Loading Overlay ──────────────────────────────────────────────────────────
-
-class _LoadingOverlay extends StatelessWidget {
-  const _LoadingOverlay();
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final cs = theme.colorScheme;
-
-    return Container(
-      color: cs.surface.withOpacity(0.8),
-      alignment: Alignment.center,
-      child: Card(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        elevation: 8,
-        child: Padding(
-          padding: const EdgeInsets.all(32),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              CircularProgressIndicator(color: cs.primary, strokeWidth: 4),
-              const SizedBox(height: 16),
-              Text(
-                'Đang xử lý...',
-                style: theme.textTheme.bodyLarge?.copyWith(
-                  fontWeight: FontWeight.w500,
-                  color: cs.onSurface,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-// ─── Empty Content Dialog ─────────────────────────────────────────────────────
+// Empty Content Dialog
 
 class _EmptyContentDialog extends StatelessWidget {
   const _EmptyContentDialog();

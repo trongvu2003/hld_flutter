@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:hld_flutter/views/user/home/widgets/video_thumbnail_only.dart';
+import 'package:intl/intl.dart';
 import '../../../../theme/app_colors.dart';
 
 class PostCard extends StatelessWidget {
@@ -317,20 +318,12 @@ class PostCard extends StatelessWidget {
     return mediaWidget;
   }
 }
-
 String formatTime(String? dateStr) {
   if (dateStr == null || dateStr.isEmpty) return '';
 
-  final date = DateTime.parse(dateStr).toLocal();
+  final parsedDate = DateTime.tryParse(dateStr);
+  if (parsedDate == null) return '';
 
-  String twoDigits(int n) => n.toString().padLeft(2, '0');
-
-  final day = twoDigits(date.day);
-  final month = twoDigits(date.month);
-  final year = date.year;
-
-  final hour = twoDigits(date.hour);
-  final minute = twoDigits(date.minute);
-
-  return '$day/$month/$year $hour:$minute';
+  // BỎ .toLocal() đi vì Backend đã trả về giờ VN sẵn rồi
+  return DateFormat('dd/MM/yyyy HH:mm').format(parsedDate);
 }

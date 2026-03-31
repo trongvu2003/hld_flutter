@@ -13,6 +13,7 @@ import 'widgets/back_to_top_button.dart';
 import 'widgets/doctor_list.dart';
 import 'widgets/news_ticker.dart';
 import 'widgets/post_card.dart';
+import 'widgets/post_status.dart';
 import 'widgets/section_header.dart';
 import 'widgets/service_grid.dart';
 import 'widgets/specialty_list.dart';
@@ -260,6 +261,23 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                 ),
               ),
+
+            Consumer<PostViewModel>(
+              builder: (context, postVM, child) {
+                final isCreating = postVM.isCreating;
+                final isSuccess = postVM.isCreateSuccess;
+                final progress = postVM.uploadProgress;
+
+                if (isCreating || isSuccess) {
+                  return PostStatusToast(
+                    isCreating: isCreating,
+                    isSuccess: isSuccess,
+                    progress: progress,
+                  );
+                }
+                return const SizedBox.shrink();
+              },
+            ),
           ],
         ),
       ),

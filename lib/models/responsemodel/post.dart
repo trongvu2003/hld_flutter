@@ -14,7 +14,7 @@ class UserInfo {
   }
 }
 
-class PostModel {
+class PostResponse {
   final String id;
   final String content;
   final List<String> media;
@@ -22,7 +22,7 @@ class PostModel {
   final String userModel;
   final String createdAt;
 
-  PostModel({
+  PostResponse({
     required this.id,
     required this.content,
     required this.media,
@@ -31,8 +31,8 @@ class PostModel {
     required this.createdAt,
   });
 
-  factory PostModel.fromJson(Map<String, dynamic> json) {
-    return PostModel(
+  factory PostResponse.fromJson(Map<String, dynamic> json) {
+    return PostResponse(
       id: json['_id'] ?? '',
       content: json['content'] ?? '',
       media: List<String>.from(json['media'] ?? []),
@@ -44,15 +44,47 @@ class PostModel {
 }
 
 class PostPageResponse {
-  final List<PostModel> posts;
+  final List<PostResponse> posts;
   final bool hasMore;
 
   PostPageResponse({required this.posts, required this.hasMore});
 
   factory PostPageResponse.fromJson(Map<String, dynamic> json) {
     return PostPageResponse(
-      posts: (json['posts'] as List).map((i) => PostModel.fromJson(i)).toList(),
+      posts: (json['posts'] as List).map((i) => PostResponse.fromJson(i)).toList(),
       hasMore: json['hasMore'] ?? false,
     );
+  }
+}
+
+class CreatePostResponse {
+  final String user;
+  final String content;
+  final List<String> media;
+  final String keywords;
+
+  CreatePostResponse({
+    required this.user,
+    required this.content,
+    required this.media,
+    required this.keywords,
+  });
+
+  factory CreatePostResponse.fromJson(Map<String, dynamic> json) {
+    return CreatePostResponse(
+      user: json['user'] ?? '',
+      content: json['content'] ?? '',
+      media: List<String>.from(json['media'] ?? []),
+      keywords: json['keywords'] ?? '',
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'user': user,
+      'content': content,
+      'media': media,
+      'keywords': keywords,
+    };
   }
 }
