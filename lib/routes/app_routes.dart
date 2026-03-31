@@ -9,4 +9,5 @@ class AppRoutes {
   static const splash = '/';
   static const main = '/main';
   static const createpost = '/createpost';
+  static const doctorlistscreen= '/doctorlistscreen';
 }

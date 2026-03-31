@@ -42,7 +42,11 @@ class _SpecialtyListState extends State<SpecialtyList> {
             itemBuilder:
                 (_, i) => SpecialtyItem(
                   specialty: displayed[i],
-                  onTap: () => widget.onTap,
+                  onTap: () => widget.onTap({
+                    'id': displayed[i].id,
+                    'name': displayed[i].name,
+                    'description': displayed[i].description,
+                  }),
                 ),
           ),
         ),

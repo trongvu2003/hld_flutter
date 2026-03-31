@@ -5,6 +5,7 @@ import 'package:hld_flutter/viewmodels/doctor_viewmodel.dart';
 import 'package:hld_flutter/viewmodels/post_viewmodel.dart';
 import 'package:hld_flutter/views/user/home/widgets/ai_search_bar.dart';
 import 'package:provider/provider.dart';
+import '../../../routes/app_routes.dart';
 import '../../../viewmodels/specialty_viewmodel.dart';
 import '../../../viewmodels/user_viewmodel.dart';
 import '../../skeleton/skeleton_box.dart';
@@ -118,8 +119,13 @@ class _HomeScreenState extends State<HomeScreen> {
                                 onTap:
                                     (specialty) => Navigator.pushNamed(
                                       context,
-                                      '/doctor-list',
-                                      arguments: specialty,
+                                      AppRoutes.doctorlistscreen,
+                                      arguments: {
+                                        'specialtyId': specialty['id'],
+                                        'specialtyName': specialty['name'],
+                                        'specialtyDesc':
+                                            specialty['description'],
+                                      },
                                     ),
                               ),
                     );
@@ -550,9 +556,7 @@ class _PostSkeleton extends StatelessWidget {
           Row(
             children: [
               // Sử dụng ClipOval bọc ngoài Skeleton để tạo hình tròn hoàn hảo cho Avatar
-              ClipOval(
-                child: Skeleton(width: 45, height: 45, radius: 22.5),
-              ),
+              ClipOval(child: Skeleton(width: 45, height: 45, radius: 22.5)),
               const SizedBox(width: 12),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
