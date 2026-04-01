@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hld_flutter/views/auth/intro1_screen.dart';
 import 'package:hld_flutter/views/auth/start_screen.dart';
+import 'package:hld_flutter/views/user/home/doctor/doctor_profile.dart';
 import 'package:hld_flutter/views/user/home/home_screen.dart';
 import 'package:hld_flutter/views/user/main_screen.dart';
 import 'package:hld_flutter/views/user/post/create_post_screen.dart';
@@ -27,7 +28,6 @@ class AppPages {
         userRole: args['userRole'],
       );
     },
-
     AppRoutes.doctorlistscreen: (context) {
       final args =
           ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
@@ -35,6 +35,14 @@ class AppPages {
         specialtyId: args['specialtyId'],
         specialtyName: args['specialtyName'],
         specialtyDesc: args['specialtyDesc'],
+      );
+    },
+    AppRoutes.other_user_profile: (context) {
+      final args =
+          ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+      return DoctorScreen(
+        doctorId: args['doctorId'],
+        currentUserId: args['currentUserId'],
       );
     },
   };

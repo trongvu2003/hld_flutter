@@ -10,4 +10,5 @@ class AppRoutes {
   static const main = '/main';
   static const createpost = '/createpost';
   static const doctorlistscreen= '/doctorlistscreen';
+  static const other_user_profile= '/doctorprofile';
 }

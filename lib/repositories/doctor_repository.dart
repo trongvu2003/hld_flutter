@@ -9,4 +9,8 @@ class DoctorRepository {
   Future<List<GetDoctorResponse>> getDoctors() async{
     return doctorService.getDoctors();
   }
+
+  Future<GetDoctorResponse> getDoctorById(String doctorId) async{
+    return doctorService.getDoctorById(doctorId);
+  }
 }

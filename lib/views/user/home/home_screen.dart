@@ -108,6 +108,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ],
                   ),
                 ),
+
                 Consumer<SpecialtyViewModel>(
                   builder: (context, viewModel, child) {
                     return SliverToBoxAdapter(
@@ -133,21 +134,25 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
 
                 //  DOCTORS
-                Consumer<DoctorViewModel>(
-                  builder: (context, viewModel, child) {
+                Consumer2<DoctorViewModel, UserViewModel>(
+                  builder: (context, doctorVM, userVM, child) {
+                    final currentUserId = userVM.user?.id ?? '';
                     return SliverToBoxAdapter(
-                      child:
-                          viewModel.isLoading
-                              ? const _DoctorSkeletonList()
-                              : DoctorList(
-                                doctors: viewModel.doctors,
-                                onTap:
-                                    (doctor) => Navigator.pushNamed(
-                                      context,
-                                      '/doctor-screen',
-                                      arguments: doctor,
-                                    ),
-                              ),
+                      child: doctorVM.isLoading
+                          ? const _DoctorSkeletonList()
+                          : DoctorList(
+                        doctors: doctorVM.doctors,
+                        onTap: (doctor) {
+                          Navigator.pushNamed(
+                            context,
+                            AppRoutes.other_user_profile,
+                            arguments: {
+                              'doctorId': doctor.id,
+                              'currentUserId': currentUserId,
+                            },
+                          );
+                        },
+                      ),
                     );
                   },
                 ),

@@ -261,32 +261,37 @@ class _DoctorItem extends StatelessWidget {
             Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                ClipOval(
-                  child:
-                      doctor.avatarURL != null && doctor.avatarURL!.isNotEmpty
-                          ? Image.network(
-                            doctor.avatarURL!,
-                            width: 90,
-                            height: 90,
-                            fit: BoxFit.cover,
-                            errorBuilder:
-                                (_, __, ___) => ClipOval(
-                                  child: Image.asset(
-                                    'assets/images/avatar_doctor.jpg',
-                                    width: 90,
-                                    height: 90,
-                                    fit: BoxFit.cover,
-                                  ),
-                                ),
-                          )
-                          : ClipOval(
-                            child: Image.asset(
-                              'assets/images/avatar_doctor.jpg',
-                              width: 90,
-                              height: 90,
-                              fit: BoxFit.cover,
-                            ),
-                          ),
+                Container(
+                  width: 90,
+                  height: 90,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: AppColors.lightTheme,
+                      width: 2, // Độ dày viền
+                    ),
+                  ),
+                  child: ClipOval(
+                    child: doctor.avatarURL != null && doctor.avatarURL!.isNotEmpty
+                        ? Image.network(
+                      doctor.avatarURL!,
+                      width: 90,
+                      height: 90,
+                      fit: BoxFit.cover,
+                      errorBuilder: (_, __, ___) => Image.asset(
+                        'assets/images/avatar_doctor.jpg',
+                        width: 90,
+                        height: 90,
+                        fit: BoxFit.cover,
+                      ),
+                    )
+                        : Image.asset(
+                      'assets/images/avatar_doctor.jpg',
+                      width: 90,
+                      height: 90,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
                 ),
 
                 const SizedBox(width: 12),

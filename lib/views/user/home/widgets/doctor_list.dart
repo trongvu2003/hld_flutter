@@ -45,7 +45,7 @@ class DoctorListState extends State<DoctorList> {
               itemBuilder:
                   (_, i) => _DoctorItem(
                     doctor: displayed[i],
-                    onTap: () => widget.onTap,
+                    onTap: () => widget.onTap(displayed[i]),
                   ),
             ),
           ),

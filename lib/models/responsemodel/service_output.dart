@@ -3,8 +3,8 @@ class ServiceOutput {
   final String specialtyName;
   final String description;
   final List<String> imageService;
-  final String minprice;
-  final String maxprice;
+  final int minprice;
+  final int maxprice;
 
   ServiceOutput({
     required this.specialtyId,
@@ -20,15 +20,17 @@ class ServiceOutput {
       specialtyId: json['specialtyId']?.toString() ?? '',
       specialtyName: json['specialtyName']?.toString() ?? '',
       description: json['description']?.toString() ?? '',
-      imageService:
-          json['imageService'] != null && json['imageService'] is List
-              ? List<String>.from(json['imageService'])
-              : [],
-      minprice: json['minprice']?.toString() ?? '',
-      maxprice: json['maxprice']?.toString() ?? '',
+      imageService: json['imageService'] is List
+          ? List<String>.from(json['imageService'])
+          : [],
+      minprice: json['minprice'] is int
+          ? json['minprice']
+          : int.tryParse(json['minprice']?.toString() ?? '') ?? 0,
+      maxprice: json['maxprice'] is int
+          ? json['maxprice']
+          : int.tryParse(json['maxprice']?.toString() ?? '') ?? 0,
     );
   }
-
   Map<String, dynamic> toJson() {
     return {
       'specialtyId': specialtyId,

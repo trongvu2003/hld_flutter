@@ -8,6 +8,7 @@ class DoctorViewModel extends ChangeNotifier {
   DoctorViewModel(this.repository);
 
   List<GetDoctorResponse> doctors = [];
+  GetDoctorResponse? selectedDoctor;
   bool isLoading = false;
   bool isError = false;
   String error = '';
@@ -21,14 +22,35 @@ class DoctorViewModel extends ChangeNotifier {
     try {
       final res = await repository.getDoctors();
       doctors = res;
-      print('✅ LẤY BÁC SĨ THÀNH CÔNG: ${doctors.length} người');
+      print('LẤY BÁC SĨ THÀNH CÔNG: ${doctors.length} người');
     } catch (e) {
       error = e.toString();
       isError = true;
       isLoading = false;
-      print('🔴 LỖI FETCH DOCTORS: $e'); // In lỗi to ra terminal
+      print('LỖI FETCH DOCTORS: $e');
     }
     isLoading = false;
     notifyListeners();
+  }
+
+  Future<GetDoctorResponse?> getDoctorById(String doctorId) async {
+    isLoading = true;
+    isError = false;
+    error = '';
+    notifyListeners();
+
+    try {
+      selectedDoctor = await repository.getDoctorById(doctorId);
+      print('LẤY BÁC SĨ THÀNH CÔNG: ${selectedDoctor?.name}');
+      return selectedDoctor;
+    } catch (e) {
+      isError = true;
+      error = e.toString();
+      print('LỖI getDoctorById: $e');
+      return null;
+    } finally {
+      isLoading = false;
+      notifyListeners();
+    }
   }
 }
