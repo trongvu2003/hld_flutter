@@ -6,6 +6,7 @@ import 'package:hld_flutter/views/user/home/doctor/widgets/view_introduce.dart';
 import 'package:provider/provider.dart';
 import '../../../../models/responsemodel/doctor.dart';
 import '../../../../viewmodels/doctor_viewmodel.dart';
+import 'widgets/view_rating.dart';
 
 class DoctorScreen extends StatefulWidget {
   final String doctorId;
@@ -134,18 +135,10 @@ class _DoctorScreenState extends State<DoctorScreen>
   }
 
   Widget _buildReviewTab() {
-    if (_showWriteReviewScreen) {
-      return Column(
-        children: [
-          const Text("Viết đánh giá"),
-          ElevatedButton(
-            onPressed: () => setState(() => _showWriteReviewScreen = false),
-            child: const Text("Hủy"),
-          ),
-        ],
-      );
-    }
-    return const Center(child: Text("Danh sách đánh giá"));
+    return ReviewTab(
+      doctorId: _doctor!.id,
+      currentUserId: widget.currentUserId,
+    );
   }
 
   Widget _buildPostTab() {
