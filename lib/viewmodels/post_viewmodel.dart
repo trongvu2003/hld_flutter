@@ -7,15 +7,11 @@ class PostViewModel extends ChangeNotifier {
   final PostRepository repository;
 
   PostViewModel(this.repository);
-
   List<PostResponse> posts = [];
-
   bool isLoading = false;
   bool isError = false;
-
   bool hasMore = true;
   bool isLoadingMore = false;
-
   String error = '';
 
   bool isCreating = false;
@@ -31,7 +27,11 @@ class PostViewModel extends ChangeNotifier {
 
   double get uploadProgress => _uploadProgress;
 
-  // Load lần đầu
+  // CÁC BIẾN CHO FETCH BY ID
+  List<PostResponse> userPosts = [];
+  bool isUserPostsLoading = false;
+  bool hasMoreUserPosts = true;
+
   Future<void> fetchPosts({bool forceRefresh = false}) async {
     if (!forceRefresh && posts.isNotEmpty) return;
 
@@ -78,6 +78,7 @@ class PostViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  // Tạo bài viết
   Future<void> createPost(CreatePostRequest request) async {
     isCreating = true;
     isCreateSuccess = false;
@@ -95,11 +96,45 @@ class PostViewModel extends ChangeNotifier {
 
       isCreateSuccess = false;
       notifyListeners();
-
     } catch (e) {
       createError = e.toString();
       isCreateSuccess = false;
       isCreating = false;
+      notifyListeners();
+    }
+  }
+
+  Future<bool> getPostByUserId({
+    required String userId,
+    int skip = 0,
+    int limit = 10,
+    bool append = false,
+  }) async {
+    if (isUserPostsLoading) return false;
+
+    isUserPostsLoading = true;
+    if (!append) notifyListeners();
+
+    try {
+      final response = await repository.fetchPostsbyUserId(
+        userId: userId,
+        skip: skip,
+        limit: limit,
+      );
+
+      final newPosts = response.posts;
+      if (append) {
+        userPosts.addAll(newPosts);
+      } else {
+        userPosts = List.from(newPosts);
+      }
+      hasMoreUserPosts = response.hasMore;
+      return true;
+    } catch (e) {
+      debugPrint("Lỗi tải bài viết của user: $e");
+      return false;
+    } finally {
+      isUserPostsLoading = false;
       notifyListeners();
     }
   }

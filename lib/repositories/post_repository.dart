@@ -17,4 +17,8 @@ class PostRepository {
   Future<CreatePostResponse> createPost(CreatePostRequest request) async {
     return await postService.createPost(request);
   }
+
+  Future<PostPageResponse> fetchPostsbyUserId({required userId, required int skip, required int limit}) async{
+    return await postService.getPostByUserId(userId, skip, limit);
+  }
 }

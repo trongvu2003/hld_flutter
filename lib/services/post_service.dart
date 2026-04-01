@@ -55,16 +55,36 @@ class PostService {
       );
     }
 
-    final response = await dio.post(
-      '/post/create',
-      data: formData,
-    );
+    final response = await dio.post('/post/create', data: formData);
 
     if (response.statusCode == 200 || response.statusCode == 201) {
       return CreatePostResponse.fromJson(response.data);
     }
 
     throw Exception('Create post failed: ${response.statusCode}');
+  }
+
+  Future<PostPageResponse> getPostByUserId(
+    String userId,
+    int skip,
+    int limit,
+  ) async {
+    try {
+      final res = await dio.get(
+        '/post/get-by-user-id/$userId',
+        queryParameters: {'skip': skip, 'limit': limit},
+      );
+
+      return PostPageResponse.fromJson(res.data);
+    } on DioException catch (e) {
+      throw Exception(
+        e.response != null
+            ? 'Server error: ${e.response?.statusCode}'
+            : 'Network error: ${e.message}',
+      );
+    } catch (e) {
+      throw Exception('Error: $e');
+    }
   }
 
   String _getMimeType(String fileName) {

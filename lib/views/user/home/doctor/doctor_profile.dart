@@ -6,6 +6,10 @@ import 'package:hld_flutter/views/user/home/doctor/widgets/view_introduce.dart';
 import 'package:provider/provider.dart';
 import '../../../../models/responsemodel/doctor.dart';
 import '../../../../viewmodels/doctor_viewmodel.dart';
+import '../../../../viewmodels/post_viewmodel.dart';
+import '../../../skeleton/post_skeleton.dart';
+import '../widgets/post_card.dart';
+import 'widgets/other_posts_tab.dart';
 import 'widgets/view_rating.dart';
 
 class DoctorScreen extends StatefulWidget {
@@ -142,10 +146,7 @@ class _DoctorScreenState extends State<DoctorScreen>
   }
 
   Widget _buildPostTab() {
-    return ListView.builder(
-      itemCount: 5,
-      itemBuilder: (context, index) => ListTile(title: Text("Bài viết $index")),
-    );
+    return PostsTab(userID: _doctor!.id, currentUserId: widget.currentUserId,);
   }
 }
 
