@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:hld_flutter/theme/app_colors.dart';
 import 'package:provider/provider.dart';
 import '../../../../models/responsemodel/doctor.dart';
 import '../../../../viewmodels/specialty_viewmodel.dart';
-
 
 class DoctorListScreen extends StatefulWidget {
   final String specialtyId;
@@ -27,9 +27,9 @@ class _DoctorListScreenState extends State<DoctorListScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context
-          .read<SpecialtyViewModel>()
-          .fetchSpecialtyDoctor(widget.specialtyId);
+      context.read<SpecialtyViewModel>().fetchSpecialtyDoctor(
+        widget.specialtyId,
+      );
     });
   }
 
@@ -44,17 +44,17 @@ class _DoctorListScreenState extends State<DoctorListScreen> {
         children: [
           _TopBar(
             onBack: () => Navigator.pop(context),
-            onSearch: (query) =>
-                vm.filterDoctorsByLocation(query),
+            onSearch: (query) => vm.filterDoctorsByLocation(query),
           ),
           Padding(
-            padding:
-            const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: Container(
               decoration: BoxDecoration(
-                color: colorScheme.secondaryContainer,
+                color: Colors.grey.withOpacity(0.3),
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: colorScheme.tertiaryContainer),
+                border: Border.all(
+                  color: AppColors.lightTheme.withOpacity(0.5),
+                ),
               ),
               padding: const EdgeInsets.all(16),
               child: Column(
@@ -72,16 +72,18 @@ class _DoctorListScreenState extends State<DoctorListScreen> {
                   Text(
                     widget.specialtyDesc,
                     style: TextStyle(
-                        fontSize: 14, color: colorScheme.onBackground),
+                      fontSize: 14,
+                      color: colorScheme.onBackground,
+                    ),
                     maxLines: _isExpanded ? null : 3,
-                    overflow: _isExpanded
-                        ? TextOverflow.visible
-                        : TextOverflow.ellipsis,
+                    overflow:
+                        _isExpanded
+                            ? TextOverflow.visible
+                            : TextOverflow.ellipsis,
                   ),
                   if (widget.specialtyDesc.length > 100)
                     GestureDetector(
-                      onTap: () =>
-                          setState(() => _isExpanded = !_isExpanded),
+                      onTap: () => setState(() => _isExpanded = !_isExpanded),
                       child: Padding(
                         padding: const EdgeInsets.only(top: 4),
                         child: Text(
@@ -89,7 +91,7 @@ class _DoctorListScreenState extends State<DoctorListScreen> {
                           style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w500,
-                            color: colorScheme.onSecondaryContainer,
+                            color: _isExpanded ? Colors.grey : Colors.blue,
                           ),
                         ),
                       ),
@@ -99,39 +101,39 @@ class _DoctorListScreenState extends State<DoctorListScreen> {
             ),
           ),
 
-
           Expanded(
-            child: vm.isLoading
-                ? const Center(child: CircularProgressIndicator())
-                : vm.filteredDoctors.isEmpty
-                ? Center(
-              child: Text(
-                'Không tìm thấy bác sĩ trong chuyên khoa này',
-                style: TextStyle(
-                    fontSize: 16,
-                    color: colorScheme.onBackground),
-                textAlign: TextAlign.center,
-              ),
-            )
-                : ListView.separated(
-              padding: const EdgeInsets.only(bottom: 16),
-              itemCount: vm.filteredDoctors.length,
-              separatorBuilder: (_, __) =>
-              const SizedBox(height: 8),
-              itemBuilder: (context, index) {
-                return _DoctorItem(
-                  doctor: vm.filteredDoctors[index],
-                  specialtyName: widget.specialtyName,
-                  onBooking: (doctorId) {
-                    Navigator.pushNamed(
-                      context,
-                      '/other_user_profile',
-                      arguments: {'doctorId': doctorId},
-                    );
-                  },
-                );
-              },
-            ),
+            child:
+                vm.isLoading
+                    ? const Center(child: CircularProgressIndicator())
+                    : vm.filteredDoctors.isEmpty
+                    ? Center(
+                      child: Text(
+                        'Không tìm thấy bác sĩ trong chuyên khoa này',
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: colorScheme.onBackground,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    )
+                    : ListView.separated(
+                      padding: const EdgeInsets.only(bottom: 16),
+                      itemCount: vm.filteredDoctors.length,
+                      separatorBuilder: (_, __) => const SizedBox(height: 8),
+                      itemBuilder: (context, index) {
+                        return _DoctorItem(
+                          doctor: vm.filteredDoctors[index],
+                          specialtyName: widget.specialtyName,
+                          onBooking: (doctorId) {
+                            Navigator.pushNamed(
+                              context,
+                              '/other_user_profile',
+                              arguments: {'doctorId': doctorId},
+                            );
+                          },
+                        );
+                      },
+                    ),
           ),
         ],
       ),
@@ -164,21 +166,20 @@ class _TopBarState extends State<_TopBar> {
 
     return Material(
       elevation: 8,
-      color: colorScheme.primaryContainer,
+      color: AppColors.lightTheme,
       child: SafeArea(
         bottom: false,
         child: Padding(
           padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
           child: Column(
             children: [
-              // Back + title row
               Row(
                 children: [
                   GestureDetector(
                     onTap: widget.onBack,
                     child: Icon(
                       Icons.arrow_back_ios_new,
-                      color: colorScheme.onPrimaryContainer,
+                      color: Colors.black,
                       size: 24,
                     ),
                   ),
@@ -188,14 +189,13 @@ class _TopBarState extends State<_TopBar> {
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.w800,
-                      color: colorScheme.onPrimaryContainer,
+                      color: Colors.black,
                     ),
                   ),
                 ],
               ),
               const SizedBox(height: 12),
 
-              // Search field
               SizedBox(
                 height: 52,
                 child: TextField(
@@ -208,8 +208,7 @@ class _TopBarState extends State<_TopBar> {
                     ),
                     hintText: 'Nhập địa chỉ, ví dụ: HCM',
                     hintStyle: TextStyle(
-                      color:
-                      colorScheme.onSurfaceVariant.withOpacity(0.7),
+                      color: Colors.black.withOpacity(0.5),
                       fontSize: 14,
                     ),
                     filled: true,
@@ -228,8 +227,6 @@ class _TopBarState extends State<_TopBar> {
     );
   }
 }
-
-// ─────────────────────────────────────────────────
 
 class _DoctorItem extends StatelessWidget {
   final Doctor doctor;
@@ -253,29 +250,43 @@ class _DoctorItem extends StatelessWidget {
         decoration: BoxDecoration(
           color: colorScheme.background,
           borderRadius: BorderRadius.circular(12),
-          border:
-          Border.all(color: colorScheme.tertiaryContainer, width: 1),
+          border: Border.all(
+            color: AppColors.lightTheme.withOpacity(0.5),
+            width: 1,
+          ),
         ),
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
-            // ── Avatar + name row ───────────────────────────────────
             Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                // Avatar
                 ClipOval(
-                  child: doctor.avatarURL != null &&
-                      doctor.avatarURL!.isNotEmpty
-                      ? Image.network(
-                    doctor.avatarURL!,
-                    width: 90,
-                    height: 90,
-                    fit: BoxFit.cover,
-                    errorBuilder: (_, __, ___) =>
-                        _DefaultAvatar(size: 90),
-                  )
-                      : _DefaultAvatar(size: 90),
+                  child:
+                      doctor.avatarURL != null && doctor.avatarURL!.isNotEmpty
+                          ? Image.network(
+                            doctor.avatarURL!,
+                            width: 90,
+                            height: 90,
+                            fit: BoxFit.cover,
+                            errorBuilder:
+                                (_, __, ___) => ClipOval(
+                                  child: Image.asset(
+                                    'assets/images/avatar_doctor.jpg',
+                                    width: 90,
+                                    height: 90,
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
+                          )
+                          : ClipOval(
+                            child: Image.asset(
+                              'assets/images/avatar_doctor.jpg',
+                              width: 90,
+                              height: 90,
+                              fit: BoxFit.cover,
+                            ),
+                          ),
                 ),
 
                 const SizedBox(width: 12),
@@ -285,7 +296,6 @@ class _DoctorItem extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // "Bác sĩ" label + paused badge
                       Row(
                         children: [
                           Text(
@@ -299,7 +309,9 @@ class _DoctorItem extends StatelessWidget {
                             const SizedBox(width: 12),
                             Container(
                               padding: const EdgeInsets.symmetric(
-                                  horizontal: 8, vertical: 4),
+                                horizontal: 8,
+                                vertical: 4,
+                              ),
                               decoration: BoxDecoration(
                                 color: colorScheme.errorContainer,
                                 borderRadius: BorderRadius.circular(8),
@@ -321,7 +333,7 @@ class _DoctorItem extends StatelessWidget {
                         doctor.name,
                         style: const TextStyle(
                           fontSize: 22,
-                          fontWeight: FontWeight.w500,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
 
@@ -340,26 +352,18 @@ class _DoctorItem extends StatelessWidget {
 
             const SizedBox(height: 12),
 
-            // ── Address row ─────────────────────────────────────────
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Padding(
                   padding: const EdgeInsets.only(top: 2),
-                  child: Icon(
-                    Icons.location_on,
-                    size: 18,
-                    color: colorScheme.secondary,
-                  ),
+                  child: Icon(Icons.location_on, size: 18, color: Colors.black.withOpacity(0.8)),
                 ),
                 const SizedBox(width: 4),
                 Expanded(
                   child: Text(
                     doctor.address ?? 'Chưa cập nhật địa chỉ',
-                    style: TextStyle(
-                      fontSize: 13,
-                      color: colorScheme.onBackground,
-                    ),
+                    style: TextStyle(fontSize: 13, color: Colors.black.withOpacity(0.8)),
                   ),
                 ),
               ],
@@ -367,22 +371,25 @@ class _DoctorItem extends StatelessWidget {
 
             const SizedBox(height: 8),
 
-            // ── Booking button ──────────────────────────────────────
             Align(
               alignment: Alignment.centerRight,
               child: FilledButton.tonal(
                 onPressed: () => onBooking(doctor.id),
                 style: FilledButton.styleFrom(
+                    backgroundColor: AppColors.lightTheme,
                   shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20)),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
                   padding: const EdgeInsets.symmetric(
-                      horizontal: 16, vertical: 6),
+                    horizontal: 16,
+                    vertical: 6,
+                  ),
                 ),
                 child: Text(
                   'Đặt lịch khám',
                   style: TextStyle(
                     fontSize: 12,
-                    color: colorScheme.onBackground,
+                    color:Colors.black,fontWeight: FontWeight.bold
                   ),
                 ),
               ),
@@ -394,20 +401,3 @@ class _DoctorItem extends StatelessWidget {
   }
 }
 
-// ─────────────────────────────────────────────────
-
-class _DefaultAvatar extends StatelessWidget {
-  final double size;
-
-  const _DefaultAvatar({required this.size});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: size,
-      height: size,
-      color: Theme.of(context).colorScheme.secondaryContainer,
-      child: Icon(Icons.person, size: size * 0.6),
-    );
-  }
-}
