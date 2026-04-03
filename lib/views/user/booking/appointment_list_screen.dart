@@ -228,42 +228,43 @@ class _AppointmentListScreenState extends State<AppointmentListScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.primaryContainer,
-      body: Column(
-        children: [
-          //Header
-          _buildHeader(context),
-
-          //Body
-          Expanded(
-            child: Container(
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.background,
-                borderRadius: const BorderRadius.vertical(
-                  top: Radius.circular(30),
+    return SafeArea(
+      child: Scaffold(
+        backgroundColor: AppColors.lightTheme,
+        body: Column(
+          children: [
+            //Header
+            _buildHeader(context),
+            //Body
+            Expanded(
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.background,
+                  borderRadius: const BorderRadius.vertical(
+                    top: Radius.circular(30),
+                  ),
+                ),
+                child: Column(
+                  children: [
+                    // Tabs vai trò
+                    _buildRoleTabsRow(context),
+      
+                    // Dropdown trạng thái
+                    _buildStatusDropdown(context),
+      
+                    // Danh sách lịch hẹn
+                    Expanded(
+                      child:
+                          _isLoading
+                              ? _buildSkeletonList()
+                              : _buildAppointmentList(),
+                    ),
+                  ],
                 ),
               ),
-              child: Column(
-                children: [
-                  // Tabs vai trò
-                  _buildRoleTabsRow(context),
-
-                  // Dropdown trạng thái
-                  _buildStatusDropdown(context),
-
-                  // Danh sách lịch hẹn
-                  Expanded(
-                    child:
-                        _isLoading
-                            ? _buildSkeletonList()
-                            : _buildAppointmentList(),
-                  ),
-                ],
-              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -457,44 +458,6 @@ class _AppointmentListScreenState extends State<AppointmentListScreen> {
   @override
   Widget build2(BuildContext context) => build(context);
 }
-
-// Sửa lại build để bỏ TabController phức tạp
-class _FixedAppointmentListScreen extends _AppointmentListScreenState {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.primaryContainer,
-      body: Column(
-        children: [
-          _buildHeader(context),
-          Expanded(
-            child: Container(
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.background,
-                borderRadius: const BorderRadius.vertical(
-                  top: Radius.circular(30),
-                ),
-              ),
-              child: Column(
-                children: [
-                  _buildRoleTabsRow(context),
-                  _buildStatusDropdown(context),
-                  Expanded(
-                    child:
-                        _isLoading
-                            ? _buildSkeletonList()
-                            : _buildAppointmentList(),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
 
 
 class AppointmentCard extends StatelessWidget {

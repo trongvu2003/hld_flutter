@@ -19,17 +19,11 @@ class AuthViewModel extends ChangeNotifier {
   Future<void> fetchCurrentUser() async {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('accessToken');
-
     print("TOKEN: $token");
-
     if (token == null) return;
-
     final decoded = JwtDecoder.decode(token);
-
     print("DECODED: $decoded");
-
     currentUser = decoded;
-
     notifyListeners();
   }
 
@@ -39,22 +33,17 @@ class AuthViewModel extends ChangeNotifier {
       notifyListeners();
       return false;
     }
-
     isLoading = true;
     errorMessage = null;
     notifyListeners();
-
     final result = await repository.login(email, password);
-
     isLoading = false;
-
     if (result != null) {
       final token = result.accessToken;
       await _saveToken(token);
       role = _extractRole(token);
       isAuthenticated = true;
       await fetchCurrentUser();
-
       notifyListeners();
       return true;
     } else {
