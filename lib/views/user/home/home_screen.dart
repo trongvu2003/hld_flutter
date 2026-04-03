@@ -146,7 +146,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         onTap: (doctor) {
                           Navigator.pushNamed(
                             context,
-                            AppRoutes.other_user_profile,
+                            AppRoutes.otheruserprofile,
                             arguments: {
                               'doctorId': doctor.id,
                               'currentUserId': currentUserId,

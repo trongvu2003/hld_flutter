@@ -169,7 +169,7 @@ class UserInfoHeader extends StatelessWidget {
     return Column(
       children: [
         SizedBox(
-          height: 275,
+          height: 290,
           child: Stack(
             clipBehavior: Clip.none,
             children: [

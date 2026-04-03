@@ -258,7 +258,7 @@ class _RotatingFab extends StatelessWidget {
                   ),
                 ),
 
-                // ── Static background (không xoay) ───────────
+                // Static background (không xoay)
                 // Tương đương graphicsLayer { rotationZ = -angle } + background
                 Container(
                   width: size - 7, // border width = 3dp mỗi bên

@@ -7,6 +7,7 @@ import 'package:hld_flutter/views/user/main_screen.dart';
 import 'package:hld_flutter/views/user/post/create_post_screen.dart';
 import '../views/auth/signin_screen.dart';
 import '../views/auth/signup_screen.dart';
+import '../views/user/booking/appointment_list_screen.dart';
 import '../views/user/home/doctor/doctor_list_screen.dart';
 import 'app_routes.dart';
 import '../views/auth/intro_screen.dart';
@@ -37,12 +38,20 @@ class AppPages {
         specialtyDesc: args['specialtyDesc'],
       );
     },
-    AppRoutes.other_user_profile: (context) {
+    AppRoutes.otheruserprofile: (context) {
       final args =
           ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
       return DoctorScreen(
         doctorId: args['doctorId'],
         currentUserId: args['currentUserId'],
+      );
+    },
+    AppRoutes.appointmentlistscreen: (context) {
+      final args =
+      ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+      return AppointmentListScreen(
+        userRole: args['userRole'],
+        userId: args['userId'],
       );
     },
   };

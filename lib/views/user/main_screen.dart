@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hld_flutter/views/user/home/home_screen.dart';
 import 'package:provider/provider.dart';
 import '../../viewmodels/user_viewmodel.dart';
+import 'booking/appointment_list_screen.dart';
 import 'fooder_bar.dart';
 import 'header_bar.dart';
 
@@ -26,7 +27,7 @@ class _MainScreenState extends State<MainScreen> {
 
   static const _screens = [
     HomeScreen(),
-    _PlaceholderScreen(label: 'Lịch hẹn'),
+    AppointmentListScreen(userRole: '', userId: '',),
     _PlaceholderScreen(label: 'Thông báo'),
     _PlaceholderScreen(label: 'Cá nhân'),
   ];
