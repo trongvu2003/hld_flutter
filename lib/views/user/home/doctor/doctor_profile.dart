@@ -6,9 +6,6 @@ import 'package:hld_flutter/views/user/home/doctor/widgets/view_introduce.dart';
 import 'package:provider/provider.dart';
 import '../../../../models/responsemodel/doctor.dart';
 import '../../../../viewmodels/doctor_viewmodel.dart';
-import '../../../../viewmodels/post_viewmodel.dart';
-import '../../../skeleton/post_skeleton.dart';
-import '../widgets/post_card.dart';
 import 'widgets/other_posts_tab.dart';
 import 'widgets/view_rating.dart';
 

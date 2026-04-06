@@ -32,6 +32,7 @@ class PostCard extends StatelessWidget {
       margin: const EdgeInsets.symmetric(vertical: 4),
       color: Colors.white,
       child: Card(
+        color: Colors.white,
         elevation: 2,
         borderOnForeground: true,
         // Cần thêm clipBehavior để ảnh media không đè lên góc bo tròn của Card

@@ -24,14 +24,6 @@ class _MainScreenState extends State<MainScreen> {
     });
   }
 
-
-  static const _screens = [
-    HomeScreen(),
-    AppointmentListScreen(userRole: '', userId: '',),
-    _PlaceholderScreen(label: 'Thông báo'),
-    _PlaceholderScreen(label: 'Cá nhân'),
-  ];
-
   bool _onScroll(ScrollNotification n) {
     if (n is ScrollUpdateNotification) {
       final delta = n.scrollDelta ?? 0;
@@ -46,6 +38,22 @@ class _MainScreenState extends State<MainScreen> {
     final isHome = _currentIndex == 0;
     final userViewModel= context.watch<UserViewModel>();
     final user= userViewModel.user;
+    if (user == null) {
+      return Scaffold(
+        backgroundColor: Theme.of(context).colorScheme.surface,
+        body: const Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    final List<Widget> screens = [
+      const HomeScreen(),
+      AppointmentListScreen(
+        userRole: user?.role ?? 'User',
+        userId: user?.id ?? '',
+      ),
+      const _PlaceholderScreen(label: 'Thông báo'),
+      const _PlaceholderScreen(label: 'Cá nhân'),
+    ];
 
     return Material(
       color: Theme.of(context).colorScheme.surface,
@@ -57,7 +65,7 @@ class _MainScreenState extends State<MainScreen> {
             // ── 1. Nội dung tab
             IndexedStack(
               index: _currentIndex,
-              children: _screens,
+              children: screens,
             ),
 
             // ── 2. HeadBar - chỉ hiện tab home
