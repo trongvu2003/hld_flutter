@@ -6,11 +6,17 @@ class DoctorRepository {
 
   DoctorRepository(this.doctorService);
 
-  Future<List<GetDoctorResponse>> getDoctors() async{
-    return doctorService.getDoctors();
+  Future<List<GetDoctorResponse>> getDoctors() async {
+    return await doctorService.getDoctors();
   }
 
-  Future<GetDoctorResponse> getDoctorById(String doctorId) async{
-    return doctorService.getDoctorById(doctorId);
+  Future<GetDoctorResponse> getDoctorById(String doctorId) async {
+    return await doctorService.getDoctorById(doctorId);
+  }
+
+  Future<DoctorAvailableSlotsResponse> getAvailableSlots(
+    String doctorId,
+  ) async {
+    return await doctorService.getAvailableSlots(doctorId);
   }
 }

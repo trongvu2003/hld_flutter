@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hld_flutter/views/auth/intro1_screen.dart';
 import 'package:hld_flutter/views/auth/start_screen.dart';
+import 'package:hld_flutter/views/user/booking/appointment_detail_screen.dart';
 import 'package:hld_flutter/views/user/home/doctor/doctor_profile.dart';
 import 'package:hld_flutter/views/user/home/home_screen.dart';
 import 'package:hld_flutter/views/user/main_screen.dart';
@@ -8,6 +9,7 @@ import 'package:hld_flutter/views/user/post/create_post_screen.dart';
 import '../views/auth/signin_screen.dart';
 import '../views/auth/signup_screen.dart';
 import '../views/user/booking/appointment_list_screen.dart';
+import '../views/user/booking/booking_calendar_screen.dart';
 import '../views/user/home/doctor/doctor_list_screen.dart';
 import 'app_routes.dart';
 import '../views/auth/intro_screen.dart';
@@ -48,10 +50,33 @@ class AppPages {
     },
     AppRoutes.appointmentlistscreen: (context) {
       final args =
-      ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+          ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
       return AppointmentListScreen(
         userRole: args['userRole'],
         userId: args['userId'],
+      );
+    },
+
+    AppRoutes.appointmentdetailscreen: (context) {
+      final args = Map<String, dynamic>.from(
+        ModalRoute.of(context)!.settings.arguments as Map,
+      );
+      return AppointmentDetailScreen(
+        doctorId: args['doctorId'] ?? '',
+        doctorName: args['doctorName'] ?? '',
+        doctorAddress: args['doctorAddress'] ?? '',
+        doctorAvatar: args['doctorAvatar'] ?? '',
+        specialtyName: args['specialtyName'] ?? '',
+        hasHomeService: args['hasHomeService'] ?? false,
+      );
+    },
+    AppRoutes.bookingcalendar: (context) {
+      final args = Map<String, dynamic>.from(
+        ModalRoute.of(context)?.settings.arguments as Map? ?? {},
+      );
+
+      return BookingCalendarScreen(
+        doctorId: args['doctorId']?.toString() ?? '',
       );
     },
   };

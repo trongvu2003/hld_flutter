@@ -43,4 +43,19 @@ class DoctorService {
       throw Exception('Lỗi không xác định: $e');
     }
   }
+
+  Future<DoctorAvailableSlotsResponse> getAvailableSlots(
+    String doctorId,
+  ) async {
+    try {
+      final res = await dio.get('/doctor/getAvailableWorkingTime/$doctorId');
+      if (res.statusCode == 200) {
+        return DoctorAvailableSlotsResponse.fromJson(res.data);
+      } else {
+        throw Exception('Lỗi API: Server trả về mã ${res.statusCode}');
+      }
+    } catch (e) {
+      throw Exception('Lỗi không xác định: $e');
+    }
+  }
 }

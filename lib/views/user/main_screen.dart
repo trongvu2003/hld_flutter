@@ -40,7 +40,7 @@ class _MainScreenState extends State<MainScreen> {
     final user= userViewModel.user;
     if (user == null) {
       return Scaffold(
-        backgroundColor: Theme.of(context).colorScheme.surface,
+        backgroundColor: Colors.white,
         body: const Center(child: CircularProgressIndicator()),
       );
     }

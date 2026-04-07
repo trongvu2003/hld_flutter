@@ -13,6 +13,8 @@ class DoctorViewModel extends ChangeNotifier {
   bool isError = false;
   String error = '';
 
+  DoctorAvailableSlotsResponse? doctorSlots;
+
   Future<void> fetchDoctors() async {
     if (doctors.isNotEmpty) return;
     isLoading = true;
@@ -47,6 +49,28 @@ class DoctorViewModel extends ChangeNotifier {
       isError = true;
       error = e.toString();
       print('LỖI getDoctorById: $e');
+      return null;
+    } finally {
+      isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<DoctorAvailableSlotsResponse?> fetchAvailableSlots(
+    String doctorId,
+  ) async {
+    isLoading = true;
+    isError = false;
+    error = '';
+    notifyListeners();
+
+    try {
+      final res = await repository.getAvailableSlots(doctorId);
+      doctorSlots = res;
+      return res;
+    } catch (e) {
+      isError = true;
+      error = e.toString();
       return null;
     } finally {
       isLoading = false;

@@ -23,9 +23,9 @@ class Doctor {
       id: json['_id'] ?? '',
       name: json['name'] ?? '',
       specialty:
-      json['specialty'] != null
-          ? Specialty.fromJson(json['specialty'])
-          : Specialty(id: '', name: ''),
+          json['specialty'] != null
+              ? Specialty.fromJson(json['specialty'])
+              : Specialty(id: '', name: ''),
       address: json['address'] ?? '',
       avatarURL: json['avatarURL'] ?? '',
       isClinicPaused: json['isClinicPaused'] ?? false,
@@ -43,7 +43,6 @@ class Doctor {
     };
   }
 }
-
 
 class GetDoctorResponse {
   final String id;
@@ -180,5 +179,163 @@ class WorkHour {
 
   Map<String, dynamic> toJson() {
     return {'dayOfWeek': dayOfWeek, 'hour': hour, 'minute': minute};
+  }
+}
+
+class DoctorAvailableSlotsResponse {
+  final String doctorID;
+  final String doctorName;
+  final SearchPeriod searchPeriod;
+  final List<AvailableSlot> availableSlots;
+  final int totalAvailableDays;
+  final int totalAvailableSlots;
+
+  DoctorAvailableSlotsResponse({
+    required this.doctorID,
+    required this.doctorName,
+    required this.searchPeriod,
+    required this.availableSlots,
+    required this.totalAvailableDays,
+    required this.totalAvailableSlots,
+  });
+
+  factory DoctorAvailableSlotsResponse.fromJson(Map<String, dynamic> json) {
+    return DoctorAvailableSlotsResponse(
+      doctorID: json['doctorID'] ?? '',
+      doctorName: json['doctorName'] ?? '',
+      searchPeriod: SearchPeriod.fromJson(json['searchPeriod'] ?? {}),
+      availableSlots:
+          (json['availableSlots'] as List? ?? [])
+              .map((e) => AvailableSlot.fromJson(Map<String, dynamic>.from(e)))
+              .toList(),
+      totalAvailableDays: json['totalAvailableDays'] ?? 0,
+      totalAvailableSlots: json['totalAvailableSlots'] ?? 0,
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+    'doctorID': doctorID,
+    'doctorName': doctorName,
+    'searchPeriod': searchPeriod.toJson(),
+    'availableSlots': availableSlots.map((e) => e.toJson()).toList(),
+    'totalAvailableDays': totalAvailableDays,
+    'totalAvailableSlots': totalAvailableSlots,
+  };
+}
+
+class SearchPeriod {
+  final String from;
+  final String to;
+  final int numberOfDays;
+
+  SearchPeriod({
+    required this.from,
+    required this.to,
+    required this.numberOfDays,
+  });
+
+  factory SearchPeriod.fromJson(Map<String, dynamic> json) {
+    return SearchPeriod(
+      from: json['from'] ?? '',
+      to: json['to'] ?? '',
+      numberOfDays: json['numberOfDays'] ?? 0,
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+    'from': from,
+    'to': to,
+    'numberOfDays': numberOfDays,
+  };
+}
+
+class AvailableSlot {
+  final String date;
+  final int dayOfWeek;
+  final String dayName;
+  final String displayDate;
+  final List<TimeSlot> slots;
+  final int totalSlots;
+
+  AvailableSlot({
+    required this.date,
+    required this.dayOfWeek,
+    required this.dayName,
+    required this.displayDate,
+    required this.slots,
+    required this.totalSlots,
+  });
+
+  factory AvailableSlot.fromJson(Map<String, dynamic> json) {
+    return AvailableSlot(
+      date: json['date'] ?? '',
+      dayOfWeek: json['dayOfWeek'] ?? 0,
+      dayName: json['dayName'] ?? '',
+      displayDate: json['displayDate'] ?? '',
+      slots:
+          (json['slots'] as List? ?? [])
+              .map((e) => TimeSlot.fromJson(Map<String, dynamic>.from(e)))
+              .toList(),
+      totalSlots: json['totalSlots'] ?? 0,
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+    'date': date,
+    'dayOfWeek': dayOfWeek,
+    'dayName': dayName,
+    'displayDate': displayDate,
+    'slots': slots.map((e) => e.toJson()).toList(),
+    'totalSlots': totalSlots,
+  };
+
+  DateTime? toDateTime() {
+    try {
+      return DateTime.parse(date);
+    } catch (e) {
+      return null;
+    }
+  }
+}
+
+class TimeSlot {
+  final String workingHourId;
+  final String time;
+  final int hour;
+  final int minute;
+  final String displayTime;
+
+  TimeSlot({
+    required this.workingHourId,
+    required this.time,
+    required this.hour,
+    required this.minute,
+    required this.displayTime,
+  });
+
+  factory TimeSlot.fromJson(Map<String, dynamic> json) {
+    return TimeSlot(
+      workingHourId: json['workingHourId'] ?? '',
+      time: json['time'] ?? '',
+      hour: json['hour'] ?? 0,
+      minute: json['minute'] ?? 0,
+      displayTime: json['displayTime'] ?? '',
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+    'workingHourId': workingHourId,
+    'time': time,
+    'hour': hour,
+    'minute': minute,
+    'displayTime': displayTime,
+  };
+
+  DateTime? toDateTime() {
+    try {
+      return DateTime(0, 1, 1, hour, minute);
+    } catch (e) {
+      return null;
+    }
   }
 }

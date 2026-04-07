@@ -5,6 +5,7 @@ import 'package:hld_flutter/theme/app_colors.dart';
 import 'package:hld_flutter/views/user/home/doctor/widgets/view_introduce.dart';
 import 'package:provider/provider.dart';
 import '../../../../models/responsemodel/doctor.dart';
+import '../../../../routes/app_routes.dart';
 import '../../../../viewmodels/doctor_viewmodel.dart';
 import 'widgets/other_posts_tab.dart';
 import 'widgets/view_rating.dart';
@@ -84,8 +85,7 @@ class _DoctorScreenState extends State<DoctorScreen>
                 TabBar(
                   controller: _tabController,
                   labelColor: AppColors.lightTheme,
-                  unselectedLabelColor:
-                      Colors.black.withOpacity(0.7),
+                  unselectedLabelColor: Colors.black.withOpacity(0.7),
                   indicatorColor: AppColors.lightTheme,
                   labelStyle: const TextStyle(
                     fontWeight: FontWeight.w800,
@@ -143,7 +143,7 @@ class _DoctorScreenState extends State<DoctorScreen>
   }
 
   Widget _buildPostTab() {
-    return PostsTab(userID: _doctor!.id, currentUserId: widget.currentUserId,);
+    return PostsTab(userID: _doctor!.id, currentUserId: widget.currentUserId);
   }
 }
 
@@ -350,16 +350,26 @@ class BookingButton extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
       child: ElevatedButton(
-        onPressed: isPaused ? null : () {},
+        onPressed:
+            isPaused
+                ? null
+                : () {
+                  Navigator.pushNamed(
+                    context,
+                    AppRoutes.appointmentdetailscreen,
+                    arguments: {
+                      'doctorId': doctor.id,
+                      'doctorName': doctor.name,
+                      'doctorAddress': doctor.address,
+                      'doctorAvatar': doctor.avatarURL,
+                      'specialtyName': doctor.specialty.name,
+                      'hasHomeService': doctor.hasHomeService,
+                    },
+                  );
+                },
         style: ElevatedButton.styleFrom(
-          backgroundColor:
-              isPaused
-                  ? Colors.grey
-                  : AppColors.lightTheme,
-          foregroundColor:
-              isPaused
-                  ? Colors.black38
-                  : Colors.black,
+          backgroundColor: isPaused ? Colors.grey : AppColors.lightTheme,
+          foregroundColor: isPaused ? Colors.black38 : Colors.black,
           minimumSize: const Size(double.infinity, 55),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
@@ -416,39 +426,37 @@ class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
     double shrinkOffset,
     bool overlapsContent,
   ) {
-    return Container(
-      color: Colors.white,
-      child: _tabBar,
-    );
+    return Container(color: Colors.white, child: _tabBar);
   }
 
   @override
   bool shouldRebuild(_SliverAppBarDelegate oldDelegate) => false;
 }
 
-
 void _openImageDialog(BuildContext context, String imageUrl) {
   showDialog(
     context: context,
     barrierColor: Colors.black87,
-    builder: (_) => GestureDetector(
-      onTap: () => Navigator.pop(context), // tap ra ngoài để đóng
-      child: Scaffold(
-        backgroundColor: Colors.transparent,
-        body: Center(
-          child: InteractiveViewer(
-            child: Hero(
-              tag: imageUrl,
-              child: Image.network(
-                imageUrl,
-                fit: BoxFit.contain,
-                errorBuilder: (_, __, ___) =>
-                const Icon(Icons.broken_image, color: Colors.white),
+    builder:
+        (_) => GestureDetector(
+          onTap: () => Navigator.pop(context),
+          child: Scaffold(
+            backgroundColor: Colors.transparent,
+            body: Center(
+              child: InteractiveViewer(
+                child: Hero(
+                  tag: imageUrl,
+                  child: Image.network(
+                    imageUrl,
+                    fit: BoxFit.contain,
+                    errorBuilder:
+                        (_, __, ___) =>
+                            const Icon(Icons.broken_image, color: Colors.white),
+                  ),
+                ),
               ),
             ),
           ),
         ),
-      ),
-    ),
   );
 }

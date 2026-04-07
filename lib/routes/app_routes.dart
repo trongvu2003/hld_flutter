@@ -12,4 +12,6 @@ class AppRoutes {
   static const doctorlistscreen= '/doctorlistscreen';
   static const otheruserprofile= '/doctorprofile';
   static const appointmentlistscreen= '/appointmentlistscreen';
+  static const appointmentdetailscreen= '/booking';
+  static const bookingcalendar= '/booking-calendar';
 }
