@@ -2,7 +2,6 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:hld_flutter/theme/app_colors.dart';
 import 'package:provider/provider.dart';
-
 import '../../routes/app_routes.dart';
 import '../../viewmodels/post_viewmodel.dart';
 import '../../viewmodels/user_viewmodel.dart';

@@ -9,6 +9,7 @@ import 'package:hld_flutter/repositories/user_repository.dart';
 import 'package:hld_flutter/routes/app_pages.dart';
 import 'package:hld_flutter/services/auth_service.dart';
 import 'package:hld_flutter/services/doctor_service.dart';
+import 'package:hld_flutter/services/notification_service.dart';
 import 'package:hld_flutter/services/post_service.dart';
 import 'package:hld_flutter/services/review_service.dart';
 import 'package:hld_flutter/services/specialty_service.dart';
@@ -16,12 +17,14 @@ import 'package:hld_flutter/services/user_service.dart';
 import 'package:hld_flutter/viewmodels/appointment_viewmodel.dart';
 import 'package:hld_flutter/viewmodels/auth_viewmodel.dart';
 import 'package:hld_flutter/viewmodels/doctor_viewmodel.dart';
+import 'package:hld_flutter/viewmodels/notification_viewmodel.dart';
 import 'package:hld_flutter/viewmodels/post_viewmodel.dart';
 import 'package:hld_flutter/viewmodels/review_viewmodel.dart';
 import 'package:hld_flutter/viewmodels/specialty_viewmodel.dart';
 import 'package:hld_flutter/viewmodels/user_viewmodel.dart';
 import 'package:provider/provider.dart';
 import 'repositories/appointment_repository.dart';
+import 'repositories/notification_repository.dart';
 import 'routes/app_routes.dart';
 import 'services/appointment_service.dart';
 
@@ -57,6 +60,12 @@ void main() async {
           create:
               (_) => AppointmentViewModel(
                 AppointmentRepository(AppointmentService()),
+              ),
+        ),
+        ChangeNotifierProvider(
+          create:
+              (_) => NotificationViewModel(
+                NotificationRepository(NotificationService()),
               ),
         ),
       ],

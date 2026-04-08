@@ -82,5 +82,6 @@ class AppPages {
     },
 
     AppRoutes.confirmbookingscreen: (context) => const ConfirmBookingScreen(),
+    AppRoutes.notificationpage: (context) => const ConfirmBookingScreen(),
   };
 }

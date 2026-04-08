@@ -5,6 +5,7 @@ import '../../viewmodels/user_viewmodel.dart';
 import 'booking/appointment_list_screen.dart';
 import 'fooder_bar.dart';
 import 'header_bar.dart';
+import 'home/notification/notification_page.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -65,7 +66,7 @@ class _MainScreenState extends State<MainScreen> {
         userRole: user?.role ?? 'User',
         userId: user?.id ?? '',
       ),
-      const _PlaceholderScreen(label: 'Thông báo'),
+      const NotificationScreen(),
       const _PlaceholderScreen(label: 'Cá nhân'),
     ];
 
