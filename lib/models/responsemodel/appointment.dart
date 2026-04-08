@@ -117,3 +117,62 @@ class Patient {
     return {'_id': id, 'name': name, 'avatarURL': avatarURL};
   }
 }
+
+
+class CreateAppointmentResponse {
+  final String message;
+  final Appointment appointment;
+
+  CreateAppointmentResponse({
+    required this.message,
+    required this.appointment,
+  });
+
+  factory CreateAppointmentResponse.fromJson(Map<String, dynamic> json) {
+    return CreateAppointmentResponse(
+      message: json['message'] ?? '',
+      appointment: Appointment.fromJson(json['appointment'] ?? {}),
+    );
+  }
+}
+
+class Appointment {
+  final String id;
+  final String doctor;
+  final String patient;
+  final String date;
+  final String time;
+  final String status;
+  final String examinationMethod;
+  final String reason;
+  final String? notes;
+  final double totalCost;
+
+  Appointment({
+    required this.id,
+    required this.doctor,
+    required this.patient,
+    required this.date,
+    required this.time,
+    required this.status,
+    required this.examinationMethod,
+    required this.reason,
+    this.notes,
+    required this.totalCost,
+  });
+
+  factory Appointment.fromJson(Map<String, dynamic> json) {
+    return Appointment(
+      id: json['id'] ?? '',
+      doctor: json['doctor'] ?? '',
+      patient: json['patient'] ?? '',
+      date: json['date'] ?? '',
+      time: json['time'] ?? '',
+      status: json['status'] ?? '',
+      examinationMethod: json['examinationMethod'] ?? '',
+      reason: json['reason'] ?? '',
+      notes: json['notes'],
+      totalCost: double.tryParse(json['totalCost']?.toString() ?? '0') ?? 0.0,
+    );
+  }
+}

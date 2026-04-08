@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hld_flutter/views/auth/intro1_screen.dart';
 import 'package:hld_flutter/views/auth/start_screen.dart';
 import 'package:hld_flutter/views/user/booking/appointment_detail_screen.dart';
+import 'package:hld_flutter/views/user/booking/confirm_booking_screen.dart';
 import 'package:hld_flutter/views/user/home/doctor/doctor_profile.dart';
 import 'package:hld_flutter/views/user/home/home_screen.dart';
 import 'package:hld_flutter/views/user/main_screen.dart';
@@ -79,5 +80,7 @@ class AppPages {
         doctorId: args['doctorId']?.toString() ?? '',
       );
     },
+
+    AppRoutes.confirmbookingscreen: (context) => const ConfirmBookingScreen(),
   };
 }

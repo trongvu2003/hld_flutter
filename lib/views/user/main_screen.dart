@@ -16,12 +16,26 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
   int _currentIndex = 0;
   bool _barsVisible = true;
+  bool _isInit = false;
   @override
   void initState() {
     super.initState();
     Future.microtask(() {
       context.read<UserViewModel>().loadUser();
     });
+  }
+
+  //  Để hứng arguments truyền từ Navigator sang
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_isInit) {
+      final rawArgs = ModalRoute.of(context)?.settings.arguments;
+      if (rawArgs is Map) {
+        _currentIndex = rawArgs['tabIndex'] ?? 0;
+      }
+      _isInit = true;
+    }
   }
 
   bool _onScroll(ScrollNotification n) {

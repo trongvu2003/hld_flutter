@@ -390,7 +390,7 @@ class _PatientInfoSectionState extends State<_PatientInfoSection> {
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(ctx),
-                child: const Text('Đóng'),
+                child: const Text('Đóng',style: TextStyle(color:Colors.blueAccent,fontSize: 14),),
               ),
             ],
           ),
