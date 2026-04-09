@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
 import '../../../../theme/app_colors.dart';
 import '../../../../viewmodels/user_viewmodel.dart';
 
@@ -22,7 +21,6 @@ class _EditOptionPageState extends State<EditOptionPage> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     final user = context.watch<UserViewModel>().user;
     final clinicButtonText =
         (user?.role == "User") ? "Đăng kí phòng khám" : "Quản lý phòng khám";
@@ -61,7 +59,7 @@ class _EditOptionPageState extends State<EditOptionPage> {
               text: "Chỉnh sửa thông tin cá nhân",
               icon: Icons.person,
               onClick: () {
-                Navigator.pushNamed(context, '/editProfile');
+                Navigator.pushNamed(context, '/editprofile');
               },
             ),
 

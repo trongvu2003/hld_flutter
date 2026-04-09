@@ -18,4 +18,5 @@ class AppRoutes {
   static const notificationpage = '/notification';
   static const personal = '/personal';
   static const editoptionpage ='/editoptionpage';
+  static const editprofile ='/editprofile';
 }
