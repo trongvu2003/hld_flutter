@@ -7,6 +7,7 @@ class PostViewModel extends ChangeNotifier {
   final PostRepository repository;
 
   PostViewModel(this.repository);
+
   List<PostResponse> posts = [];
   bool isLoading = false;
   bool isError = false;
@@ -31,6 +32,14 @@ class PostViewModel extends ChangeNotifier {
   List<PostResponse> userPosts = [];
   bool isUserPostsLoading = false;
   bool hasMoreUserPosts = true;
+
+  //  Danh sách bài viết cho trang Profile của TÔI
+  List<PostResponse> myPosts = [];
+  bool isMyPostsLoading = false;
+
+  //  Danh sách bài viết cho trang NGƯỜI KHÁC (Bác sĩ)
+  List<PostResponse> visitorPosts = [];
+  bool isVisitorPostsLoading = false;
 
   Future<void> fetchPosts({bool forceRefresh = false}) async {
     if (!forceRefresh && posts.isNotEmpty) return;
@@ -104,16 +113,20 @@ class PostViewModel extends ChangeNotifier {
     }
   }
 
-  Future<bool> getPostByUserId({
+  Future<void> getPostByUserId({
     required String userId,
+    required bool isMyProfile,
     int skip = 0,
     int limit = 10,
-    bool append = false,
   }) async {
-    if (isUserPostsLoading) return false;
-
-    isUserPostsLoading = true;
-    if (!append) notifyListeners();
+    if (isMyProfile) {
+      isMyPostsLoading = true;
+      myPosts = []; // Clear bài cũ của mình
+    } else {
+      isVisitorPostsLoading = true;
+      visitorPosts = []; // Clear bài cũ của bác sĩ cũ
+    }
+    notifyListeners();
 
     try {
       final response = await repository.fetchPostsbyUserId(
@@ -122,19 +135,16 @@ class PostViewModel extends ChangeNotifier {
         limit: limit,
       );
 
-      final newPosts = response.posts;
-      if (append) {
-        userPosts.addAll(newPosts);
+      if (isMyProfile) {
+        myPosts = response.posts;
       } else {
-        userPosts = List.from(newPosts);
+        visitorPosts = response.posts;
       }
-      hasMoreUserPosts = response.hasMore;
-      return true;
     } catch (e) {
-      debugPrint("Lỗi tải bài viết của user: $e");
-      return false;
+      debugPrint("Lỗi: $e");
     } finally {
-      isUserPostsLoading = false;
+      isMyPostsLoading = false;
+      isVisitorPostsLoading = false;
       notifyListeners();
     }
   }

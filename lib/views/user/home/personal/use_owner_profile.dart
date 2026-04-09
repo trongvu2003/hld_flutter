@@ -28,14 +28,19 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
   Future<void> _initData() async {
     final prefs = await SharedPreferences.getInstance();
     final userId = prefs.getString('userId');
+
     if (!mounted) return;
+
+    // Load thông tin user (Avatar, Name,...)
     context.read<UserViewModel>().loadUser();
+
+    // Load danh sách bài viết của CHÍNH MÌNH
     if (userId != null) {
       context.read<PostViewModel>().getPostByUserId(
         userId: userId,
         skip: 0,
         limit: 10,
-        append: false,
+        isMyProfile: true,
       );
     }
   }
