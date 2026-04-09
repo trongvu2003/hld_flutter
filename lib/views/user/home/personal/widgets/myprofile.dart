@@ -124,7 +124,7 @@ class ProfileSection extends StatelessWidget {
             height: 50,
             child: ElevatedButton(
               onPressed: () {
-                Navigator.pushNamed(context, '/editOptionPage');
+                Navigator.pushNamed(context, '/editoptionpage');
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.lightTheme,

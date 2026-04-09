@@ -17,4 +17,5 @@ class AppRoutes {
   static const confirmbookingscreen = '/booking-confirm';
   static const notificationpage = '/notification';
   static const personal = '/personal';
+  static const editoptionpage ='/editoptionpage';
 }
