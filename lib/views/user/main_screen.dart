@@ -19,6 +19,10 @@ class _MainScreenState extends State<MainScreen> {
   int _currentIndex = 0;
   bool _barsVisible = true;
   bool _isInit = false;
+
+  //  Mảng đánh dấu các tab đã được truy cập (Khởi tạo toàn false)
+  final List<bool> _visitedTabs = [false, false, false, false];
+
   @override
   void initState() {
     super.initState();
@@ -27,7 +31,6 @@ class _MainScreenState extends State<MainScreen> {
     });
   }
 
-  //  Để hứng arguments truyền từ Navigator sang
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -36,6 +39,8 @@ class _MainScreenState extends State<MainScreen> {
       if (rawArgs is Map) {
         _currentIndex = rawArgs['tabIndex'] ?? 0;
       }
+      // Đánh dấu tab khởi đầu là đã truy cập
+      _visitedTabs[_currentIndex] = true;
       _isInit = true;
     }
   }
@@ -52,23 +57,29 @@ class _MainScreenState extends State<MainScreen> {
   @override
   Widget build(BuildContext context) {
     final isHome = _currentIndex == 0;
-    final userViewModel= context.watch<UserViewModel>();
-    final user= userViewModel.user;
+    final userViewModel = context.watch<UserViewModel>();
+    final user = userViewModel.user;
+
     if (user == null) {
-      return Scaffold(
+      return const Scaffold(
         backgroundColor: Colors.white,
-        body: const Center(child: CircularProgressIndicator()),
+        body: Center(child: CircularProgressIndicator()),
       );
     }
 
+    // Chỉ build màn hình thật nếu nó đã được truy cập (_visitedTabs == true)
+    // Nếu chưa truy cập, trả về SizedBox.shrink() (widget rỗng, không tốn tài nguyên)
     final List<Widget> screens = [
-      const HomeScreen(),
-      AppointmentListScreen(
-        userRole: user?.role ?? 'User',
-        userId: user?.id ?? '',
-      ),
-      const NotificationScreen(),
-      const ProfileUserPage(),
+      _visitedTabs[0] ? const HomeScreen() : const SizedBox.shrink(),
+      _visitedTabs[1]
+          ? AppointmentListScreen(
+            userRole: user.role ?? 'User',
+            userId: user.id ?? '',
+          )
+          : const SizedBox.shrink(),
+
+      _visitedTabs[2] ? const NotificationScreen() : const SizedBox.shrink(),
+      _visitedTabs[3] ? const ProfileUserPage() : const SizedBox.shrink(),
     ];
 
     return Material(
@@ -77,12 +88,8 @@ class _MainScreenState extends State<MainScreen> {
         onNotification: _onScroll,
         child: Stack(
           children: [
-
             // ── 1. Nội dung tab
-            IndexedStack(
-              index: _currentIndex,
-              children: screens,
-            ),
+            IndexedStack(index: _currentIndex, children: screens),
 
             // ── 2. HeadBar - chỉ hiện tab home
             AnimatedPositioned(
@@ -91,7 +98,7 @@ class _MainScreenState extends State<MainScreen> {
               top: (isHome && _barsVisible) ? 0 : -100,
               left: 0,
               right: 0,
-              child: HeadBar(userName: user?.name),
+              child: HeadBar(userName: user.name),
             ),
 
             // ── 3. FootBar - luôn hiện, ẩn khi scroll xuống
@@ -103,10 +110,15 @@ class _MainScreenState extends State<MainScreen> {
               right: 0,
               child: FootBar(
                 currentIndex: _currentIndex,
-                onTap: (i) => setState(() => _currentIndex = i),
+                onTap: (i) {
+                  setState(() {
+                    _currentIndex = i;
+                    // Đánh dấu tab này đã được truy cập để build giao diện
+                    _visitedTabs[i] = true;
+                  });
+                },
               ),
             ),
-
           ],
         ),
       ),
