@@ -12,6 +12,7 @@ import '../views/auth/signup_screen.dart';
 import '../views/user/booking/appointment_list_screen.dart';
 import '../views/user/booking/booking_calendar_screen.dart';
 import '../views/user/home/doctor/doctor_list_screen.dart';
+import '../views/user/home/personal/use_owner_profile.dart';
 import 'app_routes.dart';
 import '../views/auth/intro_screen.dart';
 
@@ -83,5 +84,6 @@ class AppPages {
 
     AppRoutes.confirmbookingscreen: (context) => const ConfirmBookingScreen(),
     AppRoutes.notificationpage: (context) => const ConfirmBookingScreen(),
+    AppRoutes.personal: (context) => const ProfileUserPage(),
   };
 }

@@ -9,11 +9,12 @@ class AppRoutes {
   static const splash = '/';
   static const main = '/main';
   static const createpost = '/createpost';
-  static const doctorlistscreen= '/doctorlistscreen';
-  static const otheruserprofile= '/doctorprofile';
-  static const appointmentlistscreen= '/appointmentlistscreen';
-  static const appointmentdetailscreen= '/booking';
-  static const bookingcalendar= '/booking-calendar';
-  static const confirmbookingscreen= '/booking-confirm';
-  static const notificationpage ='/notification';
+  static const doctorlistscreen = '/doctorlistscreen';
+  static const otheruserprofile = '/doctorprofile';
+  static const appointmentlistscreen = '/appointmentlistscreen';
+  static const appointmentdetailscreen = '/booking';
+  static const bookingcalendar = '/booking-calendar';
+  static const confirmbookingscreen = '/booking-confirm';
+  static const notificationpage = '/notification';
+  static const personal = '/personal';
 }

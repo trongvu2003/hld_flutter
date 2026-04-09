@@ -56,6 +56,8 @@ class _PostsTabState extends State<PostsTab> {
         }
 
         return ListView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
           padding: const EdgeInsets.all(8.0),
           itemCount: vm.userPosts.length,
           itemBuilder: (context, i) {

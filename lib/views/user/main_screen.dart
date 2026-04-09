@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hld_flutter/views/user/home/home_screen.dart';
+import 'package:hld_flutter/views/user/home/personal/use_owner_profile.dart';
 import 'package:provider/provider.dart';
 import '../../viewmodels/user_viewmodel.dart';
 import 'booking/appointment_list_screen.dart';
@@ -67,7 +68,7 @@ class _MainScreenState extends State<MainScreen> {
         userId: user?.id ?? '',
       ),
       const NotificationScreen(),
-      const _PlaceholderScreen(label: 'Cá nhân'),
+      const ProfileUserPage(),
     ];
 
     return Material(
@@ -108,22 +109,6 @@ class _MainScreenState extends State<MainScreen> {
 
           ],
         ),
-      ),
-    );
-  }
-}
-
-// Placeholder tạm - xoá khi làm màn thật
-class _PlaceholderScreen extends StatelessWidget {
-  final String label;
-  const _PlaceholderScreen({required this.label});
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Text(
-        label,
-        style: Theme.of(context).textTheme.headlineMedium,
       ),
     );
   }
