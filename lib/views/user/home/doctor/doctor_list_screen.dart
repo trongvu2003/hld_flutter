@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../../../../models/responsemodel/doctor.dart';
 import '../../../../routes/app_routes.dart';
 import '../../../../viewmodels/specialty_viewmodel.dart';
+import '../../../skeleton/skeleton_box.dart';
 
 class DoctorListScreen extends StatefulWidget {
   final String specialtyId;
@@ -105,7 +106,7 @@ class _DoctorListScreenState extends State<DoctorListScreen> {
           Expanded(
             child:
                 vm.isLoading
-                    ? const Center(child: CircularProgressIndicator())
+                    ? _buildDoctorListSkeleton()
                     : vm.filteredDoctors.isEmpty
                     ? Center(
                       child: Text(
@@ -272,25 +273,27 @@ class _DoctorItem extends StatelessWidget {
                     ),
                   ),
                   child: ClipOval(
-                    child: doctor.avatarURL != null && doctor.avatarURL!.isNotEmpty
-                        ? Image.network(
-                      doctor.avatarURL!,
-                      width: 90,
-                      height: 90,
-                      fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) => Image.asset(
-                        'assets/images/avatar_doctor.jpg',
-                        width: 90,
-                        height: 90,
-                        fit: BoxFit.cover,
-                      ),
-                    )
-                        : Image.asset(
-                      'assets/images/avatar_doctor.jpg',
-                      width: 90,
-                      height: 90,
-                      fit: BoxFit.cover,
-                    ),
+                    child:
+                        doctor.avatarURL != null && doctor.avatarURL!.isNotEmpty
+                            ? Image.network(
+                              doctor.avatarURL!,
+                              width: 90,
+                              height: 90,
+                              fit: BoxFit.cover,
+                              errorBuilder:
+                                  (_, __, ___) => Image.asset(
+                                    'assets/images/avatar_doctor.jpg',
+                                    width: 90,
+                                    height: 90,
+                                    fit: BoxFit.cover,
+                                  ),
+                            )
+                            : Image.asset(
+                              'assets/images/avatar_doctor.jpg',
+                              width: 90,
+                              height: 90,
+                              fit: BoxFit.cover,
+                            ),
                   ),
                 ),
 
@@ -362,13 +365,20 @@ class _DoctorItem extends StatelessWidget {
               children: [
                 Padding(
                   padding: const EdgeInsets.only(top: 2),
-                  child: Icon(Icons.location_on, size: 18, color: Colors.black.withOpacity(0.8)),
+                  child: Icon(
+                    Icons.location_on,
+                    size: 18,
+                    color: Colors.black.withOpacity(0.8),
+                  ),
                 ),
                 const SizedBox(width: 4),
                 Expanded(
                   child: Text(
                     doctor.address ?? 'Chưa cập nhật địa chỉ',
-                    style: TextStyle(fontSize: 13, color: Colors.black.withOpacity(0.8)),
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: Colors.black.withOpacity(0.8),
+                    ),
                   ),
                 ),
               ],
@@ -380,24 +390,24 @@ class _DoctorItem extends StatelessWidget {
               alignment: Alignment.centerRight,
               child: FilledButton.tonal(
                 onPressed:
-                isPaused
-                    ? null
-                    : () {
-                  Navigator.pushNamed(
-                    context,
-                    AppRoutes.appointmentdetailscreen,
-                    arguments: {
-                      'doctorId': doctor.id,
-                      'doctorName': doctor.name,
-                      'doctorAddress': doctor.address,
-                      'doctorAvatar': doctor.avatarURL,
-                      'specialtyName': doctor.specialty.name,
-                      'hasHomeService':  false,
-                    },
-                  );
-                },
+                    isPaused
+                        ? null
+                        : () {
+                          Navigator.pushNamed(
+                            context,
+                            AppRoutes.appointmentdetailscreen,
+                            arguments: {
+                              'doctorId': doctor.id,
+                              'doctorName': doctor.name,
+                              'doctorAddress': doctor.address,
+                              'doctorAvatar': doctor.avatarURL,
+                              'specialtyName': doctor.specialty.name,
+                              'hasHomeService': false,
+                            },
+                          );
+                        },
                 style: FilledButton.styleFrom(
-                    backgroundColor: AppColors.lightTheme,
+                  backgroundColor: AppColors.lightTheme,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(20),
                   ),
@@ -410,7 +420,8 @@ class _DoctorItem extends StatelessWidget {
                   'Đặt lịch khám',
                   style: TextStyle(
                     fontSize: 12,
-                    color:Colors.black,fontWeight: FontWeight.bold
+                    color: Colors.black,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
               ),
@@ -422,3 +433,68 @@ class _DoctorItem extends StatelessWidget {
   }
 }
 
+Widget _buildDoctorListSkeleton() {
+  return ListView.separated(
+    padding: const EdgeInsets.symmetric(vertical: 8),
+    itemCount: 5, // Hiển thị 5 item mẫu khi đang load
+    separatorBuilder: (_, __) => const SizedBox(height: 8),
+    itemBuilder: (context, index) {
+      return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.grey.withOpacity(0.2)),
+          ),
+          child: Column(
+            children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  // Skeleton cho Avatar tròn 90x90
+                  const Skeleton(width: 90, height: 90, radius: 45),
+                  const SizedBox(width: 12),
+                  // Skeleton cho thông tin text
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Skeleton(width: 50, height: 16, radius: 4),
+                        const SizedBox(height: 8),
+                        const Skeleton(width: 150, height: 22, radius: 4),
+                        const SizedBox(height: 8),
+                        const Skeleton(width: 100, height: 15, radius: 4),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              // Skeleton cho Địa chỉ
+              Row(
+                children: [
+                  Skeleton(width: 18, height: 18, radius: 9),
+                  const SizedBox(width: 4),
+                  const Expanded(
+                    child: Skeleton(
+                      width: double.infinity,
+                      height: 13,
+                      radius: 4,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              // Skeleton cho Nút bấm
+              Align(
+                alignment: Alignment.centerRight,
+                child: const Skeleton(width: 100, height: 32, radius: 20),
+              ),
+            ],
+          ),
+        ),
+      );
+    },
+  );
+}

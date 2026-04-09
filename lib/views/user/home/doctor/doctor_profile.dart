@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 import '../../../../models/responsemodel/doctor.dart';
 import '../../../../routes/app_routes.dart';
 import '../../../../viewmodels/doctor_viewmodel.dart';
+import '../../../skeleton/skeleton_box.dart';
 import 'widgets/other_posts_tab.dart';
 import 'widgets/view_rating.dart';
 
@@ -62,7 +63,7 @@ class _DoctorScreenState extends State<DoctorScreen>
   @override
   Widget build(BuildContext context) {
     if (_isLoading || _doctor == null) {
-      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+      return _buildDoctorSkeleton(context);
     }
 
     return Scaffold(
@@ -458,5 +459,110 @@ void _openImageDialog(BuildContext context, String imageUrl) {
             ),
           ),
         ),
+  );
+}
+
+Widget _buildDoctorSkeleton(BuildContext context) {
+  return Scaffold(
+    backgroundColor: Colors.white,
+    body: SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Header Skeleton (Ảnh bìa + Avatar)
+          SizedBox(
+            height: 290,
+            child: Stack(
+              children: [
+                Skeleton(width: double.infinity, height: 200), // Banner
+                Positioned(
+                  top: 140,
+                  left: 20,
+                  child: Skeleton(
+                    width: 120,
+                    height: 120,
+                    radius: 60,
+                  ), // Avatar
+                ),
+                Positioned(
+                  top: 210,
+                  left: 150,
+                  right: 16,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Skeleton(width: 150, height: 24, radius: 4),
+                      // Tên
+                      const SizedBox(height: 8),
+                      Skeleton(width: 100, height: 16, radius: 4),
+                      // Chuyên khoa
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          // Stat Bar Skeleton
+          Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: 24.0,
+              vertical: 8.0,
+            ),
+            child: Container(
+              height: 70,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: Colors.grey.shade200),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: List.generate(
+                  3,
+                  (index) => Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Skeleton(width: 40, height: 20, radius: 4),
+                      const SizedBox(height: 4),
+                      Skeleton(width: 60, height: 12, radius: 4),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+
+          // TabBar Skeleton
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 16),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: List.generate(
+                3,
+                (index) => Skeleton(width: 80, height: 30, radius: 15),
+              ),
+            ),
+          ),
+
+          // Content Skeleton
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Skeleton(width: 120, height: 20, radius: 4),
+                const SizedBox(height: 12),
+                Skeleton(width: double.infinity, height: 100, radius: 8),
+                const SizedBox(height: 20),
+                Skeleton(width: 150, height: 20, radius: 4),
+                const SizedBox(height: 12),
+                Skeleton(width: double.infinity, height: 150, radius: 8),
+              ],
+            ),
+          ),
+        ],
+      ),
+    ),
   );
 }
