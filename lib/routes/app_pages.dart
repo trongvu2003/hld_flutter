@@ -14,6 +14,7 @@ import '../views/user/booking/booking_calendar_screen.dart';
 import '../views/user/home/doctor/doctor_list_screen.dart';
 import '../views/user/home/personal/edit_option_page.dart';
 import '../views/user/home/personal/edit_user_profile.dart';
+import '../views/user/home/personal/setting_page.dart';
 import '../views/user/home/personal/use_owner_profile.dart';
 import 'app_routes.dart';
 import '../views/auth/intro_screen.dart';
@@ -89,5 +90,6 @@ class AppPages {
     AppRoutes.personal: (context) => const ProfileUserPage(),
     AppRoutes.editoptionpage: (context) => const EditOptionPage(),
     AppRoutes.editprofile: (context) => const EditUserProfile(),
+    AppRoutes.setting: (context) =>const SettingScreen(),
   };
 }

@@ -19,4 +19,5 @@ class AppRoutes {
   static const personal = '/personal';
   static const editoptionpage ='/editoptionpage';
   static const editprofile ='/editprofile';
+  static const setting='/setting';
 }
