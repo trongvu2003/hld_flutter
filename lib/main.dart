@@ -23,12 +23,23 @@ import 'package:hld_flutter/viewmodels/review_viewmodel.dart';
 import 'package:hld_flutter/viewmodels/specialty_viewmodel.dart';
 import 'package:hld_flutter/viewmodels/user_viewmodel.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'repositories/appointment_repository.dart';
 import 'repositories/notification_repository.dart';
 import 'routes/app_routes.dart';
 import 'services/appointment_service.dart';
 
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  // Khởi tạo SharedPreferences và lấy Token
+  final prefs = await SharedPreferences.getInstance();
+  final String? token = prefs.getString('accessToken');
+  String startRoute;
+  if (token == null || token.isEmpty || token == "unknown") {
+    startRoute = AppRoutes.intro1;
+  } else {
+    startRoute= AppRoutes.main;
+  }
   await dotenv.load(fileName: ".env");
   runApp(
     MultiProvider(
@@ -69,20 +80,23 @@ void main() async {
               ),
         ),
       ],
-      child: const MyApp(),
+      child: MyApp(initialRoute: startRoute),
     ),
   );
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final String initialRoute;
+
+  const MyApp({super.key, required this.initialRoute});
+
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Hellodoc',
-      initialRoute: AppRoutes.intro1,
+      initialRoute: initialRoute,
       routes: AppPages.routes,
     );
   }
