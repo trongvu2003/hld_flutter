@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hld_flutter/theme/app_colors.dart';
 import 'package:provider/provider.dart';
 import '../../../../models/responsemodel/doctor.dart';
+import '../../../../routes/app_routes.dart';
 import '../../../../viewmodels/specialty_viewmodel.dart';
 
 class DoctorListScreen extends StatefulWidget {
@@ -243,7 +244,6 @@ class _DoctorItem extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final isPaused = doctor.isClinicPaused ?? false;
-
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Container(
@@ -379,7 +379,23 @@ class _DoctorItem extends StatelessWidget {
             Align(
               alignment: Alignment.centerRight,
               child: FilledButton.tonal(
-                onPressed: () => onBooking(doctor.id),
+                onPressed:
+                isPaused
+                    ? null
+                    : () {
+                  Navigator.pushNamed(
+                    context,
+                    AppRoutes.appointmentdetailscreen,
+                    arguments: {
+                      'doctorId': doctor.id,
+                      'doctorName': doctor.name,
+                      'doctorAddress': doctor.address,
+                      'doctorAvatar': doctor.avatarURL,
+                      'specialtyName': doctor.specialty.name,
+                      'hasHomeService':  false,
+                    },
+                  );
+                },
                 style: FilledButton.styleFrom(
                     backgroundColor: AppColors.lightTheme,
                   shape: RoundedRectangleBorder(
