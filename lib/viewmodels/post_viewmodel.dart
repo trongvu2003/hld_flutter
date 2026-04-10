@@ -41,6 +41,14 @@ class PostViewModel extends ChangeNotifier {
   List<PostResponse> visitorPosts = [];
   bool isVisitorPostsLoading = false;
 
+  //QUẢN LÝ BÌNH LUẬN THEO MAP
+  Map<String, List<CommentPostResponse>> commentsMap = {};
+  Map<String, bool> hasMoreMap = {};
+  Map<String, bool> isLoadingMap = {};
+  List<CommentPostResponse> getComments(String postId) => commentsMap[postId] ?? [];
+  bool getHasMoreComments(String postId) => hasMoreMap[postId] ?? false;
+  bool getIsLoadingComments(String postId) => isLoadingMap[postId] ?? false;
+
   Future<void> fetchPosts({bool forceRefresh = false}) async {
     if (!forceRefresh && posts.isNotEmpty) return;
 
@@ -145,6 +153,33 @@ class PostViewModel extends ChangeNotifier {
     } finally {
       isMyPostsLoading = false;
       isVisitorPostsLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<GetCommentPageResponse> fetchComments({
+    required String postId,
+    int skip = 0,
+    int limit = 10,
+  }) async {
+    isLoadingMap[postId] = true;
+    notifyListeners();
+
+    try {
+      final res = await repository.getCommentByPostId(postId, skip, limit);
+      if (skip == 0) {
+        commentsMap[postId] = res.comments;
+      } else {
+        final currentComments = commentsMap[postId] ?? [];
+        commentsMap[postId] = [...currentComments, ...res.comments];
+      }
+      hasMoreMap[postId] = res.hasMore;
+      return res;
+    } catch (e) {
+      debugPrint("Error fetching comments for post $postId: $e");
+      rethrow;
+    } finally {
+      isLoadingMap[postId] = false;
       notifyListeners();
     }
   }

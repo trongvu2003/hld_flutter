@@ -36,7 +36,8 @@ class PostResponse {
       id: json['_id'] ?? '',
       content: json['content'] ?? '',
       media: List<String>.from(json['media'] ?? []),
-      userInfo: json['userInfo'] != null ? UserInfo.fromJson(json['userInfo']) : null,
+      userInfo:
+          json['userInfo'] != null ? UserInfo.fromJson(json['userInfo']) : null,
       userModel: json['userModel'] ?? '',
       createdAt: json['createdAt'] ?? '',
     );
@@ -51,7 +52,8 @@ class PostPageResponse {
 
   factory PostPageResponse.fromJson(Map<String, dynamic> json) {
     return PostPageResponse(
-      posts: (json['posts'] as List).map((i) => PostResponse.fromJson(i)).toList(),
+      posts:
+          (json['posts'] as List).map((i) => PostResponse.fromJson(i)).toList(),
       hasMore: json['hasMore'] ?? false,
     );
   }
@@ -85,6 +87,90 @@ class CreatePostResponse {
       'content': content,
       'media': media,
       'keywords': keywords,
+    };
+  }
+}
+
+class CommentUser {
+  final String id;
+  final String name;
+  final String? avatarURL;
+
+  const CommentUser({required this.id, required this.name, this.avatarURL});
+
+  // Chuyển đổi từ JSON sang Object
+  factory CommentUser.fromJson(Map<String, dynamic> json) {
+    return CommentUser(
+      id: json['_id'] ?? '',
+      name: json['name'] ?? '',
+      avatarURL: json['avatarURL'],
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {'_id': id, 'name': name, 'avatarURL': avatarURL};
+  }
+}
+
+class CommentPostResponse {
+  final String id;
+  final CommentUser user;
+  final String post;
+  final String content;
+  final String createdAt;
+
+  const CommentPostResponse({
+    required this.id,
+    required this.user,
+    required this.post,
+    required this.content,
+    required this.createdAt,
+  });
+
+  factory CommentPostResponse.fromJson(Map<String, dynamic> json) {
+    return CommentPostResponse(
+      id: json['_id'] ?? '',
+      // Map key '_id'
+      user: CommentUser.fromJson(json['user'] ?? {}),
+      post: json['post'] ?? '',
+      content: json['content'] ?? '',
+      createdAt: json['createdAt'] ?? '',
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      '_id': id,
+      'user': user.toJson(),
+      'post': post,
+      'content': content,
+      'createdAt': createdAt,
+    };
+  }
+}
+
+class GetCommentPageResponse {
+  final List<CommentPostResponse> comments;
+  final bool hasMore;
+
+  const GetCommentPageResponse({required this.comments, required this.hasMore});
+
+  factory GetCommentPageResponse.fromJson(Map<String, dynamic> json) {
+    var commentsList = json['comments'] as List? ?? [];
+
+    return GetCommentPageResponse(
+      comments:
+          commentsList
+              .map((item) => CommentPostResponse.fromJson(item))
+              .toList(),
+      hasMore: json['hasMore'] ?? false,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'comments': comments.map((e) => e.toJson()).toList(),
+      'hasMore': hasMore,
     };
   }
 }

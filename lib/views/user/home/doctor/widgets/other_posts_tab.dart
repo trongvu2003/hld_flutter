@@ -84,20 +84,7 @@ class _PostsTabState extends State<PostsTab> {
       itemBuilder: (context, i) {
         final post = posts[i];
         return PostCard(
-          post: {
-            'id': post.id,
-            'content': post.content,
-            'media': post.media,
-            'userInfo':
-                post.userInfo != null
-                    ? {
-                      '_id': post.userInfo!.id,
-                      'name': post.userInfo!.name,
-                      'avatarURL': post.userInfo!.avatarUrl,
-                    }
-                    : null,
-            'createdAt': post.createdAt,
-          },
+          post: post,
           currentUserId: widget.currentUserId,
           onReport: () => print("Báo cáo: ${post.id}"),
           onDelete: () => print("Xoá: ${post.id}"),

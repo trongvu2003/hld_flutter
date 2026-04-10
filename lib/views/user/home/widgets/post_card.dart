@@ -1,13 +1,17 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:hld_flutter/viewmodels/post_viewmodel.dart';
+import 'package:hld_flutter/viewmodels/user_viewmodel.dart';
 import 'package:hld_flutter/views/user/home/widgets/video_thumbnail_only.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
+import '../../../../models/responsemodel/post.dart';
 import '../../../../theme/app_colors.dart';
 import '../../../skeleton/skeleton_box.dart';
-
+import '../../post/comment_bottom_sheet.dart';
 
 class PostCard extends StatelessWidget {
-  final Map<String, dynamic> post;
+  final PostResponse post;
   final String currentUserId;
   final VoidCallback onReport;
   final VoidCallback onDelete;
@@ -23,10 +27,11 @@ class PostCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final userInfo = post['userInfo'] as Map? ?? {};
-    final images = post['media'] as List? ?? [];
-    final isOwner = currentUserId == userInfo['id'];
-    final avatar = userInfo['avatarURL'];
+    final userInfo = post.userInfo;
+    final images = post.media;
+    final isOwner = currentUserId == userInfo?.id;
+    final avatar = userInfo?.avatarUrl;
+    final userVM = context.watch<UserViewModel>().user;
 
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 4),
@@ -35,7 +40,6 @@ class PostCard extends StatelessWidget {
         color: Colors.white,
         elevation: 2,
         borderOnForeground: true,
-        // Cần thêm clipBehavior để ảnh media không đè lên góc bo tròn của Card
         clipBehavior: Clip.hardEdge,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
@@ -84,14 +88,14 @@ class PostCard extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          userInfo['name'] ?? 'Người dùng',
+                          userInfo?.name ?? 'Người dùng',
                           style: const TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
                         Text(
-                          formatTime(post['createdAt']),
+                          formatTime(post.createdAt),
                           style: Theme.of(
                             context,
                           ).textTheme.labelSmall?.copyWith(
@@ -131,10 +135,10 @@ class PostCard extends StatelessWidget {
             ),
 
             // Content
-            if ((post['content'] ?? '').isNotEmpty)
+            if ((post.content ?? '').isNotEmpty)
               Padding(
                 padding: const EdgeInsets.fromLTRB(12, 0, 12, 8),
-                child: Text(post['content']),
+                child: Text(post.content),
               ),
 
             // Media Grid (Hỗ trợ nhiều Ảnh và Video)
@@ -159,7 +163,7 @@ class PostCard extends StatelessWidget {
                           icon: const Icon(Icons.favorite_border),
                           iconSize: 30,
                         ),
-                        Text('${post['likesCount'] ?? 0}'),
+                        // Text('${post. ?? 0}'),
                       ],
                     ),
                   ),
@@ -168,11 +172,21 @@ class PostCard extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         IconButton(
-                          onPressed: onNavigateToDetail,
+                          onPressed: () {
+                            showModalBottomSheet(
+                              context: context,
+                              isScrollControlled: true,
+                              backgroundColor: Colors.transparent,
+                              builder:
+                                  (_) => CommentBottomSheet(
+                                    postId: post.id ?? "",
+                                    currentUserId: userVM!.id ?? "",
+                                  ),
+                            );
+                          },
                           icon: const Icon(Icons.comment_outlined),
                           iconSize: 30,
                         ),
-                        Text('${post['commentsCount'] ?? 0}'),
                       ],
                     ),
                   ),
@@ -270,6 +284,7 @@ class PostCard extends StatelessWidget {
       ),
     );
   }
+
   Widget _buildMediaItem(
     String url,
     BuildContext context, {
@@ -290,13 +305,11 @@ class PostCard extends StatelessWidget {
         fit: BoxFit.cover,
         width: double.infinity,
         height: double.infinity,
-        // 2. SKELETON CHO HÌNH ẢNH TRONG LƯỚI MEDIA:
         placeholder:
             (context, url) => const Skeleton(
               width: double.infinity,
               height: double.infinity,
-              radius:
-                  0, // Card đã có thuộc tính clipBehavior nên ảnh sẽ tự bo góc theo Card, không cần bo ở đây
+              radius: 0,
             ),
         errorWidget:
             (_, __, ___) => Container(

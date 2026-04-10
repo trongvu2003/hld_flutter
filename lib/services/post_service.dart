@@ -101,4 +101,25 @@ class PostService {
     };
     return map[ext] ?? 'application/octet-stream';
   }
+
+  Future<GetCommentPageResponse> getCommentByPostId(
+    String postId,
+    int skip,
+    int limit,
+  ) async {
+    try {
+      final res = await dio.get(
+        '/post/$postId/comment/get',
+        queryParameters: {'skip': skip, 'limit': limit},
+      );
+
+      if (res.statusCode == 200) {
+        return GetCommentPageResponse.fromJson(res.data);
+      } else {
+        throw Exception('Failed to load comments: ${res.statusCode}');
+      }
+    } catch (e) {
+      throw Exception('Error fetching comments: $e');
+    }
+  }
 }

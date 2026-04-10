@@ -186,22 +186,8 @@ class _HomeScreenState extends State<HomeScreen> {
                       delegate: SliverChildBuilderDelegate((context, i) {
                         final post = vm.posts[i];
                         return PostCard(
-                          post: {
-                            'id': post.id,
-                            'content': post.content,
-                            'media': post.media,
-                            'userInfo':
-                                post.userInfo != null
-                                    ? {
-                                      '_id': post.userInfo!.id,
-                                      'name': post.userInfo!.name,
-                                      'avatarURL': post.userInfo!.avatarUrl,
-                                    }
-                                    : null,
-                            'createdAt': post.createdAt,
-                          },
+                          post: post,
                           currentUserId: userVM.user!.id ?? "",
-                          // Bạn có thể truyền User ID từ UserViewModel vào đây
                           onReport: () {
                             AppDialog.show(
                               context: context,
