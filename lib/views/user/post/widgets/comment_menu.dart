@@ -9,7 +9,7 @@ class CommentMenu extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return PopupMenuButton<String>(
-      icon: const Icon(Icons.more_horiz, size: 20, color: Colors.grey),
+      icon: const Icon(Icons.more_vert, size: 22, color: Colors.black),
       onSelected: (val) => val == 'edit' ? onEdit() : onDelete(),
       itemBuilder:
           (context) => [
