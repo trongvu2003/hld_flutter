@@ -139,27 +139,28 @@ class _HomeScreenState extends State<HomeScreen> {
                   builder: (context, doctorVM, userVM, child) {
                     final currentUserId = userVM.user?.id ?? '';
                     return SliverToBoxAdapter(
-                      child: doctorVM.isLoading
-                          ? const _DoctorSkeletonList()
-                          : DoctorList(
-                        doctors: doctorVM.doctors,
-                        onTap: (doctor) {
-                          Navigator.pushNamed(
-                            context,
-                            AppRoutes.otheruserprofile,
-                            arguments: {
-                              'doctorId': doctor.id,
-                              'currentUserId': currentUserId,
-                            },
-                          );
-                        },
-                      ),
+                      child:
+                          doctorVM.isLoading
+                              ? const _DoctorSkeletonList()
+                              : DoctorList(
+                                doctors: doctorVM.doctors,
+                                onTap: (doctor) {
+                                  Navigator.pushNamed(
+                                    context,
+                                    AppRoutes.otheruserprofile,
+                                    arguments: {
+                                      'doctorId': doctor.id,
+                                      'currentUserId': currentUserId,
+                                    },
+                                  );
+                                },
+                              ),
                     );
                   },
                 ),
                 //  POSTS
-                Consumer<PostViewModel>(
-                  builder: (context, vm, child) {
+                Consumer2<PostViewModel, UserViewModel>(
+                  builder: (context, vm, userVM, child) {
                     if (vm.isLoading && vm.posts.isEmpty) {
                       return SliverList(
                         delegate: SliverChildBuilderDelegate(
@@ -199,7 +200,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     : null,
                             'createdAt': post.createdAt,
                           },
-                          currentUserId: '',
+                          currentUserId: userVM.user!.id ?? "",
                           // Bạn có thể truyền User ID từ UserViewModel vào đây
                           onReport: () {
                             AppDialog.show(

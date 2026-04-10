@@ -1,19 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:hld_flutter/repositories/auth_repository.dart';
-import 'package:hld_flutter/repositories/doctor_repository.dart';
-import 'package:hld_flutter/repositories/post_repository.dart';
-import 'package:hld_flutter/repositories/review_repository.dart';
-import 'package:hld_flutter/repositories/specialty_repository.dart';
-import 'package:hld_flutter/repositories/user_repository.dart';
 import 'package:hld_flutter/routes/app_pages.dart';
-import 'package:hld_flutter/services/auth_service.dart';
-import 'package:hld_flutter/services/doctor_service.dart';
-import 'package:hld_flutter/services/notification_service.dart';
-import 'package:hld_flutter/services/post_service.dart';
-import 'package:hld_flutter/services/review_service.dart';
-import 'package:hld_flutter/services/specialty_service.dart';
-import 'package:hld_flutter/services/user_service.dart';
 import 'package:hld_flutter/viewmodels/appointment_viewmodel.dart';
 import 'package:hld_flutter/viewmodels/auth_viewmodel.dart';
 import 'package:hld_flutter/viewmodels/doctor_viewmodel.dart';
@@ -24,10 +11,8 @@ import 'package:hld_flutter/viewmodels/specialty_viewmodel.dart';
 import 'package:hld_flutter/viewmodels/user_viewmodel.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'repositories/appointment_repository.dart';
-import 'repositories/notification_repository.dart';
+import 'models/DI/injection_geit.dart';
 import 'routes/app_routes.dart';
-import 'services/appointment_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -38,47 +23,21 @@ void main() async {
   if (token == null || token.isEmpty || token == "unknown") {
     startRoute = AppRoutes.intro1;
   } else {
-    startRoute= AppRoutes.main;
+    startRoute = AppRoutes.main;
   }
   await dotenv.load(fileName: ".env");
+  setupLocator();
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider(
-          create: (_) => AuthViewModel(AuthRepository(AuthService())),
-        ),
-        ChangeNotifierProvider(
-          create: (_) => UserViewModel(UserRepository(UserService())),
-        ),
-
-        ChangeNotifierProvider(
-          create: (_) => PostViewModel(PostRepository(PostService())),
-        ),
-
-        ChangeNotifierProvider(
-          create:
-              (_) =>
-                  SpecialtyViewModel(SpecialtyRepository(SpecialtyService())),
-        ),
-
-        ChangeNotifierProvider(
-          create: (_) => DoctorViewModel(DoctorRepository(DoctorService())),
-        ),
-        ChangeNotifierProvider(
-          create: (_) => ReviewViewModel(ReviewRepository(ReviewService())),
-        ),
-        ChangeNotifierProvider(
-          create:
-              (_) => AppointmentViewModel(
-                AppointmentRepository(AppointmentService()),
-              ),
-        ),
-        ChangeNotifierProvider(
-          create:
-              (_) => NotificationViewModel(
-                NotificationRepository(NotificationService()),
-              ),
-        ),
+        ChangeNotifierProvider(create: (_) => getIt<AuthViewModel>()),
+        ChangeNotifierProvider(create: (_) => getIt<UserViewModel>()),
+        ChangeNotifierProvider(create: (_) => getIt<PostViewModel>()),
+        ChangeNotifierProvider(create: (_) => getIt<SpecialtyViewModel>()),
+        ChangeNotifierProvider(create: (_) => getIt<DoctorViewModel>()),
+        ChangeNotifierProvider(create: (_) => getIt<ReviewViewModel>()),
+        ChangeNotifierProvider(create: (_) => getIt<AppointmentViewModel>()),
+        ChangeNotifierProvider(create: (_) => getIt<NotificationViewModel>()),
       ],
       child: MyApp(initialRoute: startRoute),
     ),
@@ -89,7 +48,6 @@ class MyApp extends StatelessWidget {
   final String initialRoute;
 
   const MyApp({super.key, required this.initialRoute});
-
 
   @override
   Widget build(BuildContext context) {
