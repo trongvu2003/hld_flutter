@@ -33,4 +33,22 @@ class PostRepository {
   ) async {
     return await postService.getCommentByPostId(postId, skip, limit);
   }
+
+  Future<CreateCommentPostResponse> createCommentByPostId(
+    String postId,
+    CreateCommentPostRequest request,
+  ) async {
+    return await postService.createCommentByPostId(postId, request);
+  }
+
+  Future<void> updateCommentById(
+    String commentId,
+    CreateCommentPostRequest request,
+  ) async {
+    return await postService.updateCommentById(commentId, request);
+  }
+
+  Future<void> deleteCommentById(String commentId) async {
+    return await postService.deleteCommentById(commentId);
+  }
 }

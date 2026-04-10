@@ -23,7 +23,10 @@ class CommentItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: isEditing ? Colors.grey : Colors.grey.shade300,
+        color:
+            isEditing
+                ? Colors.grey
+                : Colors.grey.shade300,
         borderRadius: BorderRadius.circular(16),
         border:
             isEditing

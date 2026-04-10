@@ -122,4 +122,76 @@ class PostService {
       throw Exception('Error fetching comments: $e');
     }
   }
+
+  Future<CreateCommentPostResponse> createCommentByPostId(
+    String postId,
+    CreateCommentPostRequest request,
+  ) async {
+    try {
+      final res = await dio.post(
+        '/post/$postId/comment/create',
+        //  Chuyển object request thành JSON để gửi trong Body
+        data: request.toJson(),
+      );
+
+      if (res.statusCode == 200 || res.statusCode == 201) {
+        return CreateCommentPostResponse.fromJson(res.data);
+      } else {
+        throw Exception('Failed to create comment: ${res.statusCode}');
+      }
+    } on DioException catch (e) {
+      throw Exception(
+        e.response != null
+            ? 'Server error: ${e.response?.statusCode} - ${e.response?.data}'
+            : 'Network error: ${e.message}',
+      );
+    } catch (e) {
+      throw Exception('Error creating comment: $e');
+    }
+  }
+
+  Future<void> updateCommentById(
+    String commentId,
+    CreateCommentPostRequest request,
+  ) async {
+    try {
+      final res = await dio.patch(
+        '/post/$commentId/comment/update',
+        data: request.toJson(),
+      );
+      if (res.statusCode == 200 || res.statusCode == 204) {
+        return;
+      } else {
+        throw Exception('Failed to update comment: ${res.statusCode}');
+      }
+    } on DioException catch (e) {
+      throw Exception(
+        e.response != null
+            ? 'Server error: ${e.response?.statusCode} - ${e.response?.data}'
+            : 'Network error: ${e.message}',
+      );
+    } catch (e) {
+      throw Exception('Error updating comment: $e');
+    }
+  }
+
+  Future<void> deleteCommentById(String commentId) async {
+    try {
+      final res = await dio.delete('/post/$commentId/comment/delete');
+
+      if (res.statusCode == 200 || res.statusCode == 204) {
+        return;
+      } else {
+        throw Exception('Failed to delete comment: ${res.statusCode}');
+      }
+    } on DioException catch (e) {
+      throw Exception(
+        e.response != null
+            ? 'Server error: ${e.response?.statusCode} - ${e.response?.data}'
+            : 'Network error: ${e.message}',
+      );
+    } catch (e) {
+      throw Exception('Error deleting comment: $e');
+    }
+  }
 }

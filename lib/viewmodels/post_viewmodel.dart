@@ -45,8 +45,12 @@ class PostViewModel extends ChangeNotifier {
   Map<String, List<CommentPostResponse>> commentsMap = {};
   Map<String, bool> hasMoreMap = {};
   Map<String, bool> isLoadingMap = {};
-  List<CommentPostResponse> getComments(String postId) => commentsMap[postId] ?? [];
+
+  List<CommentPostResponse> getComments(String postId) =>
+      commentsMap[postId] ?? [];
+
   bool getHasMoreComments(String postId) => hasMoreMap[postId] ?? false;
+
   bool getIsLoadingComments(String postId) => isLoadingMap[postId] ?? false;
 
   Future<void> fetchPosts({bool forceRefresh = false}) async {
@@ -181,6 +185,68 @@ class PostViewModel extends ChangeNotifier {
     } finally {
       isLoadingMap[postId] = false;
       notifyListeners();
+    }
+  }
+
+  Future<CreateCommentPostResponse> sendComment({
+    required String postId,
+    required String userId,
+    required String userModel,
+    required String content,
+  }) async {
+    try {
+      final request = CreateCommentPostRequest(
+        userId: userId,
+        userModel: userModel,
+        content: content,
+      );
+
+      final response = await repository.createCommentByPostId(postId, request);
+      //  Làm mới lại danh sách bình luận của bài viết này
+      await fetchComments(postId: postId, skip: 0, limit: 10);
+      return response;
+    } catch (e) {
+      debugPrint("Error sending comment: $e");
+      rethrow;
+    }
+  }
+
+  Future<void> updateComment({
+    required String postId,
+    required String commentId,
+    required String userId,
+    required String userModel,
+    required String content,
+  }) async {
+    try {
+      final request = CreateCommentPostRequest(
+        userId: userId,
+        userModel: userModel,
+        content: content,
+      );
+
+      await repository.updateCommentById(commentId, request);
+      await fetchComments(postId: postId, skip: 0, limit: 10);
+    } catch (e) {
+      debugPrint("Error updating comment: $e");
+      rethrow;
+    }
+  }
+
+  Future<void> deleteComment({
+    required String postId,
+    required String commentId,
+  }) async {
+    try {
+      await repository.deleteCommentById(commentId);
+      final commentsOfThisPost = commentsMap[postId];
+      if (commentsOfThisPost != null) {
+        commentsOfThisPost.removeWhere((c) => c.id == commentId);
+        notifyListeners();
+      }
+    } catch (e) {
+      debugPrint("Error deleting comment: $e");
+      rethrow;
     }
   }
 }

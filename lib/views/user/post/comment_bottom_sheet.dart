@@ -74,24 +74,54 @@ class _CommentBottomSheetState extends State<CommentBottomSheet> {
   void _submitComment() async {
     final text = _textController.text.trim();
     if (text.isEmpty) return;
-    // Ví dụ:
-    // if (_editingCommentId != null) {
-    //    await context.read<PostViewModel>().updateComment(widget.postId, _editingCommentId!, text);
-    // } else {
-    //    await context.read<PostViewModel>().addComment(widget.postId, text);
-    // }
 
-    _textController.clear();
-    _editingCommentId = null;
-    _focusNode.unfocus();
-
-    // Cuộn lên đầu để xem comment mới (nếu add mới)
-    if (_scrollController.hasClients) {
-      _scrollController.animateTo(
-        0,
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeOut,
+    //  Lấy thông tin user đang đăng nhập
+    final user = context.read<UserViewModel>().user;
+    if (user == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Không tìm thấy thông tin người dùng.')),
       );
+      return;
+    }
+
+    try {
+      if (_editingCommentId != null) {
+        await context.read<PostViewModel>().updateComment(
+          postId: widget.postId,
+          commentId: _editingCommentId!,
+          userId: user.id ?? '',
+          userModel: user.role ?? '',
+          content: text,
+        );
+      } else {
+        //Điền data cho hàm Tạo mới
+        await context.read<PostViewModel>().sendComment(
+          postId: widget.postId,
+          userId: user.id ?? '',
+          userModel: user.role ?? '',
+          content: text,
+        );
+      }
+
+      // Xóa chữ trong ô nhập và đóng bàn phím sau khi gửi thành công
+      _textController.clear();
+      _editingCommentId = null;
+      _focusNode.unfocus();
+
+      // Cuộn lên đầu để xem comment mới
+      if (_scrollController.hasClients) {
+        _scrollController.animateTo(
+          0,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOut,
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Có lỗi xảy ra: $e')));
+      }
     }
   }
 
@@ -173,8 +203,10 @@ class _CommentBottomSheetState extends State<CommentBottomSheet> {
                                     isEditing: _editingCommentId == comment.id,
                                     onEdit: () => _startEdit(comment),
                                     onDelete: () {
-                                      // TODO: Gọi hàm xóa từ ViewModel
-                                      // viewModel.deleteComment(widget.postId, comment.id);
+                                      viewModel.deleteComment(
+                                        postId: widget.postId,
+                                        commentId: comment.id,
+                                      );
                                     },
                                   ),
                                 );

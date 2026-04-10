@@ -174,3 +174,27 @@ class GetCommentPageResponse {
     };
   }
 }
+
+class CreateCommentPostResponse {
+  final String user;
+  final String post;
+  final String content;
+
+  CreateCommentPostResponse({
+    required this.user,
+    required this.post,
+    required this.content,
+  });
+
+  factory CreateCommentPostResponse.fromJson(Map<String, dynamic> json) {
+    return CreateCommentPostResponse(
+      user: json['user'] ?? '',
+      post: json['post'] ?? '',
+      content: json['content'] ?? '',
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {'user': user, 'post': post, 'content': content};
+  }
+}
