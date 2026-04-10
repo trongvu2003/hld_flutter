@@ -28,7 +28,6 @@ class _MediaDetailScreenState extends State<MediaDetailScreen> {
     super.initState();
     _currentIndex = widget.initialIndex;
     _pageController = PageController(initialPage: widget.initialIndex);
-
     _preloadVideos();
   }
 
@@ -122,7 +121,12 @@ class _MediaDetailScreenState extends State<MediaDetailScreen> {
             child: Align(
               alignment: Alignment.topRight,
               child: Padding(
-                padding: const EdgeInsets.all(16.0),
+                padding: const EdgeInsets.only(
+                  top: 4,
+                  right: 16,
+                  left: 16,
+                  bottom: 16,
+                ),
                 child: IconButton(
                   icon: const Icon(Icons.close, color: Colors.white, size: 30),
                   onPressed: () => Navigator.of(context).pop(),
