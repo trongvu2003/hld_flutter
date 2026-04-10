@@ -81,7 +81,7 @@ class HeadBar extends StatelessWidget implements PreferredSizeWidget {
                     'HelloDoc',
                     style: Theme.of(context).textTheme.titleLarge?.copyWith(
                       fontWeight: FontWeight.w900,
-                      color: Theme.of(context).colorScheme.onPrimaryContainer,
+                      color: Colors.black,
                       letterSpacing: 1,
                     ),
                   ),

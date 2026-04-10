@@ -54,33 +54,33 @@ class _VideoThumbnailOnlyState extends State<VideoThumbnailOnly>
 
   @override
   Widget build(BuildContext context) {
-    // 1. Nếu có lỗi mạng/link hỏng
+    //  Nếu có lỗi mạng/link hỏng
     if (_hasError) {
       return _ErrorPlaceholder();
     }
 
-    // 2. Nếu đang tải (Kế thừa xài luôn class Skeleton xịn của bác)
     if (!_isInitialized) {
-      return const Skeleton(width: double.infinity, height: 220, radius: 0);
+      return const Skeleton(width: double.infinity, height: double.infinity, radius: 0);
     }
-
-    // 3. Đã tải xong, chạy video
-    final ratio = _controller.value.aspectRatio;
-    final maxHeight = ratio < 1 ? 400.0 : 260.0;
-
-    return ConstrainedBox(
-      constraints: BoxConstraints(maxHeight: maxHeight),
+    return SizedBox.expand(
       child: FadeTransition(
         opacity: _fadeAnimation,
-        child: AspectRatio(
-          aspectRatio: ratio,
+        child: ClipRect(
           child: Stack(
             alignment: Alignment.center,
+            fit: StackFit.expand,
             children: [
-              // Video frame
-              VideoPlayer(_controller),
+              FittedBox(
+                fit: BoxFit.cover,
+                clipBehavior: Clip.hardEdge,
+                child: SizedBox(
+                  width: _controller.value.size.width,
+                  height: _controller.value.size.height,
+                  child: VideoPlayer(_controller),
+                ),
+              ),
 
-              // Gradient overlay phía dưới
+              //  Gradient overlay phía dưới
               Positioned.fill(
                 child: DecoratedBox(
                   decoration: BoxDecoration(
@@ -97,8 +97,8 @@ class _VideoThumbnailOnlyState extends State<VideoThumbnailOnly>
                 ),
               ),
 
-              // Play button
-              _PlayButton(),
+              //  Play button (Được căn giữa tự động bởi Stack)
+              Center(child: _PlayButton()),
             ],
           ),
         ),

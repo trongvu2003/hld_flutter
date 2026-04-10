@@ -9,6 +9,7 @@ import '../../../../models/responsemodel/post.dart';
 import '../../../../theme/app_colors.dart';
 import '../../../skeleton/skeleton_box.dart';
 import '../../post/comment_bottom_sheet.dart';
+import '../../post/media_detail_screen.dart';
 
 class PostCard extends StatelessWidget {
   final PostResponse post;
@@ -143,9 +144,15 @@ class PostCard extends StatelessWidget {
 
             // Media Grid (Hỗ trợ nhiều Ảnh và Video)
             if (images.isNotEmpty) ...[
-              SizedBox(
-                width: double.infinity,
-                child: _buildMediaGrid(images, context),
+              Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: _buildMediaGrid(images, context),
+                  ),
+                ),
               ),
             ],
 
@@ -210,7 +217,7 @@ class PostCard extends StatelessWidget {
     if (count == 1) {
       return SizedBox(
         height: 250,
-        child: _buildMediaItem(images[0].toString(), context),
+        child: _buildMediaItem(images[0].toString(), context, 0, images),
       );
     }
 
@@ -219,9 +226,13 @@ class PostCard extends StatelessWidget {
         height: 250,
         child: Row(
           children: [
-            Expanded(child: _buildMediaItem(images[0].toString(), context)),
+            Expanded(
+              child: _buildMediaItem(images[0].toString(), context, 0, images),
+            ),
             const SizedBox(width: 2),
-            Expanded(child: _buildMediaItem(images[1].toString(), context)),
+            Expanded(
+              child: _buildMediaItem(images[1].toString(), context, 1, images),
+            ),
           ],
         ),
       );
@@ -232,17 +243,29 @@ class PostCard extends StatelessWidget {
         height: 250,
         child: Row(
           children: [
-            Expanded(child: _buildMediaItem(images[0].toString(), context)),
+            Expanded(
+              child: _buildMediaItem(images[0].toString(), context, 0, images),
+            ),
             const SizedBox(width: 2),
             Expanded(
               child: Column(
                 children: [
                   Expanded(
-                    child: _buildMediaItem(images[1].toString(), context),
+                    child: _buildMediaItem(
+                      images[1].toString(),
+                      context,
+                      1,
+                      images,
+                    ),
                   ),
                   const SizedBox(height: 2),
                   Expanded(
-                    child: _buildMediaItem(images[2].toString(), context),
+                    child: _buildMediaItem(
+                      images[2].toString(),
+                      context,
+                      2,
+                      images,
+                    ),
                   ),
                 ],
               ),
@@ -251,6 +274,7 @@ class PostCard extends StatelessWidget {
         ),
       );
     }
+
     return SizedBox(
       height: 300,
       child: Column(
@@ -258,9 +282,23 @@ class PostCard extends StatelessWidget {
           Expanded(
             child: Row(
               children: [
-                Expanded(child: _buildMediaItem(images[0].toString(), context)),
+                Expanded(
+                  child: _buildMediaItem(
+                    images[0].toString(),
+                    context,
+                    0,
+                    images,
+                  ),
+                ),
                 const SizedBox(width: 2),
-                Expanded(child: _buildMediaItem(images[1].toString(), context)),
+                Expanded(
+                  child: _buildMediaItem(
+                    images[1].toString(),
+                    context,
+                    1,
+                    images,
+                  ),
+                ),
               ],
             ),
           ),
@@ -268,12 +306,21 @@ class PostCard extends StatelessWidget {
           Expanded(
             child: Row(
               children: [
-                Expanded(child: _buildMediaItem(images[2].toString(), context)),
+                Expanded(
+                  child: _buildMediaItem(
+                    images[2].toString(),
+                    context,
+                    2,
+                    images,
+                  ),
+                ),
                 const SizedBox(width: 2),
                 Expanded(
                   child: _buildMediaItem(
                     images[3].toString(),
                     context,
+                    3,
+                    images,
                     remainingCount: count > 4 ? count - 4 : 0,
                   ),
                 ),
@@ -287,7 +334,9 @@ class PostCard extends StatelessWidget {
 
   Widget _buildMediaItem(
     String url,
-    BuildContext context, {
+    BuildContext context,
+    int currentIndex,
+    List allMedia, {
     int remainingCount = 0,
   }) {
     bool isVideo(String url) {
@@ -319,8 +368,10 @@ class PostCard extends StatelessWidget {
       );
     }
 
+    Widget finalWidget = mediaWidget;
+
     if (remainingCount > 0) {
-      return Stack(
+      finalWidget = Stack(
         fit: StackFit.expand,
         children: [
           mediaWidget,
@@ -340,8 +391,21 @@ class PostCard extends StatelessWidget {
         ],
       );
     }
+    return GestureDetector(
+      onTap: () {
+        List<String> stringMediaList = allMedia.map((e) => e.toString()).toList();
 
-    return mediaWidget;
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (_) => MediaDetailScreen(
+              mediaUrls: stringMediaList,
+              initialIndex: currentIndex,
+            ),
+          ),
+        );
+      },
+      child: finalWidget,
+    );
   }
 }
 
