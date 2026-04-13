@@ -21,4 +21,5 @@ class AppRoutes {
   static const editprofile ='/editprofile';
   static const setting='/setting';
   static const profileotheruserpage='/otheruserprofile';
+  static const postdetail='/postdetail';
 }

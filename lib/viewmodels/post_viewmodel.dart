@@ -52,6 +52,10 @@ class PostViewModel extends ChangeNotifier {
   bool getHasMoreComments(String postId) => hasMoreMap[postId] ?? false;
 
   bool getIsLoadingComments(String postId) => isLoadingMap[postId] ?? false;
+  PostResponse? postDetail;
+  bool isPostDetailLoading = false;
+  List<PostResponse> similarPosts = [];
+  bool isSimilarLoading = false;
 
   Future<void> fetchPosts({bool forceRefresh = false}) async {
     if (!forceRefresh && posts.isNotEmpty) return;
@@ -248,5 +252,52 @@ class PostViewModel extends ChangeNotifier {
       debugPrint("Error deleting comment: $e");
       rethrow;
     }
+  }
+
+  Future<void> getPostById(String postId) async {
+    isPostDetailLoading = true;
+    postDetail = null;
+    notifyListeners();
+
+    try {
+      final res = await repository.getPostById(postId);
+
+      postDetail = res;
+      print("Lấy bài viết chi tiết thành công: ${res.id}");
+    } catch (e) {
+      debugPrint("Lỗi khi lấy chi tiết bài viết: $e");
+    } finally {
+      isPostDetailLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> getSimilarPosts(String postId) async {
+    isSimilarLoading = true;
+    similarPosts = [];
+    notifyListeners();
+
+    try {
+      final response = await repository.getSimilarPosts(
+        postId: postId,
+        limit: 5,
+        minSimilarity: 0.6,
+      );
+
+      similarPosts = response.map((item) => item.post).toList();
+    } catch (e) {
+      debugPrint("Lỗi lấy bài viết liên quan: $e");
+    } finally {
+      isSimilarLoading = false;
+      notifyListeners();
+    }
+  }
+
+  void clearPosts() {
+    posts.clear();
+    hasMore = true;
+    myPosts.clear();
+    visitorPosts.clear();
+    notifyListeners();
   }
 }

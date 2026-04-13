@@ -12,6 +12,14 @@ class UserInfo {
       avatarUrl: json['avatarURL'],
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      '_id': id,
+      'name': name,
+      'avatarURL': avatarUrl,
+    };
+  }
 }
 
 class PostResponse {
@@ -41,6 +49,17 @@ class PostResponse {
       userModel: json['userModel'] ?? '',
       createdAt: json['createdAt'] ?? '',
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      '_id': id,
+      'content': content,
+      'media': media,
+      'userInfo': userInfo?.toJson(),
+      'userModel': userModel,
+      'createdAt': createdAt,
+    };
   }
 }
 
@@ -130,7 +149,6 @@ class CommentPostResponse {
   factory CommentPostResponse.fromJson(Map<String, dynamic> json) {
     return CommentPostResponse(
       id: json['_id'] ?? '',
-      // Map key '_id'
       user: CommentUser.fromJson(json['user'] ?? {}),
       post: json['post'] ?? '',
       content: json['content'] ?? '',
@@ -196,5 +214,28 @@ class CreateCommentPostResponse {
 
   Map<String, dynamic> toJson() {
     return {'user': user, 'post': post, 'content': content};
+  }
+}
+
+
+class SimilarPostResponse {
+  final PostResponse post;
+  final double similarity;
+
+  SimilarPostResponse({
+    required this.post,
+    required this.similarity,
+  });
+  factory SimilarPostResponse.fromJson(Map<String, dynamic> json) {
+    return SimilarPostResponse(
+      post: PostResponse.fromJson(json['post'] as Map<String, dynamic>),
+      similarity: (json['similarity'] as num?)?.toDouble() ?? 0.0,
+    );
+  }
+  Map<String, dynamic> toJson() {
+    return {
+      'post': post.toJson(),
+      'similarity': similarity,
+    };
   }
 }

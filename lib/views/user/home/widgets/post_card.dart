@@ -64,7 +64,7 @@ class PostCard extends StatelessWidget {
                         } else {
                           Navigator.pushNamed(
                             context,
-                            AppRoutes.otheruserprofile,
+                            AppRoutes.profileotheruserpage,
                             arguments: {'userOwnerID': userInfo?.id},
                           );
                           print("User dc bam ${userInfo?.id}");
@@ -162,11 +162,24 @@ class PostCard extends StatelessWidget {
 
             // Content
             if ((post.content ?? '').isNotEmpty)
-              Padding(
-                padding: const EdgeInsets.fromLTRB(12, 0, 12, 8),
-                child: Text(post.content),
-              ),
+              GestureDetector(
+                onTap: () {
+                  Navigator.pushNamed(
+                    context,
+                    AppRoutes.postdetail,
+                    arguments: {'postId': post.id},
+                  );
+                },
+                // Bắt sự kiện kể cả khi bấm vào vùng trống (không có màu)
+                behavior: HitTestBehavior.opaque,
 
+                // Dùng Container và ép width chiếm toàn bộ chiều ngang
+                child: Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.fromLTRB(12, 0, 12, 8),
+                  child: Text(post.content),
+                ),
+              ),
             // Media Grid (Hỗ trợ nhiều Ảnh và Video)
             if (images.isNotEmpty) ...[
               Padding(

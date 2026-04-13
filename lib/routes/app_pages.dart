@@ -17,6 +17,7 @@ import '../views/user/home/personal/edit_user_profile.dart';
 import '../views/user/home/personal/otheruserprofile.dart';
 import '../views/user/home/personal/setting_page.dart';
 import '../views/user/home/personal/use_owner_profile.dart';
+import '../views/user/post/postdetailscreen.dart';
 import 'app_routes.dart';
 import '../views/auth/intro_screen.dart';
 
@@ -91,9 +92,9 @@ class AppPages {
     AppRoutes.personal: (context) => const ProfileUserPage(),
     AppRoutes.editoptionpage: (context) => const EditOptionPage(),
     AppRoutes.editprofile: (context) => const EditUserProfile(),
-    AppRoutes.setting: (context) =>const SettingScreen(),
+    AppRoutes.setting: (context) => const SettingScreen(),
 
-    AppRoutes.otheruserprofile: (context) {
+    AppRoutes.profileotheruserpage: (context) {
       final args = Map<String, dynamic>.from(
         ModalRoute.of(context)?.settings.arguments as Map? ?? {},
       );
@@ -101,6 +102,13 @@ class AppPages {
       return ProfileOtherUserPage(
         userOwnerID: args['userOwnerID']?.toString() ?? '',
       );
+    },
+
+    AppRoutes.postdetail: (context) {
+      final args = Map<String, dynamic>.from(
+        ModalRoute.of(context)?.settings.arguments as Map? ?? {},
+      );
+      return PostDetailScreen(postId: args['postId']?.toString() ?? '');
     },
   };
 }

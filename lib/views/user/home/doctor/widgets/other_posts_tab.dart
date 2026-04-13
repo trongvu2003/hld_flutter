@@ -89,7 +89,7 @@ class _PostsTabState extends State<PostsTab> {
           onReport: () => print("Báo cáo: ${post.id}"),
           onDelete: () => print("Xoá: ${post.id}"),
           onNavigateToDetail: () {
-            Navigator.pushNamed(context, '/post-detail/${post.id}');
+            Navigator.pushNamed(context, '/postdetail/${post.id}');
           },
         );
       },

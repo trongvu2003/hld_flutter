@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import '../models/requestmodel/post.dart';
 import '../models/responsemodel/post.dart';
 import '../services/post_service.dart';
@@ -26,29 +28,33 @@ class PostRepository {
     return await postService.getPostByUserId(userId, skip, limit);
   }
 
-  Future<GetCommentPageResponse> getCommentByPostId(
-    String postId,
-    int skip,
-    int limit,
-  ) async {
+  Future<GetCommentPageResponse> getCommentByPostId(String postId,
+      int skip,
+      int limit,) async {
     return await postService.getCommentByPostId(postId, skip, limit);
   }
 
-  Future<CreateCommentPostResponse> createCommentByPostId(
-    String postId,
-    CreateCommentPostRequest request,
-  ) async {
+  Future<CreateCommentPostResponse> createCommentByPostId(String postId,
+      CreateCommentPostRequest request,) async {
     return await postService.createCommentByPostId(postId, request);
   }
 
-  Future<void> updateCommentById(
-    String commentId,
-    CreateCommentPostRequest request,
-  ) async {
+  Future<void> updateCommentById(String commentId,
+      CreateCommentPostRequest request,) async {
     return await postService.updateCommentById(commentId, request);
   }
 
   Future<void> deleteCommentById(String commentId) async {
     return await postService.deleteCommentById(commentId);
+  }
+
+  Future<PostResponse> getPostById(String postId) async {
+    return await postService.getPostById(postId);
+  }
+
+  Future<List<SimilarPostResponse>> getSimilarPosts({required postId,
+    required int limit,
+    required double minSimilarity,}){
+    return postService.getSimilarPosts(postId: postId, limit: limit, minSimilarity: minSimilarity, );
   }
 }

@@ -29,15 +29,14 @@ class PostSkeleton extends StatelessWidget {
         children: [
           Row(
             children: [
-              // Sử dụng ClipOval bọc ngoài Skeleton để tạo hình tròn hoàn hảo cho Avatar
               ClipOval(child: Skeleton(width: 45, height: 45, radius: 22.5)),
               const SizedBox(width: 12),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Skeleton(width: 120, height: 16, radius: 4), // Tên
+                  Skeleton(width: 120, height: 16, radius: 4),
                   const SizedBox(height: 6),
-                  Skeleton(width: 80, height: 12, radius: 4), // Thời gian
+                  Skeleton(width: 80, height: 12, radius: 4),
                 ],
               ),
             ],

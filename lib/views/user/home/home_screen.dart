@@ -210,7 +210,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           onNavigateToDetail: () {
                             Navigator.pushNamed(
                               context,
-                              '/post-detail/${post.id}',
+                              '/postdetail/${post.id}',
                             );
                           },
                         );

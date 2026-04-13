@@ -194,4 +194,41 @@ class PostService {
       throw Exception('Error deleting comment: $e');
     }
   }
+
+  Future<PostResponse> getPostById(String postId) async {
+    try {
+      final res = await dio.get('/post/$postId');
+      if (res.statusCode == 200) {
+        return PostResponse.fromJson(res.data);
+      } else {
+        throw Exception('Failed to load posts: ${res.statusCode}');
+      }
+    } catch (e) {
+      throw Exception('Error fetching post: $e');
+    }
+  }
+
+  Future<List<SimilarPostResponse>> getSimilarPosts({
+    required String postId,
+    int limit = 5,
+    double minSimilarity = 0.6,
+  }) async {
+    try {
+      final response = await dio.get(
+        '/post/$postId/similar',
+        queryParameters: {'limit': limit, 'minSimilarity': minSimilarity},
+      );
+
+      if (response.statusCode == 200) {
+        final List<dynamic> data = response.data;
+        return data.map((json) => SimilarPostResponse.fromJson(json)).toList();
+      } else {
+        throw Exception(
+          'Lỗi khi tải bài viết liên quan: ${response.statusCode}',
+        );
+      }
+    } catch (e) {
+      throw Exception('Lỗi getSimilarPosts: $e');
+    }
+  }
 }
