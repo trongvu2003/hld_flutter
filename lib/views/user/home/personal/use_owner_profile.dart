@@ -32,7 +32,7 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
     if (!mounted) return;
 
     // Load thông tin user (Avatar, Name,...)
-    context.read<UserViewModel>().loadUser();
+    context.read<UserViewModel>().loadCurrentUser();
 
     // Load danh sách bài viết của CHÍNH MÌNH
     if (userId != null) {
@@ -53,7 +53,7 @@ class _ProfileUserPageState extends State<ProfileUserPage> {
 
   @override
   Widget build(BuildContext context) {
-    final user = context.watch<UserViewModel>().user;
+    final user = context.watch<UserViewModel>().currentUser;
     if (user == null) {
       return Scaffold(
         backgroundColor: Colors.white,

@@ -13,10 +13,11 @@ class UserViewModel extends ChangeNotifier {
 
   UserViewModel(this.repository);
 
-  User? user;
+  User? currentUser;       // Thông tin của chính mình
+  User? userOfThisProfile; // Thông tin của người khác
   bool isLoading = false;
 
-  Future<void> loadUser() async {
+  Future<void> loadCurrentUser() async {
     isLoading = true;
     notifyListeners();
 
@@ -29,14 +30,30 @@ class UserViewModel extends ChangeNotifier {
       final decoded = JwtDecoder.decode(token);
       final userId = decoded['userId'];
 
-      user = await repository.getUser(userId);
+      currentUser = await repository.getUser(userId);
     } catch (e) {
-      print("USER ERROR: $e");
+      print("LOAD CURRENT USER ERROR: $e");
     }
 
     isLoading = false;
     notifyListeners();
   }
+
+  Future<void> loadOtherUser(String userId) async {
+    isLoading = true;
+    notifyListeners();
+
+    try {
+      // Gọi API lấy user theo ID truyền vào, không dùng Token ID
+      userOfThisProfile = await repository.getUser(userId);
+    } catch (e) {
+      print("LOAD OTHER USER ERROR: $e");
+    }
+
+    isLoading = false;
+    notifyListeners();
+  }
+
 
   Future<void> updateUser({
     File? avatarFile,
@@ -73,7 +90,7 @@ class UserViewModel extends ChangeNotifier {
       );
 
       if (updatedUser != null) {
-        await loadUser();
+        await loadCurrentUser();
       }
     } catch (e) {
       print("UPDATE USER ERROR: $e");

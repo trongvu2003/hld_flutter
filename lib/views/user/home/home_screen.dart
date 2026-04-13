@@ -46,7 +46,7 @@ class _HomeScreenState extends State<HomeScreen> {
     _scrollController.addListener(_onScroll);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
-      context.read<UserViewModel>().loadUser();
+      context.read<UserViewModel>().loadCurrentUser();
       context.read<PostViewModel>().fetchPosts();
       context.read<SpecialtyViewModel>().fetchSpecialties();
       context.read<DoctorViewModel>().fetchDoctors();
@@ -137,7 +137,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 //  DOCTORS
                 Consumer2<DoctorViewModel, UserViewModel>(
                   builder: (context, doctorVM, userVM, child) {
-                    final currentUserId = userVM.user?.id ?? '';
+                    final currentUserId = userVM.currentUser?.id ?? '';
                     return SliverToBoxAdapter(
                       child:
                           doctorVM.isLoading
@@ -187,7 +187,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         final post = vm.posts[i];
                         return PostCard(
                           post: post,
-                          currentUserId: userVM.user!.id ?? "",
+                          currentUserId: userVM.currentUser!.id ?? "",
                           onReport: () {
                             AppDialog.show(
                               context: context,
@@ -328,7 +328,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _buildGreetingRow(BuildContext context) {
     final vm = context.watch<UserViewModel>();
-    final user = vm.user;
+    final user = vm.currentUser;
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 16),

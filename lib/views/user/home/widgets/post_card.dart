@@ -1,6 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:hld_flutter/viewmodels/post_viewmodel.dart';
+import 'package:hld_flutter/routes/app_routes.dart';
 import 'package:hld_flutter/viewmodels/user_viewmodel.dart';
 import 'package:hld_flutter/views/user/home/widgets/video_thumbnail_only.dart';
 import 'package:intl/intl.dart';
@@ -32,7 +32,7 @@ class PostCard extends StatelessWidget {
     final images = post.media;
     final isOwner = currentUserId == userInfo?.id;
     final avatar = userInfo?.avatarUrl;
-    final userVM = context.watch<UserViewModel>().user;
+    final userVM = context.watch<UserViewModel>().currentUser;
 
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 4),
@@ -56,57 +56,82 @@ class PostCard extends StatelessWidget {
               padding: const EdgeInsets.fromLTRB(12, 12, 4, 8),
               child: Row(
                 children: [
-                  ClipOval(
-                    child: SizedBox(
-                      width: 45,
-                      height: 45,
-                      child:
-                          avatar != null
-                              ? CachedNetworkImage(
-                                imageUrl: avatar,
-                                fit: BoxFit.cover,
-                                placeholder:
-                                    (context, url) => const Skeleton(
-                                      width: 45,
-                                      height: 45,
-                                      radius: 22.5,
-                                    ),
-                                errorWidget:
-                                    (context, url, error) => Image.asset(
-                                      'assets/images/avatar_doctor.jpg',
-                                      fit: BoxFit.cover,
-                                    ),
-                              )
-                              : Image.asset(
-                                'assets/images/avatar_doctor.jpg',
-                                fit: BoxFit.cover,
-                              ),
-                    ),
-                  ),
-                  const SizedBox(width: 10),
                   Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          userInfo?.name ?? 'Người dùng',
-                          style: const TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        Text(
-                          formatTime(post.createdAt),
-                          style: Theme.of(
+                    child: InkWell(
+                      onTap: () {
+                        if (post.userInfo?.id == userVM?.id) {
+                          Navigator.pushNamed(context, AppRoutes.personal);
+                        } else {
+                          Navigator.pushNamed(
                             context,
-                          ).textTheme.labelSmall?.copyWith(
-                            color:
-                                Theme.of(context).colorScheme.onSurfaceVariant,
+                            AppRoutes.otheruserprofile,
+                            arguments: {'userOwnerID': userInfo?.id},
+                          );
+                          print("User dc bam ${userInfo?.id}");
+                        }
+                      },
+                      child: Row(
+                        children: [
+                          ClipOval(
+                            child: SizedBox(
+                              width: 45,
+                              height: 45,
+                              child:
+                                  avatar != null
+                                      ? CachedNetworkImage(
+                                        imageUrl: avatar,
+                                        fit: BoxFit.cover,
+                                        placeholder:
+                                            (context, url) => const Skeleton(
+                                              width: 45,
+                                              height: 45,
+                                              radius: 22.5,
+                                            ),
+                                        errorWidget:
+                                            (
+                                              context,
+                                              url,
+                                              error,
+                                            ) => Image.asset(
+                                              'assets/images/avatar_doctor.jpg',
+                                              fit: BoxFit.cover,
+                                            ),
+                                      )
+                                      : Image.asset(
+                                        'assets/images/avatar_doctor.jpg',
+                                        fit: BoxFit.cover,
+                                      ),
+                            ),
                           ),
-                        ),
-                      ],
+                          const SizedBox(width: 10),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                userInfo?.name ?? 'Người dùng',
+                                style: const TextStyle(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              Text(
+                                formatTime(post.createdAt),
+                                style: Theme.of(
+                                  context,
+                                ).textTheme.labelSmall?.copyWith(
+                                  color:
+                                      Theme.of(
+                                        context,
+                                      ).colorScheme.onSurfaceVariant,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
                   ),
+
                   PopupMenuButton<String>(
                     onSelected: (v) {
                       if (v == 'report') onReport();
@@ -393,14 +418,16 @@ class PostCard extends StatelessWidget {
     }
     return GestureDetector(
       onTap: () {
-        List<String> stringMediaList = allMedia.map((e) => e.toString()).toList();
+        List<String> stringMediaList =
+            allMedia.map((e) => e.toString()).toList();
 
         Navigator.of(context).push(
           MaterialPageRoute(
-            builder: (_) => MediaDetailScreen(
-              mediaUrls: stringMediaList,
-              initialIndex: currentIndex,
-            ),
+            builder:
+                (_) => MediaDetailScreen(
+                  mediaUrls: stringMediaList,
+                  initialIndex: currentIndex,
+                ),
           ),
         );
       },

@@ -46,7 +46,7 @@ class _CreatePostScreenState extends State<CreatePostScreen>
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
-      context.read<UserViewModel>().loadUser();
+      context.read<UserViewModel>().loadCurrentUser();
     });
 
     _buttonAnimCtrl = AnimationController(
@@ -120,7 +120,7 @@ class _CreatePostScreenState extends State<CreatePostScreen>
       return;
     }
 
-    final user = context.read<UserViewModel>().user;
+    final user = context.read<UserViewModel>().currentUser;
     final postVM = context.read<PostViewModel>();
 
     if (user == null) {
@@ -161,7 +161,7 @@ class _CreatePostScreenState extends State<CreatePostScreen>
   @override
   Widget build(BuildContext context) {
     final userViewModel = context.watch<UserViewModel>();
-    final user = userViewModel.user;
+    final user = userViewModel.currentUser;
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle.dark,

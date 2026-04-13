@@ -68,7 +68,7 @@ class _AppointmentDetailScreenState extends State<AppointmentDetailScreen> {
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
-      context.read<UserViewModel>().loadUser();
+      context.read<UserViewModel>().loadCurrentUser();
     });
   }
 
@@ -128,7 +128,7 @@ class _AppointmentDetailScreenState extends State<AppointmentDetailScreen> {
       ).showSnackBar(const SnackBar(content: Text('Đã cập nhật lịch hẹn!')));
       Navigator.pop(context);
     } else {
-      final user = context.read<UserViewModel>().user;
+      final user = context.read<UserViewModel>().currentUser;
       Navigator.pushNamed(
         context,
         '/booking-confirm',
@@ -154,7 +154,7 @@ class _AppointmentDetailScreenState extends State<AppointmentDetailScreen> {
   @override
   Widget build(BuildContext context) {
     final vm = context.watch<UserViewModel>();
-    final user = vm.user;
+    final user = vm.currentUser;
 
     if (user == null) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));

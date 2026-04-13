@@ -42,7 +42,7 @@ class _FootBarState extends State<FootBar> with SingleTickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    final user = context.read<UserViewModel>().user;
+    final user = context.read<UserViewModel>().currentUser;
     return SizedBox(
       height: 100, // thêm space cho FAB nhô lên
       child: Stack(

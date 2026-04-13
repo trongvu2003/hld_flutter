@@ -29,7 +29,7 @@ class _EditUserProfileState extends State<EditUserProfile> {
     super.initState();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<UserViewModel>().loadUser();
+      context.read<UserViewModel>().loadCurrentUser();
     });
   }
 
@@ -47,7 +47,7 @@ class _EditUserProfileState extends State<EditUserProfile> {
   @override
   Widget build(BuildContext context) {
     final userViewModel = context.watch<UserViewModel>();
-    final user = userViewModel.user;
+    final user = userViewModel.currentUser;
 
     if (user == null) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));

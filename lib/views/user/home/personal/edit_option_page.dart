@@ -15,13 +15,13 @@ class _EditOptionPageState extends State<EditOptionPage> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<UserViewModel>().loadUser();
+      context.read<UserViewModel>().loadCurrentUser();
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    final user = context.watch<UserViewModel>().user;
+    final user = context.watch<UserViewModel>().currentUser;
     final clinicButtonText =
         (user?.role == "User") ? "Đăng kí phòng khám" : "Quản lý phòng khám";
     print("role là: ${user?.role}");

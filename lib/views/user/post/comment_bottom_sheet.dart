@@ -76,7 +76,7 @@ class _CommentBottomSheetState extends State<CommentBottomSheet> {
     if (text.isEmpty) return;
 
     //  Lấy thông tin user đang đăng nhập
-    final user = context.read<UserViewModel>().user;
+    final user = context.read<UserViewModel>().currentUser;
     if (user == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Không tìm thấy thông tin người dùng.')),
@@ -317,7 +317,7 @@ class _CommentInput extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final vm = context.watch<UserViewModel>();
-    final user = vm.user;
+    final user = vm.currentUser;
     return Row(
       children: [
         Container(

@@ -20,7 +20,7 @@ class _SettingScreenState extends State<SettingScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<UserViewModel>().loadUser();
+      context.read<UserViewModel>().loadCurrentUser();
     });
   }
 

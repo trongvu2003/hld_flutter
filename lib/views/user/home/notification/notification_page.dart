@@ -26,7 +26,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
   void _loadData() {
     final userVM = context.read<UserViewModel>();
     final notifVM = context.read<NotificationViewModel>();
-    final userId = userVM.user?.id ?? '';
+    final userId = userVM.currentUser?.id ?? '';
 
     if (userId.isNotEmpty) {
       if (_showOnlyUnread) {
@@ -50,7 +50,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
     final isLoading = notifVM.isLoading;
     final unreadCount = notifVM.unreadCount;
     final userVM = context.read<UserViewModel>();
-    final userId = userVM.user?.id ?? '';
+    final userId = userVM.currentUser?.id ?? '';
     final cs = Theme.of(context).colorScheme;
     return SafeArea(
       child: Scaffold(

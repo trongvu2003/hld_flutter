@@ -27,7 +27,7 @@ class _MainScreenState extends State<MainScreen> {
   void initState() {
     super.initState();
     Future.microtask(() {
-      context.read<UserViewModel>().loadUser();
+      context.read<UserViewModel>().loadCurrentUser();
     });
   }
 
@@ -58,7 +58,7 @@ class _MainScreenState extends State<MainScreen> {
   Widget build(BuildContext context) {
     final isHome = _currentIndex == 0;
     final userViewModel = context.watch<UserViewModel>();
-    final user = userViewModel.user;
+    final user = userViewModel.currentUser;
 
     if (user == null) {
       return const Scaffold(
