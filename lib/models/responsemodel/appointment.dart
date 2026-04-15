@@ -29,6 +29,38 @@ class AppointmentResponse {
     required this.note,
   });
 
+  AppointmentResponse copyWith({
+    String? id,
+    Doctor? doctor,
+    String? patientModel,
+    Patient? patient,
+    String? date,
+    String? time,
+    String? status,
+    String? examinationMethod,
+    String? notes,
+    String? location,
+    String? createdAt,
+    String? updatedAt,
+    String? note,
+  }) {
+    return AppointmentResponse(
+      id: id ?? this.id,
+      doctor: doctor ?? this.doctor,
+      patientModel: patientModel ?? this.patientModel,
+      patient: patient ?? this.patient,
+      date: date ?? this.date,
+      time: time ?? this.time,
+      status: status ?? this.status,
+      examinationMethod: examinationMethod ?? this.examinationMethod,
+      notes: notes ?? this.notes,
+      location: location ?? this.location,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      note: note ?? this.note,
+    );
+  }
+
   factory AppointmentResponse.fromJson(Map<String, dynamic> json) {
     return AppointmentResponse(
       id: json['_id'] ?? '',
@@ -174,5 +206,40 @@ class Appointment {
       notes: json['notes'],
       totalCost: double.tryParse(json['totalCost']?.toString() ?? '0') ?? 0.0,
     );
+  }
+}
+
+class CancelAppointmentResponse {
+  final String message;
+
+  CancelAppointmentResponse({required this.message});
+
+  factory CancelAppointmentResponse.fromJson(Map<String, dynamic> json) {
+    return CancelAppointmentResponse(
+      message: json['message'] ?? '',
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'message': message,
+    };
+  }
+}
+
+class UpdateAppointmentResponse {
+  final String message;
+  UpdateAppointmentResponse({required this.message});
+
+  factory UpdateAppointmentResponse.fromJson(Map<String, dynamic> json) {
+    return UpdateAppointmentResponse(
+      message: json['message'] ?? '',
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'message': message,
+    };
   }
 }

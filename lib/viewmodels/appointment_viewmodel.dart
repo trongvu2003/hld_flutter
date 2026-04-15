@@ -58,4 +58,59 @@ class AppointmentViewModel extends ChangeNotifier {
       notifyListeners();
     }
   }
+
+  bool isCancelling = false;
+
+  Future<bool> cancelAppointment(String appointmentId) async {
+    isCancelling = true;
+    notifyListeners();
+
+    try {
+      final res = await repository.cancelAppointment(appointmentId);
+      print("HUỶ LỊCH THÀNH CÔNG: ${res.message}");
+
+      // CẬP NHẬT GIAO DIỆN NGAY LẬP TỨC
+      final index = appointments.indexWhere((item) => item.id == appointmentId);
+      if (index != -1) {
+        appointments[index] = appointments[index].copyWith(status: 'cancelled');
+      }
+      return true;
+    } catch (e) {
+      error = e.toString();
+      print("HUỶ LỊCH THẤT BẠI: $error");
+      return false;
+    } finally {
+      isCancelling = false;
+      notifyListeners();
+    }
+  }
+
+  Future<bool> updateAppointment(
+    String id,
+    UpdateAppointmentRequest request,
+  ) async {
+    isLoading = true;
+    notifyListeners();
+
+    try {
+      await repository.updateAppointment(id, request);
+      // Cập nhật lại danh sách appointments đang có trong RAM
+      final index = appointments.indexWhere((element) => element.id == id);
+      if (index != -1) {
+        appointments[index] = appointments[index].copyWith(
+          date: request.date,
+          time: request.time,
+          notes: request.notes,
+        );
+      }
+
+      return true;
+    } catch (e) {
+      error = e.toString();
+      return false;
+    } finally {
+      isLoading = false;
+      notifyListeners();
+    }
+  }
 }

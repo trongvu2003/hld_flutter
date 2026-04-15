@@ -17,4 +17,15 @@ class AppointmentRepository {
   ) async {
     return await appointmentService.createAppointment(accessToken, request);
   }
+
+  Future<CancelAppointmentResponse> cancelAppointment(String id) async {
+    return await appointmentService.cancelAppointment(id);
+  }
+
+  Future<void> updateAppointment(
+    String id,
+    UpdateAppointmentRequest request,
+  ) async {
+    return await appointmentService.updateAppointment(id, request);
+  }
 }

@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:hld_flutter/routes/app_routes.dart';
 import 'package:hld_flutter/theme/app_colors.dart';
 import 'package:hld_flutter/viewmodels/appointment_viewmodel.dart';
 import 'package:provider/provider.dart';
 import '../../../models/responsemodel/appointment.dart';
+import '../../../models/responsemodel/doctor.dart';
 import '../../skeleton/skeleton_box.dart';
+import '../../widgets/app_dialog.dart';
 import 'widgets/appointment_card.dart';
 
 class AppointmentListScreen extends StatefulWidget {
@@ -50,38 +53,41 @@ class _AppointmentListScreenState extends State<AppointmentListScreen> {
     });
   }
 
-  List<AppointmentResponse> get _currentRoleAppointments {
-    return _roleSelectedTab == 0 ? userAppointments : doctorAppointments;
-  }
+  void _cancelAppointment(String appointmentId) async {
+    AppDialog.show(
+      context: context,
+      title: 'Huỷ lịch hẹn',
+      content:
+          'Bạn có chắc chắn muốn huỷ lịch hẹn này không? Hành động này không thể hoàn tác.',
+      cancelText: 'Đóng',
+      cancelBgColor: Colors.grey[200],
+      cancelColor: Colors.black87,
+      confirmText: 'Huỷ lịch',
+      confirmBgColor: Colors.red,
+      confirmColor: Colors.white,
+      onConfirm: () async {
+        final vm = context.read<AppointmentViewModel>();
+        final isSuccess = await vm.cancelAppointment(appointmentId);
 
-  void _cancelAppointment(String appointmentId) {
-    setState(() {
-      final list =
-          _roleSelectedTab == 0 ? userAppointments : doctorAppointments;
-      final index = list.indexWhere((a) => a.id == appointmentId);
-      // if (index != -1) {
-      //   final updated = AppointmentResponse(
-      //     id: list[index].id,
-      //     date: list[index].date,
-      //     time: list[index].time,
-      //     status: 'cancelled',
-      //     notes: list[index].notes,
-      //     location: list[index].location,
-      //     doctor: list[index].doctor,
-      //     patient: list[index].patient,
-      //   );
-      //   if (_roleSelectedTab == 0) {
-      //     _userAppointments = List.from(_userAppointments)..[index] = updated;
-      //   } else {
-      //     _doctorAppointments = List.from(_doctorAppointments)
-      //       ..[index] = updated;
-      //   }
-      // }
-    });
-    // TODO: Gọi API cancelAppointment(appointmentId, userId)
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(const SnackBar(content: Text('Đã huỷ lịch hẹn')));
+        if (!mounted) return;
+
+        if (isSuccess) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Đã huỷ lịch hẹn thành công'),
+              backgroundColor: Colors.green,
+            ),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Huỷ lịch thất bại: ${vm.error}'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      },
+    );
   }
 
   void _deleteAppointment(String appointmentId) {
@@ -94,16 +100,34 @@ class _AppointmentListScreenState extends State<AppointmentListScreen> {
             doctorAppointments.where((a) => a.id != appointmentId).toList();
       }
     });
-    // TODO: Gọi API deleteAppointment(appointmentId, userId)
     ScaffoldMessenger.of(
       context,
     ).showSnackBar(const SnackBar(content: Text('Đã xoá lịch hẹn')));
   }
 
   void _navigateToEdit(AppointmentResponse appointment) {
-    // TODO: Navigate với args tương ứng
-    // Navigator.pushNamed(context, '/appointment-detail', arguments: {...})
-    debugPrint('Navigate chỉnh sửa lịch hẹn: ${appointment.id}');
+    final doctor = appointment.doctor;
+    Navigator.pushNamed(
+      context,
+      AppRoutes.appointmentdetailscreen,
+      arguments: {
+        'isEditMode': true,
+        'appointmentId': appointment.id,
+        'doctorId': doctor.id,
+        'doctorName': doctor.name,
+        'doctorAvatar': doctor.avatarURL,
+        'specialtyName': doctor.specialty,
+        'doctorAddress': appointment.location,
+        'hasHomeService': true,
+        'selectedDate': appointment.date,
+        'selectedTime': appointment.time,
+        'notes': appointment.notes,
+        'location': appointment.location,
+        'method': appointment.examinationMethod,
+      },
+    );
+
+    debugPrint('Điều hướng chỉnh sửa lịch hẹn: ${appointment.id}');
   }
 
   void _navigateToRebook(AppointmentResponse appointment) {

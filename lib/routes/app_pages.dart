@@ -70,12 +70,19 @@ class AppPages {
         ModalRoute.of(context)!.settings.arguments as Map,
       );
       return AppointmentDetailScreen(
+        isEditing: args['isEditMode'] ?? false,
+        appointmentId: args['appointmentId'],
         doctorId: args['doctorId'] ?? '',
         doctorName: args['doctorName'] ?? '',
         doctorAddress: args['doctorAddress'] ?? '',
         doctorAvatar: args['doctorAvatar'] ?? '',
         specialtyName: args['specialtyName'] ?? '',
         hasHomeService: args['hasHomeService'] ?? false,
+        // Data cũ để hiển thị (Initial Data)
+        initialDate: args['selectedDate'],
+        initialTime: args['selectedTime'],
+        initialNotes: args['notes'],
+        initialMethod: args['method'],
       );
     },
     AppRoutes.bookingcalendar: (context) {

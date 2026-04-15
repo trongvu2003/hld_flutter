@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../../models/requestmodel/appointment.dart';
 import '../../../routes/app_routes.dart';
 import '../../../theme/app_colors.dart';
+import '../../../viewmodels/appointment_viewmodel.dart';
 import '../../../viewmodels/user_viewmodel.dart';
 
 class AppointmentDetailScreen extends StatefulWidget {
@@ -58,7 +60,7 @@ class _AppointmentDetailScreenState extends State<AppointmentDetailScreen> {
     if (widget.isEditing) {
       examinationMethod = widget.initialMethod ?? '';
       notes = widget.initialNotes ?? '';
-      date = widget.initialDate ?? '';
+      date = _formatInitialDate(widget.initialDate);
       time = widget.initialTime ?? '';
     }
     _notesController = TextEditingController(text: notes);
@@ -112,21 +114,46 @@ class _AppointmentDetailScreenState extends State<AppointmentDetailScreen> {
     }
   }
 
-  void _onSubmit() {
-    if (examinationMethod.isEmpty) {
-      _showErrorDialog('Vui lòng chọn hình thức khám');
-      return;
-    }
+  void _onSubmit() async {
     if (date.isEmpty || time.isEmpty) {
       _showErrorDialog('Vui lòng chọn ngày giờ khám');
       return;
     }
 
     if (widget.isEditing) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Đã cập nhật lịch hẹn!')));
-      Navigator.pop(context);
+      final appointmentVM = context.read<AppointmentViewModel>();
+      String dateForServer = date;
+      if (date.contains('/')) {
+        List<String> parts = date.split('/');
+        if (parts.length == 3) {
+          dateForServer =
+              "${parts[2]}-${parts[1]}-${parts[0]}";
+        }
+      }
+      final updateReq = UpdateAppointmentRequest(
+        time: time,
+        date: dateForServer,
+        notes: notes,
+      );
+
+      final success = await appointmentVM.updateAppointment(
+        widget.appointmentId!,
+        updateReq,
+      );
+
+      if (success) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Cập nhật thành công!'),
+              backgroundColor: Colors.green,
+            ),
+          );
+          Navigator.pop(context);
+        }
+      } else {
+        if (mounted) _showErrorDialog('Lỗi: ${appointmentVM.error}');
+      }
     } else {
       final user = context.read<UserViewModel>().currentUser;
       Navigator.pushNamed(
@@ -390,7 +417,10 @@ class _PatientInfoSectionState extends State<_PatientInfoSection> {
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(ctx),
-                child: const Text('Đóng',style: TextStyle(color:Colors.blueAccent,fontSize: 14),),
+                child: const Text(
+                  'Đóng',
+                  style: TextStyle(color: Colors.blueAccent, fontSize: 14),
+                ),
               ),
             ],
           ),
@@ -784,5 +814,15 @@ class _InfoRow extends StatelessWidget {
         ],
       ),
     );
+  }
+}
+
+String _formatInitialDate(String? rawDate) {
+  if (rawDate == null || rawDate.isEmpty) return '';
+  try {
+    DateTime dt = DateTime.parse(rawDate);
+    return "${dt.day.toString().padLeft(2, '0')}/${dt.month.toString().padLeft(2, '0')}/${dt.year}";
+  } catch (e) {
+    return rawDate;
   }
 }

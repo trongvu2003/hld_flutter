@@ -38,3 +38,23 @@ class CreateAppointmentRequest {
     };
   }
 }
+
+class UpdateAppointmentRequest {
+  final String time;
+  final String date;
+  final String notes;
+
+  UpdateAppointmentRequest({
+    required this.time,
+    required this.date,
+    required this.notes,
+  });
+
+  Map<String, dynamic> toJson() {
+    return {
+      'time': time,
+      'date': date,
+      'notes': notes,
+    };
+  }
+}

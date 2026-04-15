@@ -17,8 +17,8 @@ class AppointmentService {
         return data
             .map(
               (item) =>
-              AppointmentResponse.fromJson(item as Map<String, dynamic>),
-        )
+                  AppointmentResponse.fromJson(item as Map<String, dynamic>),
+            )
             .toList();
       } else {
         throw Exception('Lỗi API: Server trả về mã ${res.statusCode}');
@@ -28,8 +28,10 @@ class AppointmentService {
     }
   }
 
-  Future<CreateAppointmentResponse> createAppointment(String accessToken,
-      CreateAppointmentRequest request,) async {
+  Future<CreateAppointmentResponse> createAppointment(
+    String accessToken,
+    CreateAppointmentRequest request,
+  ) async {
     try {
       final res = await dio.post(
         '/appointments/book',
@@ -58,6 +60,36 @@ class AppointmentService {
       }
     } catch (e) {
       throw Exception('Lỗi: ${e.toString()}');
+    }
+  }
+
+  Future<CancelAppointmentResponse> cancelAppointment(String id) async {
+    try {
+      final response = await dio.patch("/appointments/cancel/$id");
+      if (response.statusCode == 200) {
+        return CancelAppointmentResponse.fromJson(response.data);
+      } else {
+        throw Exception("Lỗi server: ${response.statusCode}");
+      }
+    } on DioException catch (e) {
+      throw Exception("Lỗi kết nối API: ${e.message}");
+    } catch (e) {
+      throw Exception("Lỗi không xác định: $e");
+    }
+  }
+
+  Future<void> updateAppointment(String id, UpdateAppointmentRequest request) async {
+    try {
+      final response = await dio.put(
+        "/appointments/$id",
+        data: request.toJson(),
+      );
+
+      if (response.statusCode != 200 && response.statusCode != 204) {
+        throw Exception("Cập nhật thất bại: ${response.statusCode}");
+      }
+    } catch (e) {
+      rethrow;
     }
   }
 }
