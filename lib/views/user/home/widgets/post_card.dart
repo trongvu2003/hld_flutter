@@ -159,7 +159,7 @@ class PostCard extends StatelessWidget {
                                 : [
                                   const PopupMenuItem(
                                     value: 'report',
-                                    child: Text('Báo cáo'),
+                                    child: Text('Báo cáo bài viết'),
                                   ),
                                 ],
                   ),

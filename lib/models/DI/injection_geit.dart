@@ -1,4 +1,7 @@
 import 'package:get_it/get_it.dart';
+import 'package:hld_flutter/repositories/report_repository.dart';
+import 'package:hld_flutter/services/report_service.dart';
+import 'package:hld_flutter/viewmodels/report_viewmodel.dart';
 import '../../repositories/appointment_repository.dart';
 import '../../repositories/auth_repository.dart';
 import '../../repositories/doctor_repository.dart';
@@ -40,6 +43,7 @@ void setupLocator() {
   getIt.registerLazySingleton<ReviewService>(() => ReviewService());
   getIt.registerLazySingleton<AppointmentService>(() => AppointmentService());
   getIt.registerLazySingleton<NotificationService>(() => NotificationService());
+  getIt.registerLazySingleton<ReportService>(() => ReportService());
 
   // 2. TẦNG REPOSITORIES (Nhận inject từ Services)
   // getIt() sẽ tự động lấy đúng Service ở trên truyền vào
@@ -61,6 +65,10 @@ void setupLocator() {
   getIt.registerLazySingleton<NotificationRepository>(
     () => NotificationRepository(getIt()),
   );
+  getIt.registerLazySingleton<ReportRepository>(
+        () => ReportRepository(getIt()),
+  );
+
 
   // 3. TẦNG VIEWMODELS (Nhận inject từ Repositories)
   // Vì hiện tại bạn đang bỏ tất cả ViewModel vào main.dart (Global),
@@ -76,8 +84,10 @@ void setupLocator() {
   getIt.registerFactory<NotificationViewModel>(
     () => NotificationViewModel(getIt()),
   );
+  getIt.registerFactory<ReportViewModel>(
+        () => ReportViewModel(getIt()),
+  );
 }
-
 
 
 /// Áp dụng gelt+ ListenableBuilder

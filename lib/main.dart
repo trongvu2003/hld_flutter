@@ -6,6 +6,7 @@ import 'package:hld_flutter/viewmodels/auth_viewmodel.dart';
 import 'package:hld_flutter/viewmodels/doctor_viewmodel.dart';
 import 'package:hld_flutter/viewmodels/notification_viewmodel.dart';
 import 'package:hld_flutter/viewmodels/post_viewmodel.dart';
+import 'package:hld_flutter/viewmodels/report_viewmodel.dart';
 import 'package:hld_flutter/viewmodels/review_viewmodel.dart';
 import 'package:hld_flutter/viewmodels/specialty_viewmodel.dart';
 import 'package:hld_flutter/viewmodels/user_viewmodel.dart';
@@ -38,6 +39,7 @@ void main() async {
         ChangeNotifierProvider(create: (_) => getIt<ReviewViewModel>()),
         ChangeNotifierProvider(create: (_) => getIt<AppointmentViewModel>()),
         ChangeNotifierProvider(create: (_) => getIt<NotificationViewModel>()),
+        ChangeNotifierProvider(create: (_) => getIt<ReportViewModel>()),
       ],
       child: MyApp(initialRoute: startRoute),
     ),

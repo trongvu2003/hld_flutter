@@ -1,11 +1,15 @@
 import 'dart:async';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:hld_flutter/models/responsemodel/post.dart';
 import 'package:hld_flutter/theme/app_colors.dart';
 import 'package:hld_flutter/viewmodels/doctor_viewmodel.dart';
 import 'package:hld_flutter/viewmodels/post_viewmodel.dart';
 import 'package:hld_flutter/views/user/home/widgets/ai_search_bar.dart';
 import 'package:provider/provider.dart';
+import '../../../models/requestmodel/report.dart';
 import '../../../routes/app_routes.dart';
+import '../../../viewmodels/report_viewmodel.dart';
 import '../../../viewmodels/specialty_viewmodel.dart';
 import '../../../viewmodels/user_viewmodel.dart';
 import '../../skeleton/post_skeleton.dart';
@@ -83,11 +87,131 @@ class _HomeScreenState extends State<HomeScreen> {
     super.dispose();
   }
 
+  void _showReportDialog(BuildContext context, PostResponse post) {
+    final TextEditingController reportController = TextEditingController();
+    final userVM = context.read<UserViewModel>();
+    final reportVM = context.read<ReportViewModel>();
+    final currentUser = userVM.currentUser;
+
+    showDialog(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          backgroundColor: Colors.white,
+          title: Text(
+            "Báo cáo bài viết của ${post.userInfo?.name ?? "Bác sĩ"}",
+            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+          ),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  "Người báo cáo",
+                  style: TextStyle(fontWeight: FontWeight.w500),
+                ),
+                Text(
+                  currentUser?.name ?? "Người dùng",
+                  style: const TextStyle(color: Colors.black54),
+                ),
+                const SizedBox(height: 12),
+                const Text(
+                  "Loại báo cáo",
+                  style: TextStyle(fontWeight: FontWeight.w500),
+                ),
+                const Text("Bài viết", style: TextStyle(color: Colors.black54)),
+                const SizedBox(height: 12),
+                const Text(
+                  "Nội dung báo cáo",
+                  style: TextStyle(fontWeight: FontWeight.w500),
+                ),
+                const SizedBox(height: 8),
+                TextField(
+                  controller: reportController,
+                  maxLines: 4,
+                  decoration: InputDecoration(
+                    hintText: "Nhập nội dung...",
+                    fillColor: Colors.grey[100],
+                    filled: true,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide(color: Colors.grey.shade300),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext),
+              child: const Text("Huỷ", style: TextStyle(color: Colors.red)),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.lightTheme,
+                foregroundColor: Colors.black,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              // Trong hàm onPressed của nút Gửi báo cáo:
+              onPressed: () async {
+                final content = reportController.text.trim();
+                if (content.isEmpty) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text("Vui lòng nhập nội dung báo cáo"),
+                    ),
+                  );
+                  return;
+                }
+                final messenger = ScaffoldMessenger.of(context);
+                final reportVM = context.read<ReportViewModel>();
+
+                final request = ReportRequest(
+                  reporter: currentUser?.id ?? "",
+                  reporterModel: currentUser?.role ?? "User",
+                  content: content,
+                  type: "Bài viết",
+                  reportedId: post.userInfo?.id ?? "",
+                  postId: post.id,
+                );
+
+                final success = await reportVM.sendReport(request);
+                if (!mounted) return;
+
+                Navigator.pop(dialogContext);
+                messenger.showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      success
+                          ? "Cảm ơn bạn! Báo cáo đã được gửi."
+                          : "Gửi báo cáo thất bại: ${reportVM.error}",
+                    ),
+                    backgroundColor: success ? Colors.green : Colors.red,
+                    behavior:
+                        SnackBarBehavior.floating, // Cho nó nổi lên để dễ thấy
+                  ),
+                );
+              },
+              child: const Text("Gửi báo cáo"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    return ColoredBox(
-      color: Colors.white,
-      child: Container(
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: Container(
         padding: const EdgeInsets.fromLTRB(0, 20, 0, 0),
         color: Colors.white,
         child: Stack(
@@ -189,13 +313,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           post: post,
                           currentUserId: userVM.currentUser!.id ?? "",
                           onReport: () {
-                            AppDialog.show(
-                              context: context,
-                              title: 'Báo cáo bài viết',
-                              content: 'Chọn lý do báo cáo',
-                              confirmText: 'Gửi',
-                              onConfirm: () {},
-                            );
+                            _showReportDialog(context, post);
                           },
                           onDelete: () {
                             AppDialog.show(
