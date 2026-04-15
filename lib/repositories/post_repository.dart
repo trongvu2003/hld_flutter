@@ -73,4 +73,18 @@ class PostRepository {
   Future<void> deletePostById(String postId) async {
     return await postService.deletePostById(postId);
   }
+
+  Future<void> updatePost({
+    required String postId,
+    String? content,
+    List<String>? mediaPaths,
+    List<String>? imagePaths,
+  }) async {
+    return await postService.updatePost(
+      postId: postId,
+      content: content,
+      mediaPaths: mediaPaths,
+      imagePaths: imagePaths,
+    );
+  }
 }

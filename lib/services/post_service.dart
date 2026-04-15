@@ -251,4 +251,48 @@ class PostService {
       throw Exception('Error deleting comment: $e');
     }
   }
+
+  Future<void> updatePost({
+    required String postId,
+    String? content,
+    List<String>? mediaPaths,
+    List<String>? imagePaths,
+  }) async {
+    final formData = FormData();
+
+    // Content
+    if (content != null && content.trim().isNotEmpty) {
+      formData.fields.add(MapEntry("content", content.trim()));
+    }
+
+    // Video
+    if (mediaPaths != null) {
+      for (var path in mediaPaths) {
+        formData.files.add(
+          MapEntry(
+            "media",
+            await MultipartFile.fromFile(path, filename: path.split('/').last),
+          ),
+        );
+      }
+    }
+
+    // Image
+    if (imagePaths != null) {
+      for (var path in imagePaths) {
+        formData.files.add(
+          MapEntry(
+            "images",
+            await MultipartFile.fromFile(path, filename: path.split('/').last),
+          ),
+        );
+      }
+    }
+
+    await dio.patch(
+      "/post/$postId",
+      data: formData,
+      options: Options(contentType: 'multipart/form-data'),
+    );
+  }
 }

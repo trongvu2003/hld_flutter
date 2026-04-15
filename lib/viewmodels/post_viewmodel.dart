@@ -324,6 +324,44 @@ class PostViewModel extends ChangeNotifier {
     }
   }
 
+  bool isUpdating = false;
+
+  Future<void> updatePost(String postId, CreatePostRequest request) async {
+    isUpdating = true;
+    notifyListeners();
+
+    try {
+      List<String> videoPaths = [];
+      List<String> imagePaths = [];
+
+      if (request.mediaPaths != null) {
+        for (var path in request.mediaPaths!) {
+          final ext = path.toLowerCase().split('.').last;
+
+          if (['mp4', 'mov', 'avi', 'mkv', 'webm'].contains(ext)) {
+            videoPaths.add(path);
+          } else {
+            imagePaths.add(path);
+          }
+        }
+      }
+
+      await repository.updatePost(
+        postId: postId,
+        content: request.content,
+        mediaPaths: videoPaths.isNotEmpty ? videoPaths : null,
+        imagePaths: imagePaths.isNotEmpty ? imagePaths : null,
+      );
+      await fetchPosts(forceRefresh: true);
+    } catch (e) {
+      debugPrint("Lỗi update post: $e");
+      rethrow;
+    } finally {
+      isUpdating = false;
+      notifyListeners();
+    }
+  }
+
   void clearPosts() {
     posts.clear();
     hasMore = true;

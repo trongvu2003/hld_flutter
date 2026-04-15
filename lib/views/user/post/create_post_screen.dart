@@ -5,6 +5,7 @@ import 'package:hld_flutter/theme/app_colors.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
+import '../../../routes/app_routes.dart';
 import '../../../viewmodels/user_viewmodel.dart';
 import '../../../viewmodels/post_viewmodel.dart';
 import '../../../models/requestmodel/post.dart';
@@ -164,10 +165,23 @@ class _CreatePostScreenState extends State<CreatePostScreen>
         content: trimmed,
         mediaPaths: mediaPaths,
       );
+      if (_isEditMode) {
+        await postVM.updatePost(widget.postId!, request);
+        _showSnack("Đã cập nhật bài viết!");
+      } else {
+        await postVM.createPost(request);
+      }
 
-      postVM.createPost(request);
 
-      Navigator.pop(context);
+      if (mounted) {
+        // Lệnh này sẽ xoá sạch các trang trung gian (trang Sửa, trang Chi tiết)
+        // và đưa thẳng người dùng về màn hình Home
+        Navigator.pushNamedAndRemoveUntil(
+          context,
+          AppRoutes.main,
+              (route) => false,
+        );
+      }
     } catch (e) {
       _showSnack("Lỗi: $e");
     } finally {
@@ -596,7 +610,6 @@ class _MediaCardState extends State<_MediaCard>
           child: Stack(
             fit: StackFit.expand,
             children: [
-              // Hiển thị ảnh (Network hoặc Local)
               if (isNetwork)
                 Image.network(
                   widget.networkUrl!,
