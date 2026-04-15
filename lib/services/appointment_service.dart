@@ -78,18 +78,35 @@ class AppointmentService {
     }
   }
 
-  Future<void> updateAppointment(String id, UpdateAppointmentRequest request) async {
+  Future<UpdateAppointmentResponse> updateAppointment(
+    String id,
+    UpdateAppointmentRequest request,
+  ) async {
     try {
       final response = await dio.put(
         "/appointments/$id",
         data: request.toJson(),
       );
-
-      if (response.statusCode != 200 && response.statusCode != 204) {
+      if (response.statusCode == 200) {
+        return UpdateAppointmentResponse.fromJson(response.data);
+      } else {
         throw Exception("Cập nhật thất bại: ${response.statusCode}");
       }
     } catch (e) {
       rethrow;
+    }
+  }
+
+  Future<UpdateAppointmentResponse> deleteAppointmentById(String id) async {
+    try {
+      final res = await dio.delete("/appointments/$id");
+      if (res.statusCode == 200) {
+        return UpdateAppointmentResponse.fromJson(res.data);
+      } else {
+        throw Exception("Lỗi server: ${res.statusCode}");
+      }
+    } catch (e) {
+      throw Exception("Lỗi" + e.toString());
     }
   }
 }

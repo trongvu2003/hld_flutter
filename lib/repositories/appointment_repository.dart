@@ -22,10 +22,14 @@ class AppointmentRepository {
     return await appointmentService.cancelAppointment(id);
   }
 
-  Future<void> updateAppointment(
+  Future<UpdateAppointmentResponse> updateAppointment(
     String id,
     UpdateAppointmentRequest request,
   ) async {
     return await appointmentService.updateAppointment(id, request);
+  }
+
+  Future<UpdateAppointmentResponse> deleteAppointmentById(String id) async {
+    return await appointmentService.deleteAppointmentById(id);
   }
 }

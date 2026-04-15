@@ -52,6 +52,7 @@ class AppPages {
       final args =
           ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
       return DoctorScreen(
+        initialTabIndex: args['initialTabIndex'] ?? 0,
         doctorId: args['doctorId'],
         currentUserId: args['currentUserId'],
       );

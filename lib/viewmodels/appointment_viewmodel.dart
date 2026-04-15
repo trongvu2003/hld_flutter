@@ -113,4 +113,23 @@ class AppointmentViewModel extends ChangeNotifier {
       notifyListeners();
     }
   }
+
+  Future<bool> deleteAppointmentById(String id) async {
+    isLoading = true;
+    notifyListeners();
+
+    try {
+      final res = await repository.deleteAppointmentById(id);
+      print("XOÁ LỊCH THÀNH CÔNG: ${res.message}");
+      appointments.removeWhere((item) => item.id == id);
+      return true;
+    } catch (e) {
+      error = e.toString();
+      print("XOÁ LỊCH THẤT BẠI: $error");
+      return false;
+    } finally {
+      isLoading = false;
+      notifyListeners();
+    }
+  }
 }

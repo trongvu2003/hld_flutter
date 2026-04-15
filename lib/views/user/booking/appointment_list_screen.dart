@@ -4,7 +4,6 @@ import 'package:hld_flutter/theme/app_colors.dart';
 import 'package:hld_flutter/viewmodels/appointment_viewmodel.dart';
 import 'package:provider/provider.dart';
 import '../../../models/responsemodel/appointment.dart';
-import '../../../models/responsemodel/doctor.dart';
 import '../../skeleton/skeleton_box.dart';
 import '../../widgets/app_dialog.dart';
 import 'widgets/appointment_card.dart';
@@ -91,18 +90,36 @@ class _AppointmentListScreenState extends State<AppointmentListScreen> {
   }
 
   void _deleteAppointment(String appointmentId) {
-    setState(() {
-      if (_roleSelectedTab == 0) {
-        userAppointments =
-            userAppointments.where((a) => a.id != appointmentId).toList();
-      } else {
-        doctorAppointments =
-            doctorAppointments.where((a) => a.id != appointmentId).toList();
-      }
-    });
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(const SnackBar(content: Text('Đã xoá lịch hẹn')));
+    AppDialog.show(
+      context: context,
+      title: 'Xoá lịch hẹn',
+      content: 'Bạn có chắc chắn muốn xoá lịch hẹn này khỏi danh sách không?',
+      confirmText: 'Xoá',
+      confirmBgColor: Colors.red,
+      confirmColor: Colors.white,
+      onConfirm: () async {
+        final vm = context.read<AppointmentViewModel>();
+        final success = await vm.deleteAppointmentById(appointmentId);
+
+        if (!mounted) return;
+
+        if (success) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Đã xoá lịch hẹn thành công'),
+              backgroundColor: Colors.green,
+            ),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Xoá thất bại: ${vm.error}'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      },
+    );
   }
 
   void _navigateToEdit(AppointmentResponse appointment) {
@@ -131,11 +148,38 @@ class _AppointmentListScreenState extends State<AppointmentListScreen> {
   }
 
   void _navigateToRebook(AppointmentResponse appointment) {
+    final doctor = appointment.doctor;
+    Navigator.pushNamed(
+      context,
+      AppRoutes.appointmentdetailscreen,
+      arguments: {
+        'appointmentId': appointment.id,
+        'doctorId': doctor.id,
+        'doctorName': doctor.name,
+        'doctorAvatar': doctor.avatarURL,
+        'specialtyName': doctor.specialty,
+        'doctorAddress': appointment.location,
+        'hasHomeService': true,
+        'selectedDate': appointment.date,
+        'selectedTime': appointment.time,
+        'notes': appointment.notes,
+        'location': appointment.location,
+        'method': appointment.examinationMethod,
+      },
+    );
     debugPrint('Navigate đặt lại: ${appointment.doctor.id}');
   }
 
   void _navigateToRating(AppointmentResponse appointment) {
-    debugPrint('Navigate đánh giá bác sĩ: ${appointment.doctor.id}');
+    Navigator.pushNamed(
+      context,
+      AppRoutes.otheruserprofile,
+      arguments: {
+        'doctorId': appointment.doctor.id,
+        'currentUserId': widget.userId,
+        'initialTabIndex': 1,
+      },
+    );
   }
 
   void _navigateToServiceSelection(AppointmentResponse appointment) {

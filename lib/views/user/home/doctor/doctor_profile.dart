@@ -14,11 +14,13 @@ import 'widgets/view_rating.dart';
 class DoctorScreen extends StatefulWidget {
   final String doctorId;
   final String currentUserId;
+  final int initialTabIndex;
 
   const DoctorScreen({
     super.key,
     required this.doctorId,
     required this.currentUserId,
+    this.initialTabIndex = 0,
   });
 
   @override
@@ -35,7 +37,12 @@ class _DoctorScreenState extends State<DoctorScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
+    _tabController = TabController(
+      length: 3,
+      vsync: this,
+      initialIndex: widget.initialTabIndex,
+    );
+
     _tabController.addListener(() {
       setState(() {});
     });
@@ -397,14 +404,17 @@ class WriteReviewButton extends StatelessWidget {
       child: ElevatedButton(
         onPressed: onClick,
         style: ElevatedButton.styleFrom(
-          backgroundColor: Theme.of(context).colorScheme.onBackground,
-          foregroundColor: Theme.of(context).colorScheme.background,
+          backgroundColor: AppColors.lightTheme,
+          foregroundColor: Colors.black,
           minimumSize: const Size(double.infinity, 50),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
         ),
-        child: const Text("Viết đánh giá", style: TextStyle(fontSize: 16)),
+        child: const Text(
+          "Viết đánh giá",
+          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+        ),
       ),
     );
   }
