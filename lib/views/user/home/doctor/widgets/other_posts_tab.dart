@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../../../../routes/app_routes.dart';
 import '../../../../../viewmodels/post_viewmodel.dart';
+import '../../../../../viewmodels/user_viewmodel.dart';
 import '../../../../skeleton/post_skeleton.dart';
 import '../../widgets/post_card.dart';
 
@@ -76,6 +78,7 @@ class _PostsTabState extends State<PostsTab> {
   }
 
   Widget _buildPostList(List<dynamic> posts) {
+    final userVM = context.watch<UserViewModel>();
     return ListView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
@@ -90,6 +93,17 @@ class _PostsTabState extends State<PostsTab> {
           onDelete: () => print("Xoá: ${post.id}"),
           onNavigateToDetail: () {
             Navigator.pushNamed(context, '/postdetail/${post.id}');
+          },
+          onEdit: () {
+            Navigator.pushNamed(
+              context,
+              AppRoutes.createpost,
+              arguments: {
+                'postId': post.id,
+                'userId': userVM.currentUser?.id,
+                'userRole': userVM.currentUser?.role,
+              },
+            );
           },
         );
       },

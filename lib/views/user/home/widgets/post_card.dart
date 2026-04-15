@@ -16,6 +16,7 @@ class PostCard extends StatelessWidget {
   final String currentUserId;
   final VoidCallback onReport;
   final VoidCallback onDelete;
+  final VoidCallback onEdit;
   final VoidCallback onNavigateToDetail;
 
   const PostCard({
@@ -23,6 +24,7 @@ class PostCard extends StatelessWidget {
     required this.currentUserId,
     required this.onReport,
     required this.onDelete,
+    required this.onEdit,
     required this.onNavigateToDetail,
   });
 
@@ -136,11 +138,16 @@ class PostCard extends StatelessWidget {
                     onSelected: (v) {
                       if (v == 'report') onReport();
                       if (v == 'delete') onDelete();
+                      if (v == 'edit') onEdit();
                     },
                     itemBuilder:
                         (_) =>
                             isOwner
                                 ? [
+                                  const PopupMenuItem(
+                                    value: 'edit',
+                                    child: Text('Chỉnh sửa bài viết'),
+                                  ),
                                   const PopupMenuItem(
                                     value: 'delete',
                                     child: Text(

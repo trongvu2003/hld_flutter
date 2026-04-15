@@ -34,6 +34,7 @@ class AppPages {
       final args =
           ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
       return CreatePostScreen(
+        postId: args?['postId'],
         userId: args['userId'],
         userRole: args['userRole'],
       );

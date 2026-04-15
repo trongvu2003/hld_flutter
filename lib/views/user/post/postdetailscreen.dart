@@ -80,6 +80,17 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                       onReport: () => print("Báo cáo: ${post.id}"),
                       onDelete: () => print("Xoá: ${post.id}"),
                       onNavigateToDetail: () {},
+                      onEdit: () {
+                        Navigator.pushNamed(
+                          context,
+                          AppRoutes.createpost,
+                          arguments: {
+                            'postId': post.id,
+                            'userId': userVM.currentUser?.id,
+                            'userRole': userVM.currentUser?.role,
+                          },
+                        );
+                      },
                     ),
 
                     const SizedBox(height: 16),
@@ -168,10 +179,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
         backgroundColor: Colors.white,
         body: SafeArea(
           child: ListView(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 8.0,
-              vertical: 8.0,
-            ),
+            padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
             children: const [
               PostSkeleton(),
               SizedBox(height: 16),
@@ -183,7 +191,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                   SizedBox(width: 8),
                   Skeleton(width: 160, height: 40, radius: 8),
                 ],
-              )
+              ),
             ],
           ),
         ),

@@ -77,4 +77,5 @@ class DoctorViewModel extends ChangeNotifier {
       notifyListeners();
     }
   }
+
 }

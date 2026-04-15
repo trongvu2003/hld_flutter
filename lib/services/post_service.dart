@@ -231,4 +231,24 @@ class PostService {
       throw Exception('Lỗi getSimilarPosts: $e');
     }
   }
+
+  Future<void> deletePostById(String postId) async {
+    try {
+      final res = await dio.delete('/post/$postId');
+
+      if (res.statusCode == 200 || res.statusCode == 204) {
+        return;
+      } else {
+        throw Exception('Failed to delete post: ${res.statusCode}');
+      }
+    } on DioException catch (e) {
+      throw Exception(
+        e.response != null
+            ? 'Server error: ${e.response?.statusCode} - ${e.response?.data}'
+            : 'Network error: ${e.message}',
+      );
+    } catch (e) {
+      throw Exception('Error deleting comment: $e');
+    }
+  }
 }

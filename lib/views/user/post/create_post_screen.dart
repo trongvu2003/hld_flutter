@@ -11,12 +11,14 @@ import '../../../models/requestmodel/post.dart';
 
 class CreatePostScreen extends StatefulWidget {
   final String? postId;
+  final String userId;
+  final String userRole;
 
   const CreatePostScreen({
     super.key,
     this.postId,
-    required userId,
-    required userRole,
+    required this.userId,
+    required this.userRole,
   });
 
   @override
@@ -27,16 +29,19 @@ class _CreatePostScreenState extends State<CreatePostScreen>
     with TickerProviderStateMixin {
   final TextEditingController _textController = TextEditingController();
   final ImagePicker _picker = ImagePicker();
-
   List<XFile> _selectedMedia = [];
+  List<String> _existingMedia = [];
   bool _isLoading = false;
   bool _isUpdating = false;
   static const int _maxChars = 400;
 
   bool get _isEditMode => widget.postId != null;
 
+  // Cho phép đăng nếu có text HOẶC có ảnh cũ HOẶC có ảnh mới
   bool get _isPostEnabled =>
-      _textController.text.trim().isNotEmpty || _selectedMedia.isNotEmpty;
+      _textController.text.trim().isNotEmpty ||
+      _selectedMedia.isNotEmpty ||
+      _existingMedia.isNotEmpty;
 
   late AnimationController _buttonAnimCtrl;
   late Animation<double> _buttonScaleAnim;
@@ -44,9 +49,29 @@ class _CreatePostScreenState extends State<CreatePostScreen>
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
       if (!mounted) return;
       context.read<UserViewModel>().loadCurrentUser();
+
+      // Lấy thông tin bài viết cũ nếu đang ở chế độ chỉnh sửa
+      if (_isEditMode) {
+        setState(() => _isLoading = true);
+        final postVM = context.read<PostViewModel>();
+        await postVM.getPostById(widget.postId!);
+
+        if (mounted && postVM.postDetail != null) {
+          setState(() {
+            _textController.text = postVM.postDetail!.content ?? '';
+            _existingMedia =
+                postVM.postDetail!.media?.map((e) => e.toString()).toList() ??
+                [];
+            _isLoading = false;
+            _isLoading = false;
+          });
+        } else if (mounted) {
+          setState(() => _isLoading = false);
+        }
+      }
     });
 
     _buttonAnimCtrl = AnimationController(
@@ -190,10 +215,19 @@ class _CreatePostScreenState extends State<CreatePostScreen>
                       charCount: _textController.text.length,
                       maxChars: _maxChars,
                     ),
-                    if (_selectedMedia.isNotEmpty)
+                    // Trong ListView của hàm build:
+                    if (_selectedMedia.isNotEmpty || _existingMedia.isNotEmpty)
                       _MediaPreviewList(
-                        media: _selectedMedia,
-                        onRemove: _removeMedia,
+                        existingMedia: _existingMedia,
+                        newMedia: _selectedMedia,
+                        onRemoveExisting: (index) {
+                          setState(() => _existingMedia.removeAt(index));
+                          if (!_isPostEnabled) _buttonAnimCtrl.reverse();
+                        },
+                        onRemoveNew: (index) {
+                          setState(() => _selectedMedia.removeAt(index));
+                          if (!_isPostEnabled) _buttonAnimCtrl.reverse();
+                        },
                       ),
                   ],
                 ),
@@ -458,32 +492,55 @@ class _GradientAvatar extends StatelessWidget {
 
 //  Media Preview List
 class _MediaPreviewList extends StatelessWidget {
-  final List<XFile> media;
-  final void Function(int) onRemove;
+  final List<String> existingMedia;
+  final List<XFile> newMedia;
+  final void Function(int) onRemoveExisting;
+  final void Function(int) onRemoveNew;
 
-  const _MediaPreviewList({required this.media, required this.onRemove});
+  const _MediaPreviewList({
+    required this.existingMedia,
+    required this.newMedia,
+    required this.onRemoveExisting,
+    required this.onRemoveNew,
+  });
 
   @override
   Widget build(BuildContext context) {
+    final totalCount = existingMedia.length + newMedia.length;
+
     return SizedBox(
       height: 204,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        itemCount: media.length,
+        itemCount: totalCount,
         separatorBuilder: (_, __) => const SizedBox(width: 12),
-        itemBuilder:
-            (_, i) => _MediaCard(file: media[i], onRemove: () => onRemove(i)),
+        itemBuilder: (_, i) {
+          // Hiển thị ảnh cũ trước
+          if (i < existingMedia.length) {
+            return _MediaCard(
+              networkUrl: existingMedia[i],
+              onRemove: () => onRemoveExisting(i),
+            );
+          }
+          // Sau đó hiển thị ảnh mới chọn
+          final newIndex = i - existingMedia.length;
+          return _MediaCard(
+            localFile: newMedia[newIndex],
+            onRemove: () => onRemoveNew(newIndex),
+          );
+        },
       ),
     );
   }
 }
 
 class _MediaCard extends StatefulWidget {
-  final XFile file;
+  final String? networkUrl;
+  final XFile? localFile;
   final VoidCallback onRemove;
 
-  const _MediaCard({required this.file, required this.onRemove});
+  const _MediaCard({this.networkUrl, this.localFile, required this.onRemove});
 
   @override
   State<_MediaCard> createState() => _MediaCardState();
@@ -521,7 +578,9 @@ class _MediaCardState extends State<_MediaCard>
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final isVideo = _isVideo(widget.file.path);
+    final isNetwork = widget.networkUrl != null;
+    final pathToCheck = isNetwork ? widget.networkUrl! : widget.localFile!.path;
+    final isVideo = _isVideo(pathToCheck);
 
     return ScaleTransition(
       scale: _scaleAnim,
@@ -537,21 +596,29 @@ class _MediaCardState extends State<_MediaCard>
           child: Stack(
             fit: StackFit.expand,
             children: [
-              // Thumbnail
-              Image.file(
-                File(widget.file.path),
-                fit: BoxFit.cover,
-                errorBuilder:
-                    (_, __, ___) => Container(
-                      color: theme.colorScheme.surfaceVariant,
-                      child: Icon(
-                        Icons.broken_image_rounded,
-                        color: theme.colorScheme.onSurfaceVariant,
+              // Hiển thị ảnh (Network hoặc Local)
+              if (isNetwork)
+                Image.network(
+                  widget.networkUrl!,
+                  fit: BoxFit.cover,
+                  errorBuilder:
+                      (_, __, ___) => Container(
+                        color: theme.colorScheme.surfaceVariant,
+                        child: const Icon(Icons.broken_image_rounded),
                       ),
-                    ),
-              ),
+                )
+              else
+                Image.file(
+                  File(widget.localFile!.path),
+                  fit: BoxFit.cover,
+                  errorBuilder:
+                      (_, __, ___) => Container(
+                        color: theme.colorScheme.surfaceVariant,
+                        child: const Icon(Icons.broken_image_rounded),
+                      ),
+                ),
 
-              // Gradient overlay for video
+              // Overlay cho Video
               if (isVideo)
                 DecoratedBox(
                   decoration: BoxDecoration(
@@ -565,8 +632,6 @@ class _MediaCardState extends State<_MediaCard>
                     ),
                   ),
                 ),
-
-              // Video play icon
               if (isVideo)
                 Center(
                   child: Icon(
@@ -576,7 +641,7 @@ class _MediaCardState extends State<_MediaCard>
                   ),
                 ),
 
-              // Delete button
+              // Nút xoá
               Positioned(
                 top: 8,
                 right: 8,

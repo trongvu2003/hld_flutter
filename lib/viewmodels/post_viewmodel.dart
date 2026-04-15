@@ -293,6 +293,37 @@ class PostViewModel extends ChangeNotifier {
     }
   }
 
+  Future<void> deletePost(String postId) async {
+    try {
+      await repository.deletePostById(postId);
+      //Xoá bài viết khỏi danh sách bản tin chung
+      posts.removeWhere((post) => post.id == postId);
+      // Xoá khỏi các danh sách trang cá nhân (nếu có)
+      myPosts.removeWhere((post) => post.id == postId);
+      visitorPosts.removeWhere((post) => post.id == postId);
+      similarPosts.removeWhere((post) => post.id == postId);
+
+      // Nếu bài viết đang xem chi tiết chính là bài vừa bị xoá thì clear data
+      if (postDetail?.id == postId) {
+        postDetail = null;
+      }
+
+      //  Dọn dẹp luôn danh sách bình luận của bài viết này cho nhẹ bộ nhớ
+      commentsMap.remove(postId);
+      hasMoreMap.remove(postId);
+      isLoadingMap.remove(postId);
+
+      _successMessage = 'Xoá bài viết thành công';
+
+      notifyListeners();
+    } catch (e) {
+      debugPrint("Lỗi khi xoá bài viết: $e");
+      _errorMessage = e.toString();
+      notifyListeners();
+      rethrow;
+    }
+  }
+
   void clearPosts() {
     posts.clear();
     hasMore = true;

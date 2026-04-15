@@ -201,12 +201,36 @@ class _HomeScreenState extends State<HomeScreen> {
                             AppDialog.show(
                               context: context,
                               title: 'Xoá bài viết',
-                              content: 'Bạn có chắc muốn xoá?',
+                              content:
+                                  'Bạn có chắc muốn xoá bài viết này không?',
+                              cancelText: 'Huỷ',
+                              cancelBgColor: Colors.grey[200],
+                              cancelColor: Colors.black,
                               confirmText: 'Xoá',
-                              confirmColor: Colors.red,
-                              onConfirm: () {},
+                              confirmBgColor: Colors.red,
+                              confirmColor: Colors.white,
+                              onConfirm: () {
+                                final postId = post.id;
+                                if (postId != null && postId.isNotEmpty) {
+                                  context.read<PostViewModel>().deletePost(
+                                    postId,
+                                  );
+                                }
+                              },
                             );
                           },
+                          onEdit: () {
+                            Navigator.pushNamed(
+                              context,
+                              AppRoutes.createpost,
+                              arguments: {
+                                'postId': post.id,
+                                'userId': userVM.currentUser?.id,
+                                'userRole': userVM.currentUser?.role,
+                              },
+                            );
+                          },
+
                           onNavigateToDetail: () {
                             Navigator.pushNamed(
                               context,
