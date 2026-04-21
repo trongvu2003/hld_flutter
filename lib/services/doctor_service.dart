@@ -58,4 +58,11 @@ class DoctorService {
       throw Exception('Lỗi không xác định: $e');
     }
   }
+
+  Future<Response> applyForDoctor(String userId, FormData formData) async {
+    return await dio.patch(
+      "/doctor/apply-for-doctor/$userId",
+      data: formData,
+    );
+  }
 }

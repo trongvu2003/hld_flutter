@@ -1,6 +1,10 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:hld_flutter/models/responsemodel/doctor.dart';
 import 'package:hld_flutter/repositories/doctor_repository.dart';
+
+import '../models/requestmodel/doctor.dart';
 
 class DoctorViewModel extends ChangeNotifier {
   final DoctorRepository repository;
@@ -78,4 +82,71 @@ class DoctorViewModel extends ChangeNotifier {
     }
   }
 
+  bool _isLoading = false;
+
+  bool get isLoading1 => _isLoading;
+  String _applyMessage = "";
+
+  String get applyMessage => _applyMessage;
+
+  void setApplyMessage(String message) {
+    _applyMessage = message;
+    notifyListeners();
+  }
+
+  Future<void> applyForDoctor(
+    String userId,
+    ApplyDoctorRequest request,
+    BuildContext context,
+  ) async {
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      final response = await repository.applyForDoctor(userId, request);
+      _handleSuccess(response.message, context);
+    } on DioException catch (e) {
+      _handleApiError(e, context);
+    } catch (e) {
+      _applyMessage = "fail";
+      _showSnackBar(context, "Lỗi hệ thống: $e");
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  void _handleSuccess(String message, BuildContext context) {
+    final successKeywords = ["thành công", "đã gửi", "trước đó", "hoàn tất"];
+    final msgLower = message.toLowerCase();
+    _showSnackBar(context, "Đăng ký thành công. Vui lòng chờ xác thực.");
+    print("API Success Message: $message");
+    if (successKeywords.any((kw) => msgLower.contains(kw))) {
+      _applyMessage = "success";
+    } else {
+      _applyMessage = "fail";
+    }
+  }
+
+  void _handleApiError(DioException e, BuildContext context) {
+    final successKeywords = ["thành công", "đã gửi", "trước đó", "hoàn tất"];
+    final errorMsg = (e.response?.data ?? "").toString().toLowerCase();
+    print("API Error Body: $errorMsg");
+
+    if (successKeywords.any((kw) => errorMsg.contains(kw))) {
+      _applyMessage = "success";
+      _showSnackBar(context, "Bạn đã gửi yêu cầu trước đó.");
+    } else {
+      _applyMessage = "fail";
+      _showSnackBar(context, "Đăng ký bác sĩ thất bại.");
+    }
+  }
+
+  void _showSnackBar(BuildContext context, String message) {
+    if (context.mounted) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(message)));
+    }
+  }
 }

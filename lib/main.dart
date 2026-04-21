@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:hld_flutter/routes/app_pages.dart';
 import 'package:hld_flutter/services/NotificationServiceFirebase.dart';
-import 'package:hld_flutter/services/notification_service.dart';
 import 'package:hld_flutter/viewmodels/appointment_viewmodel.dart';
 import 'package:hld_flutter/viewmodels/auth_viewmodel.dart';
 import 'package:hld_flutter/viewmodels/doctor_viewmodel.dart';

@@ -339,3 +339,16 @@ class TimeSlot {
     }
   }
 }
+
+
+class ApplyDoctorResponse {
+  final String message;
+
+  ApplyDoctorResponse({required this.message});
+
+  factory ApplyDoctorResponse.fromJson(Map<String, dynamic> json) {
+    return ApplyDoctorResponse(
+      message: json['message']?.toString() ?? '',
+    );
+  }
+}

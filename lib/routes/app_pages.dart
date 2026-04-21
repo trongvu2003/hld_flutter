@@ -12,6 +12,7 @@ import '../views/auth/signup_screen.dart';
 import '../views/user/booking/appointment_list_screen.dart';
 import '../views/user/booking/booking_calendar_screen.dart';
 import '../views/user/home/doctor/doctor_list_screen.dart';
+import '../views/user/home/doctor/registerclinic.dart';
 import '../views/user/home/personal/edit_option_page.dart';
 import '../views/user/home/personal/edit_user_profile.dart';
 import '../views/user/home/personal/otheruserprofile.dart';
@@ -119,5 +120,7 @@ class AppPages {
       );
       return PostDetailScreen(postId: args['postId']?.toString() ?? '');
     },
+
+    AppRoutes.doctorRegister: (context) => const RegisterClinicScreen(),
   };
 }

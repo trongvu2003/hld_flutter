@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hld_flutter/routes/app_routes.dart';
 import 'package:provider/provider.dart';
 import '../../../../theme/app_colors.dart';
 import '../../../../viewmodels/user_viewmodel.dart';
@@ -71,7 +72,7 @@ class _EditOptionPageState extends State<EditOptionPage> {
               onClick: () {
                 if (user == null) return;
                 if (user.role == "User") {
-                  Navigator.pushNamed(context, '/doctorRegister');
+                  Navigator.pushNamed(context, AppRoutes.doctorRegister);
                 } else {
                   Navigator.pushNamed(context, '/editClinic');
                 }
