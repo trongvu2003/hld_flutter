@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hld_flutter/views/user/home/home_screen.dart';
 import 'package:hld_flutter/views/user/home/personal/use_owner_profile.dart';
 import 'package:provider/provider.dart';
+import '../../services/NotificationServiceFirebase.dart';
 import '../../viewmodels/user_viewmodel.dart';
 import 'booking/appointment_list_screen.dart';
 import 'fooder_bar.dart';
@@ -26,9 +27,37 @@ class _MainScreenState extends State<MainScreen> {
   @override
   void initState() {
     super.initState();
-    Future.microtask(() {
-      context.read<UserViewModel>().loadCurrentUser();
+    Future.microtask(() async {
+      final userVM = context.read<UserViewModel>();
+      await userVM.loadCurrentUser();
+      await _uploadFcmToken();
     });
+  }
+
+  Future<void> _uploadFcmToken() async {
+    final userVM = context.read<UserViewModel>();
+
+    final user = userVM.currentUser;
+
+    if (user == null) {
+      debugPrint("User chưa sẵn sàng");
+      return;
+    }
+
+    final token = await NotificationServiceFirebase().getToken();
+
+    if (token == null || token.isEmpty) {
+      debugPrint("FCM token null");
+      return;
+    }
+
+    try {
+      await userVM.sendFcmToken(user.id ?? '', user.role ?? '', token);
+
+      debugPrint("Đã gửi FCM token");
+    } catch (e) {
+      debugPrint("Lỗi gửi FCM: $e");
+    }
   }
 
   @override

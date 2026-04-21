@@ -1,6 +1,9 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:hld_flutter/routes/app_pages.dart';
+import 'package:hld_flutter/services/NotificationServiceFirebase.dart';
+import 'package:hld_flutter/services/notification_service.dart';
 import 'package:hld_flutter/viewmodels/appointment_viewmodel.dart';
 import 'package:hld_flutter/viewmodels/auth_viewmodel.dart';
 import 'package:hld_flutter/viewmodels/doctor_viewmodel.dart';
@@ -17,6 +20,7 @@ import 'routes/app_routes.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
   // Khởi tạo SharedPreferences và lấy Token
   final prefs = await SharedPreferences.getInstance();
   final String? token = prefs.getString('accessToken');
@@ -46,17 +50,33 @@ void main() async {
   );
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   final String initialRoute;
 
   const MyApp({super.key, required this.initialRoute});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  final NotificationServiceFirebase _notificationService =
+      NotificationServiceFirebase();
+  @override
+  void initState() {
+    super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _notificationService.init(context);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Hellodoc',
-      initialRoute: initialRoute,
+      initialRoute: widget.initialRoute,
       routes: AppPages.routes,
     );
   }

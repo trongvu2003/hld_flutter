@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import '../models/requestmodel/tokenrequest.dart';
 import '../models/responsemodel/user_response.dart';
 
 class UserService {
@@ -47,5 +48,9 @@ class UserService {
       print("Update user error: $e");
       return null;
     }
+  }
+
+  Future<Response> updateFcmToken(String userId, TokenRequest request) async {
+    return await dio.put('/user/$userId/fcm-token', data: request.toJson());
   }
 }

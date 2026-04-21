@@ -1,10 +1,8 @@
 import 'dart:io';
-
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 import '../models/responsemodel/user_response.dart';
 import '../repositories/user_repository.dart';
 
@@ -13,7 +11,7 @@ class UserViewModel extends ChangeNotifier {
 
   UserViewModel(this.repository);
 
-  User? currentUser;       // Thông tin của chính mình
+  User? currentUser; // Thông tin của chính mình
   User? userOfThisProfile; // Thông tin của người khác
   bool isLoading = false;
 
@@ -53,7 +51,6 @@ class UserViewModel extends ChangeNotifier {
     isLoading = false;
     notifyListeners();
   }
-
 
   Future<void> updateUser({
     File? avatarFile,
@@ -98,5 +95,19 @@ class UserViewModel extends ChangeNotifier {
 
     isLoading = false;
     notifyListeners();
+  }
+
+  Future<void> sendFcmToken(String userId, String role, String token) async {
+    try {
+      final res = await repository.updateFcmToken(userId, token, role);
+
+      if (res.statusCode == 200 || res.statusCode == 204) {
+        debugPrint("FCM: Gửi token thành công");
+      } else {
+        debugPrint("FCM: Gửi thất bại ${res.statusCode}");
+      }
+    } catch (e) {
+      debugPrint("FCM: Lỗi gửi token $e");
+    }
   }
 }

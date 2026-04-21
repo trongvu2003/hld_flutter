@@ -2,6 +2,8 @@ import 'package:dio/dio.dart';
 import 'package:hld_flutter/models/responsemodel/user_response.dart';
 import 'package:hld_flutter/services/user_service.dart';
 
+import '../models/requestmodel/tokenrequest.dart';
+
 class UserRepository {
   final UserService userService;
 
@@ -10,7 +12,6 @@ class UserRepository {
   Future<User> getUser(String id) {
     return userService.getUser(id);
   }
-
 
   Future<User?> updateUserByID({
     required String id,
@@ -32,5 +33,15 @@ class UserRepository {
       password: password,
       role: role,
     );
+  }
+
+  Future<Response> updateFcmToken(
+    String userId,
+    String token,
+    String model,
+  ) async {
+    final request = TokenRequest(token: token, userModel: model);
+
+    return await userService.updateFcmToken(userId, request);
   }
 }

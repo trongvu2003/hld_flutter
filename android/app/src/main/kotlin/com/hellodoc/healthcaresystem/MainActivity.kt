@@ -1,4 +1,4 @@
-package com.example.hld_flutter
+package com.hellodoc.healthcaresystem
 
 import io.flutter.embedding.android.FlutterActivity
 
