@@ -1,15 +1,20 @@
 import '../models/responsemodel/notification.dart';
 import '../services/notification_service.dart';
 
-class NotificationRepository{
+class NotificationRepository {
   NotificationService service;
+
   NotificationRepository(this.service);
 
-  Future<List<NotificationResponse>> getNotificationByUserId(String userId) async{
+  Future<List<NotificationResponse>> getNotificationByUserId(
+    String userId,
+  ) async {
     return await service.getNotificationByUserId(userId);
   }
 
-  Future<List<NotificationResponse>> getUnreadNotifications(String userId) async {
+  Future<List<NotificationResponse>> getUnreadNotifications(
+    String userId,
+  ) async {
     return await service.getUnreadNotifications(userId);
   }
 
@@ -25,19 +30,19 @@ class NotificationRepository{
     return await service.deleteNotification(notificationId);
   }
 
-  // Future<NotificationResponse?> createNotification(
-  //     String userId,
-  //     String userModel,
-  //     String type,
-  //     String content,
-  //     String navigatePath,
-  //     ) async {
-  //   return await service.createNotification(
-  //     userId,
-  //     userModel,
-  //     type,
-  //     content,
-  //     navigatePath,
-  //   );
-  // }
+  Future<NotificationResponse?> createNotification(
+    String userId,
+    String userModel,
+    String type,
+    String content,
+    String navigatePath,
+  ) async {
+    return await service.createNotification(
+      userId,
+      userModel,
+      type,
+      content,
+      navigatePath,
+    );
+  }
 }

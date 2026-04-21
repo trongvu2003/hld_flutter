@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../../models/requestmodel/appointment.dart';
 import '../../../theme/app_colors.dart';
 import '../../../viewmodels/appointment_viewmodel.dart';
+import '../../../viewmodels/notification_viewmodel.dart';
 
 class ConfirmBookingScreen extends StatefulWidget {
   const ConfirmBookingScreen({super.key});
@@ -86,12 +87,11 @@ class _ConfirmBookingScreenState extends State<ConfirmBookingScreen> {
   }
 
   void _showSuccessDialog(Map<String, dynamic> args) {
-    // Các biến dùng cho Notification (tạm thời chưa xài tới)
-    // final doctorName = args['doctorName']?.toString() ?? '';
-    // final patientName = args['patientName']?.toString() ?? '';
-    // final patientID = args['patientID']?.toString() ?? '';
-    // final patientModel = args['patientModel']?.toString() ?? '';
-    // final doctorId = args['doctorId']?.toString() ?? '';
+    final doctorName = args['doctorName']?.toString() ?? '';
+    final patientName = args['patientName']?.toString() ?? '';
+    final patientID = args['patientID']?.toString() ?? '';
+    final patientModel = args['patientModel']?.toString() ?? '';
+    final doctorId = args['doctorId']?.toString() ?? '';
 
     showDialog(
       context: context,
@@ -155,23 +155,21 @@ class _ConfirmBookingScreenState extends State<ConfirmBookingScreen> {
         );
       },
     );
-
-    // TODO: MỞ LẠI KHI LÀM NOTIFICATION
-    // final notificationVM = context.read<NotificationViewModel>();
-    // notificationVM.createNotification(
-    //   userId: patientID,
-    //   userModel: patientModel,
-    //   type: "ForAppointment",
-    //   content: "Bạn đã đặt lịch khám thành công với bác sĩ $doctorName",
-    //   navigatePath: "appointment",
-    // );
-    // notificationVM.createNotification(
-    //   userId: doctorId,
-    //   userModel: "Doctor",
-    //   type: "ForAppointment",
-    //   content: "Bạn có lịch khám mới với bệnh nhân $patientName",
-    //   navigatePath: "appointment",
-    // );
+    final notificationVM = context.read<NotificationViewModel>();
+    notificationVM.createNotification(
+      userId: patientID,
+      userModel: patientModel,
+      type: "ForAppointment",
+      content: "Bạn đã đặt lịch khám thành công với bác sĩ $doctorName",
+      navigatePath: "appointment",
+    );
+    notificationVM.createNotification(
+      userId: doctorId,
+      userModel: "Doctor",
+      type: "ForAppointment",
+      content: "Bạn có lịch khám mới với bệnh nhân $patientName",
+      navigatePath: "appointment",
+    );
   }
 
   void _showErrorDialog(String errorMsg) {

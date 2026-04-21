@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-
+import '../models/requestmodel/notification.dart';
 import '../models/responsemodel/notification.dart';
 
 class NotificationService {
@@ -58,36 +58,35 @@ class NotificationService {
     }
   }
 
-  //  POST: Tạo thông báo
-  // Future<NotificationResponse?> createNotification(
-  //   String userId,
-  //   String userModel,
-  //   String type,
-  //   String content,
-  //   String navigatePath,
-  // ) async {
-  //   try {
-  //     final request = CreateNotificationRequest(
-  //       userId: userId,
-  //       userModel: userModel,
-  //       type: type,
-  //       content: content,
-  //       navigatePath: navigatePath,
-  //     );
-  //
-  //     final res = await dio.post(
-  //       '/notification/create',
-  //       data: request.toJson(),
-  //     );
-  //
-  //     if (res.statusCode == 200 || res.statusCode == 201) {
-  //       return NotificationResponse.fromJson(res.data);
-  //     }
-  //     return null;
-  //   } catch (e) {
-  //     throw Exception('Lỗi không xác định: $e');
-  //   }
-  // }
+  Future<NotificationResponse?> createNotification(
+    String userId,
+    String userModel,
+    String type,
+    String content,
+    String navigatePath,
+  ) async {
+    try {
+      final request = CreateNotificationRequest(
+        userId: userId,
+        userModel: userModel,
+        type: type,
+        content: content,
+        navigatePath: navigatePath,
+      );
+
+      final res = await dio.post(
+        '/notification/create',
+        data: request.toJson(),
+      );
+
+      if (res.statusCode == 200 || res.statusCode == 201) {
+        return NotificationResponse.fromJson(res.data);
+      }
+      return null;
+    } catch (e) {
+      throw Exception('Lỗi không xác định: $e');
+    }
+  }
 
   // Đánh dấu 1 thông báo là đã đọc
   Future<void> markAsRead(String notificationId) async {

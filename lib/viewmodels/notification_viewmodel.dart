@@ -123,25 +123,28 @@ class NotificationViewModel extends ChangeNotifier {
     }
   }
 
-  // 6. TẠO THÔNG BÁO
-  // Future<void> createNotification({
-  //   required String userId,
-  //   required String userModel,
-  //   required String type,
-  //   required String content,
-  //   required String navigatePath,
-  // }) async {
-  //   try {
-  //     final newNotification = await repository.createNotification(
-  //         userId, userModel, type, content, navigatePath
-  //     );
-  //
-  //     if (newNotification != null) {
-  //       notifications.insert(0, newNotification); // Thêm lên đầu danh sách
-  //       _updateUnreadCount();
-  //     }
-  //   } catch (e) {
-  //     print('LỖI CREATE NOTIFICATION: $e');
-  //   }
-  // }
+  Future<void> createNotification({
+    required String userId,
+    required String userModel,
+    required String type,
+    required String content,
+    required String navigatePath,
+  }) async {
+    try {
+      final newNotification = await repository.createNotification(
+        userId,
+        userModel,
+        type,
+        content,
+        navigatePath,
+      );
+
+      if (newNotification != null) {
+        notifications.insert(0, newNotification);
+        _updateUnreadCount();
+      }
+    } catch (e) {
+      print('LỖI CREATE NOTIFICATION: $e');
+    }
+  }
 }
