@@ -20,17 +20,21 @@ class ServiceOutput {
       specialtyId: json['specialtyId']?.toString() ?? '',
       specialtyName: json['specialtyName']?.toString() ?? '',
       description: json['description']?.toString() ?? '',
-      imageService: json['imageService'] is List
-          ? List<String>.from(json['imageService'])
-          : [],
-      minprice: json['minprice'] is int
-          ? json['minprice']
-          : int.tryParse(json['minprice']?.toString() ?? '') ?? 0,
-      maxprice: json['maxprice'] is int
-          ? json['maxprice']
-          : int.tryParse(json['maxprice']?.toString() ?? '') ?? 0,
+      imageService:
+          json['imageService'] is List
+              ? List<String>.from(json['imageService'])
+              : [],
+      minprice:
+          json['minprice'] is int
+              ? json['minprice']
+              : int.tryParse(json['minprice']?.toString() ?? '') ?? 0,
+      maxprice:
+          json['maxprice'] is int
+              ? json['maxprice']
+              : int.tryParse(json['maxprice']?.toString() ?? '') ?? 0,
     );
   }
+
   Map<String, dynamic> toJson() {
     return {
       'specialtyId': specialtyId,
@@ -39,6 +43,35 @@ class ServiceOutput {
       'imageService': imageService,
       'minprice': minprice,
       'maxprice': maxprice,
+    };
+  }
+}
+
+class ServiceInput {
+  String specialtyId;
+  String specialtyName;
+  List<String> imageService;
+  String minprice;
+  String maxprice;
+  String description;
+
+  ServiceInput({
+    required this.specialtyId,
+    required this.specialtyName,
+    required this.imageService,
+    required this.minprice,
+    required this.maxprice,
+    required this.description,
+  });
+
+  Map<String, dynamic> toJson() {
+    return {
+      'specialtyId': specialtyId,
+      'specialtyName': specialtyName,
+      'imageService': imageService,
+      'minprice': minprice,
+      'maxprice': maxprice,
+      'description': description,
     };
   }
 }

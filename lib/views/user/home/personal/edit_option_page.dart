@@ -74,7 +74,7 @@ class _EditOptionPageState extends State<EditOptionPage> {
                 if (user.role == "User") {
                   Navigator.pushNamed(context, AppRoutes.doctorRegister);
                 } else {
-                  Navigator.pushNamed(context, '/editClinic');
+                  Navigator.pushNamed(context, AppRoutes.editClinic);
                 }
               },
             ),

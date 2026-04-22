@@ -13,6 +13,7 @@ import '../views/user/booking/appointment_list_screen.dart';
 import '../views/user/booking/booking_calendar_screen.dart';
 import '../views/user/booking/service_selection_screen.dart';
 import '../views/user/home/doctor/doctor_list_screen.dart';
+import '../views/user/home/doctor/manage_clinic.dart';
 import '../views/user/home/doctor/registerclinic.dart';
 import '../views/user/home/personal/edit_option_page.dart';
 import '../views/user/home/personal/edit_user_profile.dart';
@@ -161,5 +162,6 @@ class AppPages {
         doctorId: args['doctorId']?.toString() ?? '',
       );
     },
+    AppRoutes.editClinic: (context) => const EditClinicServiceScreen(),
   };
 }

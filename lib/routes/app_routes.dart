@@ -24,4 +24,5 @@ class AppRoutes {
   static const postdetail='/postdetail';
   static const doctorRegister="/doctorRegister";
   static const serviceselection="/serviceselection";
+  static const editClinic="/editClinic";
 }
