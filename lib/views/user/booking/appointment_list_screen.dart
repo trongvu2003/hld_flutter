@@ -46,6 +46,9 @@ class _AppointmentListScreenState extends State<AppointmentListScreen> {
       if (!mounted) return;
       if (widget.userId.isNotEmpty) {
         context.read<AppointmentViewModel>().getAppointmentUser(widget.userId);
+        context.read<AppointmentViewModel>().getAppointmentDoctor(
+          widget.userId,
+        );
       } else {
         debugPrint("Lỗi: widget.userId bị rỗng!");
       }
@@ -352,11 +355,12 @@ class _AppointmentListScreenState extends State<AppointmentListScreen> {
     final targetStatus = statusMap[_selectedStatusTab] ?? 'pending';
 
     // Thực hiện LỌC dữ liệu
+    final List<AppointmentResponse> sourceList =
+        _roleSelectedTab == 0 ? vm.appointments : vm.appointmentsfordoctor;
     final filteredAppointments =
-        vm.appointments.where((a) {
+        sourceList.where((a) {
           return a.status == targetStatus;
         }).toList();
-
     // Render UI bằng danh sách ĐÃ LỌC
     if (filteredAppointments.isEmpty) {
       return Center(
@@ -380,11 +384,10 @@ class _AppointmentListScreenState extends State<AppointmentListScreen> {
 
     return ListView.builder(
       padding: const EdgeInsets.only(bottom: 24),
-      itemCount: filteredAppointments.length, // Dùng danh sách đã lọc
+      itemCount: filteredAppointments.length,
       itemBuilder:
           (_, i) => AppointmentCard(
             appointment: filteredAppointments[i],
-            // Dùng item đã lọc
             userId: widget.userId,
             selectedStatusTab: _selectedStatusTab,
             roleSelectedTab: _roleSelectedTab,

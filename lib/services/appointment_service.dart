@@ -109,4 +109,25 @@ class AppointmentService {
       throw Exception("Lỗi" + e.toString());
     }
   }
+
+  Future<List<AppointmentResponse>> getAppointmentDoctor(
+    String doctorId,
+  ) async {
+    try {
+      final res = await dio.get("/appointments/doctor/$doctorId");
+      if (res.statusCode == 200) {
+        List<dynamic> data = res.data;
+        return data
+            .map(
+              (item) =>
+                  AppointmentResponse.fromJson(item as Map<String, dynamic>),
+            )
+            .toList();
+      } else {
+        throw Exception('Lỗi API: Server trả về mã ${res.statusCode}');
+      }
+    } catch (e) {
+      throw Exception('Lỗi ' + e.toString());
+    }
+  }
 }

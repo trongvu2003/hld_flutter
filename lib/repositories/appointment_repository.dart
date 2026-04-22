@@ -32,4 +32,10 @@ class AppointmentRepository {
   Future<UpdateAppointmentResponse> deleteAppointmentById(String id) async {
     return await appointmentService.deleteAppointmentById(id);
   }
+
+  Future<List<AppointmentResponse>> getAppointmentDoctor(
+    String doctorId,
+  ) async {
+    return await appointmentService.getAppointmentDoctor(doctorId);
+  }
 }

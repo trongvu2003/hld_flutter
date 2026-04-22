@@ -74,6 +74,14 @@ class AppointmentViewModel extends ChangeNotifier {
       if (index != -1) {
         appointments[index] = appointments[index].copyWith(status: 'cancelled');
       }
+
+      final indexDoctor = appointmentsfordoctor.indexWhere(
+        (item) => item.id == appointmentId,
+      );
+      if (indexDoctor != -1) {
+        appointmentsfordoctor[indexDoctor] = appointmentsfordoctor[indexDoctor]
+            .copyWith(status: 'cancelled');
+      }
       return true;
     } catch (e) {
       error = e.toString();
@@ -104,6 +112,18 @@ class AppointmentViewModel extends ChangeNotifier {
         );
       }
 
+      final indexDoctor = appointmentsfordoctor.indexWhere(
+        (element) => element.id == id,
+      );
+      if (indexDoctor != -1) {
+        appointmentsfordoctor[indexDoctor] = appointmentsfordoctor[indexDoctor]
+            .copyWith(
+              date: request.date,
+              time: request.time,
+              notes: request.notes,
+            );
+      }
+
       return true;
     } catch (e) {
       error = e.toString();
@@ -122,11 +142,37 @@ class AppointmentViewModel extends ChangeNotifier {
       final res = await repository.deleteAppointmentById(id);
       print("XOÁ LỊCH THÀNH CÔNG: ${res.message}");
       appointments.removeWhere((item) => item.id == id);
+      appointmentsfordoctor.removeWhere((item) => item.id == id);
       return true;
     } catch (e) {
       error = e.toString();
       print("XOÁ LỊCH THẤT BẠI: $error");
       return false;
+    } finally {
+      isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  List<AppointmentResponse> appointmentsfordoctor = [];
+
+  Future<List<AppointmentResponse>> getAppointmentDoctor(
+    String doctorId,
+  ) async {
+    isLoading = true;
+    notifyListeners();
+    try {
+      final res = await repository.getAppointmentDoctor(doctorId);
+      print(
+        "LẤY LỊCH SỬ THÀNH CÔNG cho bác sĩ: ${appointmentsfordoctor.length} items",
+      );
+      appointmentsfordoctor = res;
+      return appointmentsfordoctor;
+    } catch (e) {
+      error = e.toString();
+      print("LẤY LỊCH SỬ THẤT BẠI: " + error);
+      isError = true;
+      return [];
     } finally {
       isLoading = false;
       notifyListeners();
