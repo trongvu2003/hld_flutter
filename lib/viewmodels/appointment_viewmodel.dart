@@ -178,4 +178,28 @@ class AppointmentViewModel extends ChangeNotifier {
       notifyListeners();
     }
   }
+
+  Future<bool> confirmAppointmentDone(
+    String appointmentId,
+    String userId,
+  ) async {
+    isLoading = true;
+    notifyListeners();
+
+    try {
+      final res = await repository.confirmAppointment(appointmentId);
+      print("Xác nhận đã hoàn thành: ${res.message}");
+      await getAppointmentUser(userId);
+      await getAppointmentDoctor(userId);
+
+      return true;
+    } catch (e) {
+      error = e.toString();
+      print("Lỗi xác nhận/API: $error");
+      return false;
+    } finally {
+      isLoading = false;
+      notifyListeners();
+    }
+  }
 }

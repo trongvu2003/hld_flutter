@@ -156,7 +156,7 @@ class AppPages {
       );
 
       return ServiceSelectionScreen(
-        appointmentId: args['userOwnerID']?.toString() ?? '',
+        appointmentId: args['appointmentId']?.toString() ?? '',
         patientName: args['patientName']?.toString() ?? '',
         doctorId: args['doctorId']?.toString() ?? '',
       );

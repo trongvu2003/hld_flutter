@@ -38,4 +38,8 @@ class AppointmentRepository {
   ) async {
     return await appointmentService.getAppointmentDoctor(doctorId);
   }
+
+  Future<UpdateAppointmentResponse> confirmAppointment(String id) async {
+    return await appointmentService.confirmAppointment(id);
+  }
 }

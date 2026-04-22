@@ -135,6 +135,9 @@ class AppointmentService {
     try {
       final res = await dio.patch("/appointments/confirm/$id");
       return UpdateAppointmentResponse.fromJson(res.data);
+    } on DioException catch (e) {
+      print("LỖI 404 TẠI ĐƯỜNG DẪN: ${e.requestOptions.uri}");
+      rethrow;
     } catch (e) {
       rethrow;
     }

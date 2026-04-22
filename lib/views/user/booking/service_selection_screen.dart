@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import '../../../theme/app_colors.dart';
+import '../../../viewmodels/appointment_viewmodel.dart';
 import '../../../viewmodels/doctor_viewmodel.dart';
 import '../../../viewmodels/user_viewmodel.dart';
 
@@ -626,15 +627,27 @@ class _ServiceSelectionScreenState extends State<ServiceSelectionScreen> {
             width: double.infinity,
             height: 52,
             child: ElevatedButton(
-              onPressed: () {
-                final userId =
-                    context.read<UserViewModel>().currentUser!.id ?? '';
-                // context.read<AppointmentViewModel>().confirmAppointmentDone(
-                //   appointmentId: widget.appointmentId,
-                //   userId: userId,
-                // );
-
-                Navigator.pop(context);
+              onPressed: () async {
+                final userId = context.read<UserViewModel>().currentUser?.id ?? '';
+                final vm = context.read<AppointmentViewModel>();
+                final isSuccess = await vm.confirmAppointmentDone(widget.appointmentId, userId);
+                if (!context.mounted) return;
+                if (isSuccess == true) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Đã hoàn tất thanh toán và lịch hẹn!'),
+                      backgroundColor: Colors.green,
+                    ),
+                  );
+                  Navigator.pop(context);
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Có lỗi xảy ra, vui lòng thử lại!'),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                }
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.lightTheme,
