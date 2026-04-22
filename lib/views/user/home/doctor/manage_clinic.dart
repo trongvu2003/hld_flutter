@@ -202,7 +202,6 @@ class _EditClinicServiceScreenState extends State<EditClinicServiceScreen> {
     final request = ModifyClinicRequest(
       address: _addressCtrl.text,
       description: _descCtrl.text,
-      // Có thể lấy từ một desc chung nếu có
       workingHours: _newSchedule,
       oldWorkingHours: _oldSchedule,
       services: _servicesInput,

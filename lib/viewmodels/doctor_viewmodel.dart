@@ -149,4 +149,46 @@ class DoctorViewModel extends ChangeNotifier {
       ).showSnackBar(SnackBar(content: Text(message)));
     }
   }
+
+  bool? updateSuccess;
+
+  Future<void> updateClinic(
+    ModifyClinicRequest request,
+    String doctorId,
+    BuildContext context,
+  ) async {
+    isLoading = true;
+    updateSuccess = null;
+    notifyListeners();
+    try {
+      final isSuccess = await repository.updateClinicInfo(doctorId, request);
+      if (isSuccess) {
+        updateSuccess = true;
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Lưu thông tin phòng khám thành công!'),
+              backgroundColor: Colors.green,
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      updateSuccess = false;
+      if (context.mounted) {
+        final errorMessage = e.toString().replaceAll('Exception: ', '');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(errorMessage), backgroundColor: Colors.red),
+        );
+      }
+    } finally {
+      isLoading = false;
+      notifyListeners();
+    }
+  }
+  // Hàm này gọi sau khi chuyển trang thành công để reset lại biến
+  void resetUpdateStatus() {
+    updateSuccess = null;
+    notifyListeners();
+  }
 }

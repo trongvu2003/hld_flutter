@@ -1,5 +1,8 @@
+import 'dart:convert';
+
 import 'package:dio/dio.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import '../models/requestmodel/doctor.dart';
 import '../models/responsemodel/doctor.dart';
 
 class DoctorService {
@@ -60,9 +63,78 @@ class DoctorService {
   }
 
   Future<Response> applyForDoctor(String userId, FormData formData) async {
-    return await dio.patch(
-      "/doctor/apply-for-doctor/$userId",
-      data: formData,
-    );
+    return await dio.patch("/doctor/apply-for-doctor/$userId", data: formData);
+  }
+
+  Future<bool> updateClinicInfo(
+    String doctorId,
+    ModifyClinicRequest request,
+  ) async {
+    try {
+      FormData formData = FormData();
+
+      //  Thêm các trường Text cơ bản
+      formData.fields.addAll([
+        MapEntry('address', request.address),
+        MapEntry('description', request.description),
+        MapEntry('hasHomeService', request.hasHomeService.toString()),
+        MapEntry('isClinicPaused', request.isClinicPaused.toString()),
+        MapEntry('specialtyId', request.specialtyId),
+      ]);
+
+      // Encode các danh sách (List) thành chuỗi JSON
+      formData.fields.add(
+        MapEntry(
+          'workingHours',
+          jsonEncode(request.workingHours.map((e) => e.toJson()).toList()),
+        ),
+      );
+      formData.fields.add(
+        MapEntry(
+          'oldWorkingHours',
+          jsonEncode(request.oldWorkingHours.map((e) => e.toJson()).toList()),
+        ),
+      );
+      formData.fields.add(
+        MapEntry(
+          'services',
+          jsonEncode(request.services.map((e) => e.toJson()).toList()),
+        ),
+      );
+      formData.fields.add(
+        MapEntry(
+          'oldServices',
+          jsonEncode(request.oldServices.map((e) => e.toJson()).toList()),
+        ),
+      );
+
+      // Xử lý danh sách file ảnh
+      for (String path in request.images) {
+        if (path.isNotEmpty) {
+          formData.files.add(
+            MapEntry(
+              'images',
+              await MultipartFile.fromFile(
+                path,
+                filename: path.split('/').last,
+              ),
+            ),
+          );
+        }
+      }
+      // Gửi Request POST
+      final res = await dio.post(
+        "/doctor/doctor/$doctorId/updateclinic",
+        data: formData,
+      );
+
+      return res.statusCode == 200 || res.statusCode == 201;
+    } on DioException catch (e) {
+      throw Exception(
+        'Lỗi API Cập nhật phòng khám: ${e.response?.data ?? e.message}',
+      );
+    } catch (e) {
+      throw Exception('Lỗi không xác định: $e');
+    }
   }
 }

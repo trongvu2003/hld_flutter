@@ -25,7 +25,10 @@ class DoctorRepository {
     return await doctorService.getAvailableSlots(doctorId);
   }
 
-  Future<ApplyDoctorResponse> applyForDoctor(String userId, ApplyDoctorRequest request) async {
+  Future<ApplyDoctorResponse> applyForDoctor(
+    String userId,
+    ApplyDoctorRequest request,
+  ) async {
     // Map các trường văn bản
     Map<String, dynamic> formDataMap = {
       "license": request.license,
@@ -39,10 +42,12 @@ class DoctorRepository {
     Future<void> addFile(String key, File? file) async {
       if (file != null) {
         String fileName = file.path.split('/').last;
-        formData.files.add(MapEntry(
-          key,
-          await MultipartFile.fromFile(file.path, filename: fileName),
-        ));
+        formData.files.add(
+          MapEntry(
+            key,
+            await MultipartFile.fromFile(file.path, filename: fileName),
+          ),
+        );
       }
     }
 
@@ -55,5 +60,16 @@ class DoctorRepository {
 
     final response = await doctorService.applyForDoctor(userId, formData);
     return ApplyDoctorResponse.fromJson(response.data);
+  }
+
+  Future<bool> updateClinicInfo(
+    String doctorId,
+    ModifyClinicRequest request,
+  ) async {
+    try {
+      return await doctorService.updateClinicInfo(doctorId, request);
+    } catch (e) {
+      rethrow;
+    }
   }
 }
