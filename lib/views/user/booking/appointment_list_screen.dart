@@ -4,7 +4,6 @@ import 'package:hld_flutter/theme/app_colors.dart';
 import 'package:hld_flutter/viewmodels/appointment_viewmodel.dart';
 import 'package:provider/provider.dart';
 import '../../../models/responsemodel/appointment.dart';
-import '../../../viewmodels/user_viewmodel.dart';
 import '../../skeleton/skeleton_box.dart';
 import '../../widgets/app_dialog.dart';
 import 'widgets/appointment_card.dart';
@@ -373,42 +372,56 @@ class _AppointmentListScreenState extends State<AppointmentListScreen> {
         }).toList();
     // Render UI bằng danh sách ĐÃ LỌC
     if (filteredAppointments.isEmpty) {
-      return Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
+      return RefreshIndicator(
+        onRefresh: () async {
+          await vm.getAppointmentUser(widget.userId);
+          await vm.getAppointmentDoctor(widget.userId);
+        },
+        child: ListView(
+          // Đổi Center thành ListView để có thể kéo được
+          physics: const AlwaysScrollableScrollPhysics(),
           children: [
-            Icon(
+            SizedBox(height: MediaQuery.of(context).size.height * 0.3),
+            const Icon(
               Icons.calendar_today_outlined,
               size: 64,
-              color: Colors.grey.shade300,
+              color: Colors.grey,
             ),
             const SizedBox(height: 12),
-            Text(
-              'Không có lịch hẹn nào',
-              style: TextStyle(color: Colors.grey.shade500, fontSize: 16),
+            const Center(
+              child: Text(
+                'Không có lịch hẹn nào',
+                style: TextStyle(color: Colors.grey, fontSize: 16),
+              ),
             ),
           ],
         ),
       );
     }
 
-    return ListView.builder(
-      padding: const EdgeInsets.only(bottom: 24),
-      itemCount: filteredAppointments.length,
-      itemBuilder:
-          (_, i) => AppointmentCard(
-            appointment: filteredAppointments[i],
-            userId: widget.userId,
-            selectedStatusTab: _selectedStatusTab,
-            roleSelectedTab: _roleSelectedTab,
-            onCancel: () => _cancelAppointment(filteredAppointments[i].id),
-            onDelete: () => _deleteAppointment(filteredAppointments[i].id),
-            onEdit: () => _navigateToEdit(filteredAppointments[i]),
-            onRebook: () => _navigateToRebook(filteredAppointments[i]),
-            onRate: () => _navigateToRating(filteredAppointments[i]),
-            onComplete:
-                () => _navigateToServiceSelection(filteredAppointments[i]),
-          ),
+    return RefreshIndicator(
+      onRefresh: () async {
+        await vm.getAppointmentUser(widget.userId);
+        await vm.getAppointmentDoctor(widget.userId);
+      },
+      child: ListView.builder(
+        padding: const EdgeInsets.only(bottom: 24),
+        itemCount: filteredAppointments.length,
+        itemBuilder:
+            (_, i) => AppointmentCard(
+              appointment: filteredAppointments[i],
+              userId: widget.userId,
+              selectedStatusTab: _selectedStatusTab,
+              roleSelectedTab: _roleSelectedTab,
+              onCancel: () => _cancelAppointment(filteredAppointments[i].id),
+              onDelete: () => _deleteAppointment(filteredAppointments[i].id),
+              onEdit: () => _navigateToEdit(filteredAppointments[i]),
+              onRebook: () => _navigateToRebook(filteredAppointments[i]),
+              onRate: () => _navigateToRating(filteredAppointments[i]),
+              onComplete:
+                  () => _navigateToServiceSelection(filteredAppointments[i]),
+            ),
+      ),
     );
   }
 

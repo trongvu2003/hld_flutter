@@ -202,4 +202,14 @@ class AppointmentViewModel extends ChangeNotifier {
       notifyListeners();
     }
   }
+  Future<void> reloadDoctorAppointments(String doctorId) async {
+    isLoading = true;
+    notifyListeners();
+    try {
+      appointmentsfordoctor = await repository.getAppointmentDoctor(doctorId);
+    } finally {
+      isLoading = false;
+      notifyListeners();
+    }
+  }
 }

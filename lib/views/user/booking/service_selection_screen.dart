@@ -628,9 +628,14 @@ class _ServiceSelectionScreenState extends State<ServiceSelectionScreen> {
             height: 52,
             child: ElevatedButton(
               onPressed: () async {
-                final userId = context.read<UserViewModel>().currentUser?.id ?? '';
+                final userId =
+                    context.read<UserViewModel>().currentUser?.id ?? '';
                 final vm = context.read<AppointmentViewModel>();
-                final isSuccess = await vm.confirmAppointmentDone(widget.appointmentId, userId);
+                final isSuccess = await vm.confirmAppointmentDone(
+                  widget.appointmentId,
+                  userId,
+                );
+                await vm.reloadDoctorAppointments(userId);
                 if (!context.mounted) return;
                 if (isSuccess == true) {
                   ScaffoldMessenger.of(context).showSnackBar(
