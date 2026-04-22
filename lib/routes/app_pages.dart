@@ -11,6 +11,7 @@ import '../views/auth/signin_screen.dart';
 import '../views/auth/signup_screen.dart';
 import '../views/user/booking/appointment_list_screen.dart';
 import '../views/user/booking/booking_calendar_screen.dart';
+import '../views/user/booking/service_selection_screen.dart';
 import '../views/user/home/doctor/doctor_list_screen.dart';
 import '../views/user/home/doctor/registerclinic.dart';
 import '../views/user/home/personal/edit_option_page.dart';
@@ -33,7 +34,10 @@ class AppPages {
     AppRoutes.main: (context) => const MainScreen(),
     AppRoutes.createpost: (context) {
       final args =
-          ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+      ModalRoute
+          .of(context)!
+          .settings
+          .arguments as Map<String, dynamic>;
       return CreatePostScreen(
         postId: args?['postId'],
         userId: args['userId'],
@@ -42,7 +46,10 @@ class AppPages {
     },
     AppRoutes.doctorlistscreen: (context) {
       final args =
-          ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+      ModalRoute
+          .of(context)!
+          .settings
+          .arguments as Map<String, dynamic>;
       return DoctorListScreen(
         specialtyId: args['specialtyId'],
         specialtyName: args['specialtyName'],
@@ -51,7 +58,10 @@ class AppPages {
     },
     AppRoutes.otheruserprofile: (context) {
       final args =
-          ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+      ModalRoute
+          .of(context)!
+          .settings
+          .arguments as Map<String, dynamic>;
       return DoctorScreen(
         initialTabIndex: args['initialTabIndex'] ?? 0,
         doctorId: args['doctorId'],
@@ -60,7 +70,10 @@ class AppPages {
     },
     AppRoutes.appointmentlistscreen: (context) {
       final args =
-          ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+      ModalRoute
+          .of(context)!
+          .settings
+          .arguments as Map<String, dynamic>;
       return AppointmentListScreen(
         userRole: args['userRole'],
         userId: args['userId'],
@@ -69,7 +82,10 @@ class AppPages {
 
     AppRoutes.appointmentdetailscreen: (context) {
       final args = Map<String, dynamic>.from(
-        ModalRoute.of(context)!.settings.arguments as Map,
+        ModalRoute
+            .of(context)!
+            .settings
+            .arguments as Map,
       );
       return AppointmentDetailScreen(
         isEditing: args['isEditMode'] ?? false,
@@ -89,7 +105,10 @@ class AppPages {
     },
     AppRoutes.bookingcalendar: (context) {
       final args = Map<String, dynamic>.from(
-        ModalRoute.of(context)?.settings.arguments as Map? ?? {},
+        ModalRoute
+            .of(context)
+            ?.settings
+            .arguments as Map? ?? {},
       );
 
       return BookingCalendarScreen(
@@ -106,7 +125,10 @@ class AppPages {
 
     AppRoutes.profileotheruserpage: (context) {
       final args = Map<String, dynamic>.from(
-        ModalRoute.of(context)?.settings.arguments as Map? ?? {},
+        ModalRoute
+            .of(context)
+            ?.settings
+            .arguments as Map? ?? {},
       );
 
       return ProfileOtherUserPage(
@@ -116,11 +138,28 @@ class AppPages {
 
     AppRoutes.postdetail: (context) {
       final args = Map<String, dynamic>.from(
-        ModalRoute.of(context)?.settings.arguments as Map? ?? {},
+        ModalRoute
+            .of(context)
+            ?.settings
+            .arguments as Map? ?? {},
       );
       return PostDetailScreen(postId: args['postId']?.toString() ?? '');
     },
 
     AppRoutes.doctorRegister: (context) => const RegisterClinicScreen(),
+    AppRoutes.serviceselection: (context) {
+      final args = Map<String, dynamic>.from(
+        ModalRoute
+            .of(context)
+            ?.settings
+            .arguments as Map? ?? {},
+      );
+
+      return ServiceSelectionScreen(
+        appointmentId: args['userOwnerID']?.toString() ?? '',
+        patientName: args['patientName']?.toString() ?? '',
+        doctorId: args['doctorId']?.toString() ?? '',
+      );
+    },
   };
 }

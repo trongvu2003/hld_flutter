@@ -23,4 +23,5 @@ class AppRoutes {
   static const profileotheruserpage='/otheruserprofile';
   static const postdetail='/postdetail';
   static const doctorRegister="/doctorRegister";
+  static const serviceselection="/serviceselection";
 }

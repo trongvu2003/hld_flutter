@@ -130,4 +130,13 @@ class AppointmentService {
       throw Exception('Lỗi ' + e.toString());
     }
   }
+
+  Future<UpdateAppointmentResponse> confirmAppointment(String id) async {
+    try {
+      final res = await dio.patch("/appointments/confirm/$id");
+      return UpdateAppointmentResponse.fromJson(res.data);
+    } catch (e) {
+      rethrow;
+    }
+  }
 }

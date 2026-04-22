@@ -4,6 +4,7 @@ import 'package:hld_flutter/theme/app_colors.dart';
 import 'package:hld_flutter/viewmodels/appointment_viewmodel.dart';
 import 'package:provider/provider.dart';
 import '../../../models/responsemodel/appointment.dart';
+import '../../../viewmodels/user_viewmodel.dart';
 import '../../skeleton/skeleton_box.dart';
 import '../../widgets/app_dialog.dart';
 import 'widgets/appointment_card.dart';
@@ -186,7 +187,16 @@ class _AppointmentListScreenState extends State<AppointmentListScreen> {
   }
 
   void _navigateToServiceSelection(AppointmentResponse appointment) {
-    debugPrint('Navigate chọn dịch vụ: ${appointment.id}');
+    debugPrint('Tên bệnh nhân: ${appointment.patient.name}');
+    Navigator.pushNamed(
+      context,
+      AppRoutes.serviceselection,
+      arguments: {
+        'appointmentId': appointment.id,
+        'patientName': appointment.patient.name,
+        'doctorId': appointment.doctor.id,
+      },
+    );
   }
 
   @override
