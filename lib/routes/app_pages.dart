@@ -12,6 +12,7 @@ import '../views/auth/signup_screen.dart';
 import '../views/user/booking/appointment_list_screen.dart';
 import '../views/user/booking/booking_calendar_screen.dart';
 import '../views/user/booking/service_selection_screen.dart';
+import '../views/user/home/BMIchecking/bmi_checker_screen.dart';
 import '../views/user/home/doctor/doctor_list_screen.dart';
 import '../views/user/home/doctor/manage_clinic.dart';
 import '../views/user/home/doctor/registerclinic.dart';
@@ -163,5 +164,6 @@ class AppPages {
       );
     },
     AppRoutes.editClinic: (context) => const EditClinicServiceScreen(),
+    AppRoutes.bmichecking: (context) => const BmiCheckerScreen(),
   };
 }

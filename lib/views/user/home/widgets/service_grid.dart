@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-
 import '../../../../theme/app_colors.dart';
 import 'scale_button.dart';
 const services = [
@@ -17,11 +16,6 @@ const services = [
     'name': 'Ngôn ngữ kí hiệu',
     "image": "assets/images/speak.png",
     'route': '/sign-language',
-  },
-  {
-    'name': 'Mô hình 3d',
-    "image": "assets/images/speak.png",
-    'route': '/detection-3d',
   },
   {
     'name': 'Tiếng việt sang video cử chỉ',

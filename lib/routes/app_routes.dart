@@ -25,4 +25,5 @@ class AppRoutes {
   static const doctorRegister="/doctorRegister";
   static const serviceselection="/serviceselection";
   static const editClinic="/editClinic";
+  static const bmichecking="/bmi-checking";
 }
