@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import '../../data/models/requestmodel/appointment.dart';
 import '../../data/models/responsemodel/appointment.dart';
-import '../../data/repositories/appointment_repository.dart';
+import '../../domain/repositories/appointment_repository.dart';
 
 class AppointmentViewModel extends ChangeNotifier {
   final AppointmentRepository repository;
@@ -202,6 +202,7 @@ class AppointmentViewModel extends ChangeNotifier {
       notifyListeners();
     }
   }
+
   Future<void> reloadDoctorAppointments(String doctorId) async {
     isLoading = true;
     notifyListeners();

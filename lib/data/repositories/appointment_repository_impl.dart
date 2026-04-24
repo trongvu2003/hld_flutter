@@ -1,12 +1,12 @@
-
+import '../../domain/repositories/appointment_repository.dart';
 import '../datasources/services/appointment_service.dart';
 import '../models/requestmodel/appointment.dart';
 import '../models/responsemodel/appointment.dart';
 
-class AppointmentRepository {
+class AppointmentRepositoryImpl implements AppointmentRepository {
   final AppointmentService appointmentService;
 
-  AppointmentRepository(this.appointmentService);
+  AppointmentRepositoryImpl(this.appointmentService);
 
   Future<List<AppointmentResponse>> getAppointmentUser(String userId) async {
     return await appointmentService.getAppointmentUser(userId);

@@ -1,4 +1,6 @@
 import 'package:get_it/get_it.dart';
+import 'package:hld_flutter/data/repositories/appointment_repository_impl.dart';
+import 'package:hld_flutter/domain/repositories/appointment_repository.dart';
 import '../../data/datasources/services/appointment_service.dart';
 import '../../data/datasources/services/auth_service.dart';
 import '../../data/datasources/services/doctor_service.dart';
@@ -8,8 +10,7 @@ import '../../data/datasources/services/report_service.dart';
 import '../../data/datasources/services/review_service.dart';
 import '../../data/datasources/services/specialty_service.dart';
 import '../../data/datasources/services/user_service.dart';
-import '../../data/repositories/appointment_repository.dart';
-import '../../data/repositories/auth_repository.dart';
+import '../../data/repositories/auth_repository_impl.dart';
 import '../../data/repositories/doctor_repository.dart';
 import '../../data/repositories/notification_repository.dart';
 import '../../data/repositories/post_repository.dart';
@@ -17,6 +18,7 @@ import '../../data/repositories/report_repository.dart';
 import '../../data/repositories/review_repository.dart';
 import '../../data/repositories/specialty_repository.dart';
 import '../../data/repositories/user_repository.dart';
+import '../../domain/repositories/auth_repository.dart';
 import '../../presentation/viewmodels/appointment_viewmodel.dart';
 import '../../presentation/viewmodels/auth_viewmodel.dart';
 import '../../presentation/viewmodels/doctor_viewmodel.dart';
@@ -47,7 +49,7 @@ void setupLocator() {
 
   // 2. TẦNG REPOSITORIES (Nhận inject từ Services)
   // getIt() sẽ tự động lấy đúng Service ở trên truyền vào
-  getIt.registerLazySingleton<AuthRepository>(() => AuthRepository(getIt()));
+  getIt.registerLazySingleton<AuthRepository>(() => AuthRepositoryImpl(getIt()));
   getIt.registerLazySingleton<UserRepository>(() => UserRepository(getIt()));
   getIt.registerLazySingleton<PostRepository>(() => PostRepository(getIt()));
   getIt.registerLazySingleton<SpecialtyRepository>(
@@ -60,7 +62,7 @@ void setupLocator() {
     () => ReviewRepository(getIt()),
   );
   getIt.registerLazySingleton<AppointmentRepository>(
-    () => AppointmentRepository(getIt()),
+    () => AppointmentRepositoryImpl(getIt()),
   );
   getIt.registerLazySingleton<NotificationRepository>(
     () => NotificationRepository(getIt()),
