@@ -1,13 +1,10 @@
 import 'package:dio/dio.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import '../../models/requestmodel/appointment.dart';
 import '../../models/responsemodel/appointment.dart';
 
-
 class AppointmentService {
-  final Dio dio = Dio(
-    BaseOptions(baseUrl: dotenv.env['BASE_URL'] ?? "http://10.0.2.2:4000"),
-  );
+  final Dio dio;
+  AppointmentService(this.dio);
 
   Future<List<AppointmentResponse>> getAppointmentUser(String id) async {
     print("${dio.options.baseUrl}appointments/patient/$id");

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../data/models/requestmodel/post.dart';
 import '../../data/models/responsemodel/post.dart';
-import '../../data/repositories/post_repository_impl.dart';
+import '../../domain/repositories/post_repository.dart';
 
 
 class PostViewModel extends ChangeNotifier {

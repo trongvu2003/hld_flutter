@@ -15,5 +15,5 @@ abstract class UserRepository {
     String? role,
   });
 
-  Future<void> updateFcmToken(String userId, String token, String model);
+  Future<Response> updateFcmToken(String userId, String token, String model);
 }

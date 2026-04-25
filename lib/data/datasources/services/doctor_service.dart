@@ -1,14 +1,11 @@
 import 'dart:convert';
 import 'package:dio/dio.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:hld_flutter/data/models/requestmodel/doctor.dart';
 import '../../models/responsemodel/doctor.dart';
 
-
 class DoctorService {
-  final Dio dio = Dio(
-    BaseOptions(baseUrl: dotenv.env['BASE_URL'] ?? "http://10.0.2.2:4000"),
-  );
+  final Dio dio;
+  DoctorService(this.dio);
 
   Future<List<GetDoctorResponse>> getDoctors() async {
     try {

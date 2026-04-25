@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import '../../data/models/responsemodel/review_response.dart';
-import '../../data/repositories/review_repository_impl.dart';
+import '../../domain/repositories/review_repository.dart';
 
 class ReviewViewModel extends ChangeNotifier {
-  final ReviewRepository repository;
+  final ReViewRepository repository;
 
   ReviewViewModel(this.repository);
 

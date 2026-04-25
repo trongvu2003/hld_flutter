@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:get_it/get_it.dart';
 import 'package:hld_flutter/data/repositories/appointment_repository_impl.dart';
 import 'package:hld_flutter/domain/repositories/appointment_repository.dart';
@@ -35,6 +36,7 @@ import '../../presentation/viewmodels/report_viewmodel.dart';
 import '../../presentation/viewmodels/review_viewmodel.dart';
 import '../../presentation/viewmodels/specialty_viewmodel.dart';
 import '../../presentation/viewmodels/user_viewmodel.dart';
+import '../network/dio_client.dart';
 
 final getIt = GetIt.instance;
 
@@ -44,15 +46,17 @@ final getIt = GetIt.instance;
 
 void setupLocator() {
   // 1. TẦNG SERVICES (Tầng giao tiếp API trực tiếp)
-  getIt.registerLazySingleton<AuthService>(() => AuthService());
-  getIt.registerLazySingleton<UserService>(() => UserService());
-  getIt.registerLazySingleton<PostService>(() => PostService());
-  getIt.registerLazySingleton<SpecialtyService>(() => SpecialtyService());
-  getIt.registerLazySingleton<DoctorService>(() => DoctorService());
-  getIt.registerLazySingleton<ReviewService>(() => ReviewService());
-  getIt.registerLazySingleton<AppointmentService>(() => AppointmentService());
-  getIt.registerLazySingleton<NotificationService>(() => NotificationService());
-  getIt.registerLazySingleton<ReportService>(() => ReportService());
+  // Register Dio (singleton)
+  getIt.registerLazySingleton<Dio>(() => DioClient.create());
+  getIt.registerLazySingleton<AuthService>(() => AuthService(getIt()));
+  getIt.registerLazySingleton<UserService>(() => UserService(getIt()));
+  getIt.registerLazySingleton<PostService>(() => PostService(getIt()));
+  getIt.registerLazySingleton<SpecialtyService>(() => SpecialtyService(getIt()));
+  getIt.registerLazySingleton<DoctorService>(() => DoctorService(getIt()));
+  getIt.registerLazySingleton<ReviewService>(() => ReviewService(getIt()));
+  getIt.registerLazySingleton<AppointmentService>(() => AppointmentService(getIt()));
+  getIt.registerLazySingleton<NotificationService>(() => NotificationService(getIt()));
+  getIt.registerLazySingleton<ReportService>(() => ReportService(getIt()));
 
   // 2. TẦNG REPOSITORIES (Nhận inject từ Services)
   // getIt() sẽ tự động lấy đúng Service ở trên truyền vào

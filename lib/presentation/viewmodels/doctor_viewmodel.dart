@@ -3,7 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import '../../data/models/requestmodel/doctor.dart';
 import '../../data/models/responsemodel/doctor.dart';
-import '../../data/repositories/doctor_repository_impl.dart';
+import '../../domain/repositories/doctor_repository.dart';
 
 
 class DoctorViewModel extends ChangeNotifier {

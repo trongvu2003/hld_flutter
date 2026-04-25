@@ -1,13 +1,11 @@
 import 'package:dio/dio.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import '../../models/requestmodel/notification.dart';
 import '../../models/responsemodel/notification.dart';
 
 
 class NotificationService {
-  final Dio dio = Dio(
-    BaseOptions(baseUrl: dotenv.env['BASE_URL'] ?? "http://10.0.2.2:4000"),
-  );
+  final Dio dio;
+  NotificationService(this.dio);
 
   Future<List<NotificationResponse>> getNotificationByUserId(
     String userId,

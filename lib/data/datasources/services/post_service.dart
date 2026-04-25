@@ -1,14 +1,11 @@
 import 'dart:io';
 import 'package:dio/dio.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import '../../models/requestmodel/post.dart';
 import '../../models/responsemodel/post.dart';
 
-
 class PostService {
-  final Dio dio = Dio(
-    BaseOptions(baseUrl: dotenv.env['BASE_URL'] ?? "http://10.0.2.2:4000"),
-  );
+  final Dio dio;
+  PostService(this.dio);
 
   Future<PostPageResponse> getAllPosts(int skip, int limit) async {
     try {

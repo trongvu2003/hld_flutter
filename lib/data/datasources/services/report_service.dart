@@ -1,11 +1,9 @@
 import 'package:dio/dio.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import '../../models/requestmodel/report.dart';
 
 class ReportService {
-  final Dio dio = Dio(
-    BaseOptions(baseUrl: dotenv.env['BASE_URL'] ?? "http://10.0.2.2:4000"),
-  );
+  final Dio dio;
+  ReportService(this.dio);
 
   Future<void> sendReport(ReportRequest reportRequest) async {
     try {
