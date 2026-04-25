@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import '../../data/models/responsemodel/doctor.dart';
 import '../../data/models/responsemodel/specialty.dart';
-import '../../data/repositories/specialty_repository.dart';
+import '../../data/repositories/specialty_repository_impl.dart';
 
 
 class SpecialtyViewModel extends ChangeNotifier {

@@ -1,10 +1,11 @@
+import 'package:hld_flutter/domain/repositories/specialty_repository.dart';
 import '../datasources/services/specialty_service.dart';
 import '../models/responsemodel/specialty.dart';
 
-class SpecialtyRepository {
+class SpecialtyRepositoryImpl implements SpecialtyRepository {
   final SpecialtyService specialtyService;
 
-  SpecialtyRepository(this.specialtyService);
+  SpecialtyRepositoryImpl(this.specialtyService);
 
   Future<List<GetSpecialtyResponse>> getAllSpecialties() {
     return specialtyService.getAllSpecialties();

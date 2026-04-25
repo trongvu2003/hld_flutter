@@ -1,5 +1,5 @@
 import 'package:flutter/cupertino.dart';
-import 'package:hld_flutter/data/repositories/notification_repository.dart';
+import 'package:hld_flutter/data/repositories/notification_repository_impl.dart';
 import '../../data/models/responsemodel/notification.dart';
 
 class NotificationViewModel extends ChangeNotifier {

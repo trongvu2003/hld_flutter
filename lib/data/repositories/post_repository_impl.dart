@@ -1,12 +1,12 @@
+import '../../domain/repositories/post_repository.dart';
 import '../datasources/services/post_service.dart';
 import '../models/requestmodel/post.dart';
 import '../models/responsemodel/post.dart';
 
-
-class PostRepository {
+class PostRepositoryImpl implements PostRepository {
   final PostService postService;
 
-  PostRepository(this.postService);
+  PostRepositoryImpl(this.postService);
 
   Future<PostPageResponse> fetchPosts({
     required int skip,

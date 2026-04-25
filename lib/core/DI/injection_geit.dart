@@ -11,14 +11,21 @@ import '../../data/datasources/services/review_service.dart';
 import '../../data/datasources/services/specialty_service.dart';
 import '../../data/datasources/services/user_service.dart';
 import '../../data/repositories/auth_repository_impl.dart';
-import '../../data/repositories/doctor_repository.dart';
-import '../../data/repositories/notification_repository.dart';
-import '../../data/repositories/post_repository.dart';
-import '../../data/repositories/report_repository.dart';
-import '../../data/repositories/review_repository.dart';
-import '../../data/repositories/specialty_repository.dart';
-import '../../data/repositories/user_repository.dart';
+import '../../data/repositories/doctor_repository_impl.dart';
+import '../../data/repositories/notification_repository_impl.dart';
+import '../../data/repositories/post_repository_impl.dart';
+import '../../data/repositories/report_repository_impl.dart';
+import '../../data/repositories/review_repository_impl.dart';
+import '../../data/repositories/specialty_repository_impl.dart';
+import '../../data/repositories/user_repository_impl.dart';
 import '../../domain/repositories/auth_repository.dart';
+import '../../domain/repositories/doctor_repository.dart';
+import '../../domain/repositories/notification_repository.dart';
+import '../../domain/repositories/post_repository.dart';
+import '../../domain/repositories/report_repository.dart';
+import '../../domain/repositories/review_repository.dart';
+import '../../domain/repositories/specialty_repository.dart';
+import '../../domain/repositories/user_repository.dart';
 import '../../presentation/viewmodels/appointment_viewmodel.dart';
 import '../../presentation/viewmodels/auth_viewmodel.dart';
 import '../../presentation/viewmodels/doctor_viewmodel.dart';
@@ -49,28 +56,33 @@ void setupLocator() {
 
   // 2. TẦNG REPOSITORIES (Nhận inject từ Services)
   // getIt() sẽ tự động lấy đúng Service ở trên truyền vào
-  getIt.registerLazySingleton<AuthRepository>(() => AuthRepositoryImpl(getIt()));
-  getIt.registerLazySingleton<UserRepository>(() => UserRepository(getIt()));
-  getIt.registerLazySingleton<PostRepository>(() => PostRepository(getIt()));
+  getIt.registerLazySingleton<AuthRepository>(
+    () => AuthRepositoryImpl(getIt()),
+  );
+  getIt.registerLazySingleton<UserRepository>(
+    () => UserRepositoryImpl(getIt()),
+  );
+  getIt.registerLazySingleton<PostRepository>(
+    () => PostRepositoryImpl(getIt()),
+  );
   getIt.registerLazySingleton<SpecialtyRepository>(
-    () => SpecialtyRepository(getIt()),
+    () => SpecialtyRepositoryImpl(getIt()),
   );
   getIt.registerLazySingleton<DoctorRepository>(
-    () => DoctorRepository(getIt()),
+    () => DoctorRepositoryImpl(getIt()),
   );
-  getIt.registerLazySingleton<ReviewRepository>(
-    () => ReviewRepository(getIt()),
+  getIt.registerLazySingleton<ReViewRepository>(
+    () => ReViewRepositoryImpl(getIt()),
   );
   getIt.registerLazySingleton<AppointmentRepository>(
     () => AppointmentRepositoryImpl(getIt()),
   );
   getIt.registerLazySingleton<NotificationRepository>(
-    () => NotificationRepository(getIt()),
+    () => NotificationRepositoryImpl(getIt()),
   );
   getIt.registerLazySingleton<ReportRepository>(
-        () => ReportRepository(getIt()),
+    () => ReportRepositoryImpl(getIt()),
   );
-
 
   // 3. TẦNG VIEWMODELS (Nhận inject từ Repositories)
   // Vì hiện tại bạn đang bỏ tất cả ViewModel vào main.dart (Global),
@@ -86,26 +98,23 @@ void setupLocator() {
   getIt.registerFactory<NotificationViewModel>(
     () => NotificationViewModel(getIt()),
   );
-  getIt.registerFactory<ReportViewModel>(
-        () => ReportViewModel(getIt()),
-  );
+  getIt.registerFactory<ReportViewModel>(() => ReportViewModel(getIt()));
 }
 
-
 /// Áp dụng gelt+ ListenableBuilder
-  // 1. TÌM (Bằng GetIt)
-  // final _userVM = getIt<UserViewModel>();
-  //
-  // @override
-  // Widget build(BuildContext context) {
-  //   return Scaffold(
-  //     // 2. NGHE (Bằng ListenableBuilder)
-  //     body: ListenableBuilder(
-  //         listenable: _userVM,
-  //         builder: (context, child) {
-  //           // Nó sẽ tự rebuild chỗ này khi _userVM thay đổi
-  //           return Text(_userVM.user?.name ?? '');
-  //         }
-  //     ),
-  //   );
-  // }
+// 1. TÌM (Bằng GetIt)
+// final _userVM = getIt<UserViewModel>();
+//
+// @override
+// Widget build(BuildContext context) {
+//   return Scaffold(
+//     // 2. NGHE (Bằng ListenableBuilder)
+//     body: ListenableBuilder(
+//         listenable: _userVM,
+//         builder: (context, child) {
+//           // Nó sẽ tự rebuild chỗ này khi _userVM thay đổi
+//           return Text(_userVM.user?.name ?? '');
+//         }
+//     ),
+//   );
+// }

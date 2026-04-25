@@ -1,10 +1,11 @@
+import '../../domain/repositories/notification_repository.dart';
 import '../datasources/services/notification_service.dart';
 import '../models/responsemodel/notification.dart';
 
-class NotificationRepository {
+class NotificationRepositoryImpl implements NotificationRepository {
   NotificationService service;
 
-  NotificationRepository(this.service);
+  NotificationRepositoryImpl(this.service);
 
   Future<List<NotificationResponse>> getNotificationByUserId(
     String userId,

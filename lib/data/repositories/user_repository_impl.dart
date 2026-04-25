@@ -1,12 +1,13 @@
 import 'package:dio/dio.dart';
 import 'package:hld_flutter/data/datasources/services/user_service.dart';
+import '../../domain/repositories/user_repository.dart';
 import '../models/requestmodel/tokenrequest.dart';
 import '../models/responsemodel/user_response.dart';
 
-class UserRepository {
+class UserRepositoryImpl implements UserRepository {
   final UserService userService;
 
-  UserRepository(this.userService);
+  UserRepositoryImpl(this.userService);
 
   Future<User> getUser(String id) {
     return userService.getUser(id);

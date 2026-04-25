@@ -1,13 +1,14 @@
 import 'dart:io';
 import 'package:dio/dio.dart';
+import '../../domain/repositories/doctor_repository.dart';
 import '../datasources/services/doctor_service.dart';
 import '../models/requestmodel/doctor.dart';
 import '../models/responsemodel/doctor.dart';
 
-class DoctorRepository {
+class DoctorRepositoryImpl implements DoctorRepository {
   final DoctorService doctorService;
 
-  DoctorRepository(this.doctorService);
+  DoctorRepositoryImpl(this.doctorService);
 
   Future<List<GetDoctorResponse>> getDoctors() async {
     return await doctorService.getDoctors();

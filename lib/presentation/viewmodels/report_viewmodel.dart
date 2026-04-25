@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import '../../data/models/requestmodel/report.dart';
-import '../../data/repositories/report_repository.dart';
+import '../../data/repositories/report_repository_impl.dart';
 
 class ReportViewModel extends ChangeNotifier {
   final ReportRepository repository;
