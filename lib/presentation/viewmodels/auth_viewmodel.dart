@@ -1,12 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../../domain/repositories/auth_repository.dart';
+import '../../domain/usecases/auth/extract_role_usecase.dart';
+import '../../domain/usecases/auth/get_current_user_usecase.dart';
+import '../../domain/usecases/auth/login_usecase.dart';
+import '../../domain/usecases/auth/save_token_usecase.dart';
 
 class AuthViewModel extends ChangeNotifier {
-  final AuthRepository repository;
+  final LoginUseCase loginUseCase;
+  final SaveTokenUseCase saveTokenUseCase;
+  final GetCurrentUserUseCase getCurrentUserUseCase;
+  final ExtractRoleUseCase extractRoleUseCase;
 
-  AuthViewModel(this.repository);
+  AuthViewModel(
+    this.loginUseCase,
+    this.saveTokenUseCase,
+    this.getCurrentUserUseCase,
+    this.extractRoleUseCase,
+  );
 
   String email = '';
   String password = '';
@@ -17,13 +28,7 @@ class AuthViewModel extends ChangeNotifier {
   Map<String, dynamic>? currentUser;
 
   Future<void> fetchCurrentUser() async {
-    final prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('accessToken');
-    print("TOKEN: $token");
-    if (token == null) return;
-    final decoded = JwtDecoder.decode(token);
-    print("DECODED: $decoded");
-    currentUser = decoded;
+    currentUser = await getCurrentUserUseCase();
     notifyListeners();
   }
 
@@ -33,37 +38,31 @@ class AuthViewModel extends ChangeNotifier {
       notifyListeners();
       return false;
     }
+
     isLoading = true;
     errorMessage = null;
     notifyListeners();
-    final result = await repository.login(email, password);
+
+    final result = await loginUseCase(email, password);
+
     isLoading = false;
+
     if (result != null) {
       final token = result.accessToken;
-      await _saveToken(token);
-      role = _extractRole(token);
+
+      await saveTokenUseCase(token);
+      role = extractRoleUseCase(token);
+
       isAuthenticated = true;
+
       await fetchCurrentUser();
+
       notifyListeners();
       return true;
     } else {
       errorMessage = "Sai tài khoản hoặc mật khẩu";
       notifyListeners();
       return false;
-    }
-  }
-
-  Future<void> _saveToken(String token) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('accessToken', token);
-  }
-
-  String _extractRole(String token) {
-    try {
-      final decoded = JwtDecoder.decode(token);
-      return decoded['role'] ?? 'User';
-    } catch (e) {
-      return 'User';
     }
   }
 }

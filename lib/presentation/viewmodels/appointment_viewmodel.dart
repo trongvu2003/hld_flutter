@@ -1,13 +1,13 @@
 import 'package:flutter/cupertino.dart';
 import '../../data/models/requestmodel/appointment.dart';
 import '../../data/models/responsemodel/appointment.dart';
-import '../../domain/usecases/appointment/cancel_appointment.dart';
-import '../../domain/usecases/appointment/confirm_appointment.dart';
-import '../../domain/usecases/appointment/create_appointment.dart';
-import '../../domain/usecases/appointment/delete_appointment.dart';
-import '../../domain/usecases/appointment/get_appointment_doctor.dart';
-import '../../domain/usecases/appointment/get_appointment_user.dart';
-import '../../domain/usecases/appointment/update_appointment.dart';
+import '../../domain/usecases/appointment/cancel_appointment_usecase.dart';
+import '../../domain/usecases/appointment/confirm_appointment_usecase.dart';
+import '../../domain/usecases/appointment/create_appointment_usecase.dart';
+import '../../domain/usecases/appointment/delete_appointment_usecase.dart';
+import '../../domain/usecases/appointment/get_appointment_doctor_usecase.dart';
+import '../../domain/usecases/appointment/get_appointment_user_usecase.dart';
+import '../../domain/usecases/appointment/update_appointment_usecase.dart';
 
 class AppointmentViewModel extends ChangeNotifier {
   final GetAppointmentUserUseCase getAppointmentUserUC;

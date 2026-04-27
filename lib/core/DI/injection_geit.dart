@@ -27,13 +27,17 @@ import '../../domain/repositories/report_repository.dart';
 import '../../domain/repositories/review_repository.dart';
 import '../../domain/repositories/specialty_repository.dart';
 import '../../domain/repositories/user_repository.dart';
-import '../../domain/usecases/appointment/cancel_appointment.dart';
-import '../../domain/usecases/appointment/confirm_appointment.dart';
-import '../../domain/usecases/appointment/create_appointment.dart';
-import '../../domain/usecases/appointment/delete_appointment.dart';
-import '../../domain/usecases/appointment/get_appointment_doctor.dart';
-import '../../domain/usecases/appointment/get_appointment_user.dart';
-import '../../domain/usecases/appointment/update_appointment.dart';
+import '../../domain/usecases/appointment/cancel_appointment_usecase.dart';
+import '../../domain/usecases/appointment/confirm_appointment_usecase.dart';
+import '../../domain/usecases/appointment/create_appointment_usecase.dart';
+import '../../domain/usecases/appointment/delete_appointment_usecase.dart';
+import '../../domain/usecases/appointment/get_appointment_doctor_usecase.dart';
+import '../../domain/usecases/appointment/get_appointment_user_usecase.dart';
+import '../../domain/usecases/appointment/update_appointment_usecase.dart';
+import '../../domain/usecases/auth/extract_role_usecase.dart';
+import '../../domain/usecases/auth/get_current_user_usecase.dart';
+import '../../domain/usecases/auth/login_usecase.dart';
+import '../../domain/usecases/auth/save_token_usecase.dart';
 import '../../presentation/viewmodels/appointment_viewmodel.dart';
 import '../../presentation/viewmodels/auth_viewmodel.dart';
 import '../../presentation/viewmodels/doctor_viewmodel.dart';
@@ -109,10 +113,21 @@ void setupLocator() {
   getIt.registerLazySingleton(() => UpdateAppointmentUseCase(getIt()));
   getIt.registerLazySingleton(() => DeleteAppointmentUseCase(getIt()));
   getIt.registerLazySingleton(() => ConfirmAppointmentUseCase(getIt()));
-
+  // USECASES - Auth
+  getIt.registerLazySingleton(() => LoginUseCase(getIt()));
+  getIt.registerLazySingleton(() => SaveTokenUseCase());
+  getIt.registerLazySingleton(() => GetCurrentUserUseCase());
+  getIt.registerLazySingleton(() => ExtractRoleUseCase());
   // 3. TẦNG VIEWMODELS (Nhận inject từ Repositories)
   // Vì hiện tại bạn đang bỏ tất cả ViewModel vào main.dart (Global),
-  getIt.registerFactory<AuthViewModel>(() => AuthViewModel(getIt()));
+  getIt.registerFactory<AuthViewModel>(
+    () => AuthViewModel(
+      getIt(), // LoginUseCase
+      getIt(), // SaveTokenUseCase
+      getIt(), // GetCurrentUserUseCase
+      getIt(), // ExtractRoleUseCase
+    ),
+  );
   getIt.registerFactory<UserViewModel>(() => UserViewModel(getIt()));
   getIt.registerFactory<PostViewModel>(() => PostViewModel(getIt()));
   getIt.registerFactory<SpecialtyViewModel>(() => SpecialtyViewModel(getIt()));
