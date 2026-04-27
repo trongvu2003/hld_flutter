@@ -18,15 +18,15 @@ class AppointmentViewModel extends ChangeNotifier {
   final DeleteAppointmentUseCase deleteAppointmentUC;
   final ConfirmAppointmentUseCase confirmAppointmentUC;
 
-  AppointmentViewModel(
-    this.getAppointmentUserUC,
-    this.getAppointmentDoctorUC,
-    this.createAppointmentUC,
-    this.cancelAppointmentUC,
-    this.updateAppointmentUC,
-    this.deleteAppointmentUC,
-    this.confirmAppointmentUC,
-  );
+  AppointmentViewModel({
+    required this.getAppointmentUserUC,
+    required this.getAppointmentDoctorUC,
+    required this.createAppointmentUC,
+    required this.cancelAppointmentUC,
+    required this.updateAppointmentUC,
+    required this.deleteAppointmentUC,
+    required this.confirmAppointmentUC,
+  });
 
   List<AppointmentResponse> appointments = [];
   bool isLoading = false;

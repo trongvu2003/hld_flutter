@@ -115,76 +115,62 @@ void setupLocator() {
   getIt.registerLazySingleton<ReportRepository>(
     () => ReportRepositoryImpl(getIt()),
   );
-
-  // USECASES - Appointment
-  getIt.registerLazySingleton(() => GetAppointmentUserUseCase(getIt()));
-  getIt.registerLazySingleton(() => GetAppointmentDoctorUseCase(getIt()));
-  getIt.registerLazySingleton(() => CreateAppointmentUseCase(getIt()));
-  getIt.registerLazySingleton(() => CancelAppointmentUseCase(getIt()));
-  getIt.registerLazySingleton(() => UpdateAppointmentUseCase(getIt()));
-  getIt.registerLazySingleton(() => DeleteAppointmentUseCase(getIt()));
-  getIt.registerLazySingleton(() => ConfirmAppointmentUseCase(getIt()));
-  // USECASES - Auth
-  getIt.registerLazySingleton(() => LoginUseCase(getIt()));
-  getIt.registerLazySingleton(() => SaveTokenUseCase());
-  getIt.registerLazySingleton(() => GetCurrentUserUseCase());
-  getIt.registerLazySingleton(() => ExtractRoleUseCase());
-  // USECASES - Doctor
-  getIt.registerLazySingleton(() => GetDoctorsUseCase(getIt()));
-  getIt.registerLazySingleton(() => GetDoctorByIdUseCase(getIt()));
-  getIt.registerLazySingleton(() => GetAvailableSlotsUseCase(getIt()));
-  getIt.registerLazySingleton(() => ApplyDoctorUseCase(getIt()));
-  getIt.registerLazySingleton(() => UpdateClinicUseCase(getIt()));
-  // USECASES - Notification
-  getIt.registerLazySingleton(() => GetNotificationsUseCase(getIt()));
-  getIt.registerLazySingleton(() => GetUnreadNotificationsUseCase(getIt()));
-  getIt.registerLazySingleton(() => MarkAsReadUseCase(getIt()));
-  getIt.registerLazySingleton(() => MarkAllAsReadUseCase(getIt()));
-  getIt.registerLazySingleton(() => DeleteNotificationUseCase(getIt()));
-  getIt.registerLazySingleton(() => CreateNotificationUseCase(getIt()));
-
   // 3. TẦNG VIEWMODELS (Nhận inject từ Repositories)
   // Vì hiện tại bạn đang bỏ tất cả ViewModel vào main.dart (Global),
   getIt.registerFactory<AuthViewModel>(
     () => AuthViewModel(
-      getIt(), // LoginUseCase
-      getIt(), // SaveTokenUseCase
-      getIt(), // GetCurrentUserUseCase
-      getIt(), // ExtractRoleUseCase
+      loginUseCase: getIt(),
+      saveTokenUseCase: getIt(),
+      getCurrentUserUseCase: getIt(),
+      extractRoleUseCase: getIt(),
     ),
   );
   getIt.registerFactory<UserViewModel>(() => UserViewModel(getIt()));
-  getIt.registerFactory<PostViewModel>(() => PostViewModel(getIt()));
+  getIt.registerFactory<PostViewModel>(
+    () => PostViewModel(
+      getPostsUseCase: getIt(),
+      createPostUseCase: getIt(),
+      deletePostUseCase: getIt(),
+      updatePostUseCase: getIt(),
+      getPostByIdUseCase: getIt(),
+      getSimilarPostsUseCase: getIt(),
+      getPostsByUserUseCase: getIt(),
+      getCommentsUseCase: getIt(),
+      createCommentUseCase: getIt(),
+      updateCommentUseCase: getIt(),
+      deleteCommentUseCase: getIt(),
+    ),
+  );
   getIt.registerFactory<SpecialtyViewModel>(() => SpecialtyViewModel(getIt()));
   getIt.registerFactory<DoctorViewModel>(
-    () => DoctorViewModel(getIt(), getIt(), getIt(), getIt(), getIt()),
+    () => DoctorViewModel(
+      getDoctorsUseCase: getIt(),
+      getDoctorByIdUseCase: getIt(),
+      getAvailableSlotsUseCase: getIt(),
+      applyDoctorUseCase: getIt(),
+      updateClinicUseCase: getIt(),
+    ),
   );
   getIt.registerFactory<ReviewViewModel>(() => ReviewViewModel(getIt()));
   getIt.registerFactory<AppointmentViewModel>(
     () => AppointmentViewModel(
-      getIt(),
-      // GetAppointmentUserUseCase
-      getIt(),
-      // GetAppointmentDoctorUseCase
-      getIt(),
-      // CreateAppointmentUseCase
-      getIt(),
-      // CancelAppointmentUseCase
-      getIt(),
-      // UpdateAppointmentUseCase
-      getIt(),
-      // DeleteAppointmentUseCase
-      getIt(), // ConfirmAppointmentUseCase
+      getAppointmentUserUC: getIt(),
+      getAppointmentDoctorUC: getIt(),
+      createAppointmentUC: getIt(),
+      cancelAppointmentUC: getIt(),
+      updateAppointmentUC: getIt(),
+      deleteAppointmentUC: getIt(),
+      confirmAppointmentUC: getIt(),
     ),
   );
   getIt.registerFactory<NotificationViewModel>(
     () => NotificationViewModel(
-      getIt(),
-      getIt(),
-      getIt(),
-      getIt(),
-      getIt(),
-      getIt(),
+      getNotificationsUseCase: getIt(),
+      getUnreadNotificationsUseCase: getIt(),
+      markAsReadUseCase: getIt(),
+      markAllAsReadUseCase: getIt(),
+      deleteNotificationUseCase: getIt(),
+      createNotificationUseCase: getIt(),
     ),
   );
   getIt.registerFactory<ReportViewModel>(() => ReportViewModel(getIt()));

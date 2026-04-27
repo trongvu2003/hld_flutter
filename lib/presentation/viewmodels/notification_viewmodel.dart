@@ -1,6 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import '../../data/models/responsemodel/notification.dart';
-import '../../domain/repositories/notification_repository.dart';
 import '../../domain/usecases/notification/create_notification_usecase.dart';
 import '../../domain/usecases/notification/delete_notification_usecase.dart';
 import '../../domain/usecases/notification/get_notifications_usecase.dart';
@@ -16,14 +15,14 @@ class NotificationViewModel extends ChangeNotifier {
   final DeleteNotificationUseCase deleteNotificationUseCase;
   final CreateNotificationUseCase createNotificationUseCase;
 
-  NotificationViewModel(
-    this.getNotificationsUseCase,
-    this.getUnreadNotificationsUseCase,
-    this.markAsReadUseCase,
-    this.markAllAsReadUseCase,
-    this.deleteNotificationUseCase,
-    this.createNotificationUseCase,
-  );
+  NotificationViewModel({
+    required this.getNotificationsUseCase,
+    required this.getUnreadNotificationsUseCase,
+    required this.markAsReadUseCase,
+    required this.markAllAsReadUseCase,
+    required this.deleteNotificationUseCase,
+    required this.createNotificationUseCase,
+  });
 
   List<NotificationResponse> notifications = [];
   int unreadCount = 0; // Thêm biến đếm số thông báo chưa đọc

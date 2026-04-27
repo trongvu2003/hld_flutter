@@ -1,13 +1,44 @@
 import 'package:flutter/material.dart';
 import '../../data/models/requestmodel/post.dart';
 import '../../data/models/responsemodel/post.dart';
-import '../../domain/repositories/post_repository.dart';
-
+import '../../domain/usecases/post/comment/create_comment_usecase.dart';
+import '../../domain/usecases/post/comment/delete_comment_usecase.dart';
+import '../../domain/usecases/post/comment/get_comments_usecase.dart';
+import '../../domain/usecases/post/comment/update_comment_usecase.dart';
+import '../../domain/usecases/post/create_post_usecase.dart';
+import '../../domain/usecases/post/delete_post_usecase.dart';
+import '../../domain/usecases/post/get_post_by_id_usecase.dart';
+import '../../domain/usecases/post/get_posts_by_user_usecase.dart';
+import '../../domain/usecases/post/get_posts_usecase.dart';
+import '../../domain/usecases/post/get_similar_posts_usecase.dart';
+import '../../domain/usecases/post/update_post_usecase.dart';
 
 class PostViewModel extends ChangeNotifier {
-  final PostRepository repository;
+  final GetPostsUseCase getPostsUseCase;
+  final CreatePostUseCase createPostUseCase;
+  final DeletePostUseCase deletePostUseCase;
+  final UpdatePostUseCase updatePostUseCase;
+  final GetPostByIdUseCase getPostByIdUseCase;
+  final GetSimilarPostsUseCase getSimilarPostsUseCase;
+  final GetPostsByUserUseCase getPostsByUserUseCase;
+  final GetCommentsUseCase getCommentsUseCase;
+  final CreateCommentUseCase createCommentUseCase;
+  final UpdateCommentUseCase updateCommentUseCase;
+  final DeleteCommentUseCase deleteCommentUseCase;
 
-  PostViewModel(this.repository);
+  PostViewModel({
+    required this.getPostsUseCase,
+    required this.createPostUseCase,
+    required this.deletePostUseCase,
+    required this.updatePostUseCase,
+    required this.getPostByIdUseCase,
+    required this.getSimilarPostsUseCase,
+    required this.getPostsByUserUseCase,
+    required this.getCommentsUseCase,
+    required this.createCommentUseCase,
+    required this.updateCommentUseCase,
+    required this.deleteCommentUseCase,
+  });
 
   List<PostResponse> posts = [];
   bool isLoading = false;
@@ -71,7 +102,7 @@ class PostViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final res = await repository.fetchPosts(skip: 0, limit: 10);
+      final res = await getPostsUseCase(skip: 0, limit: 10);
 
       posts = res.posts;
       hasMore = res.hasMore;
@@ -92,7 +123,7 @@ class PostViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final res = await repository.fetchPosts(skip: posts.length, limit: 10);
+      final res = await getPostsUseCase(skip: posts.length, limit: 10);
 
       posts.addAll(res.posts);
       hasMore = res.hasMore;
@@ -112,7 +143,7 @@ class PostViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      await repository.createPost(request);
+      await createPostUseCase(request);
       await fetchPosts(forceRefresh: true);
       isCreating = false;
       isCreateSuccess = true;
@@ -146,7 +177,7 @@ class PostViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final response = await repository.fetchPostsbyUserId(
+      final response = await getPostsByUserUseCase(
         userId: userId,
         skip: skip,
         limit: limit,
@@ -175,7 +206,7 @@ class PostViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final res = await repository.getCommentByPostId(postId, skip, limit);
+      final res = await getCommentsUseCase(postId, skip, limit);
       if (skip == 0) {
         commentsMap[postId] = res.comments;
       } else {
@@ -206,7 +237,7 @@ class PostViewModel extends ChangeNotifier {
         content: content,
       );
 
-      final response = await repository.createCommentByPostId(postId, request);
+      final response = await createCommentUseCase(postId, request);
       //  Làm mới lại danh sách bình luận của bài viết này
       await fetchComments(postId: postId, skip: 0, limit: 10);
       return response;
@@ -230,7 +261,7 @@ class PostViewModel extends ChangeNotifier {
         content: content,
       );
 
-      await repository.updateCommentById(commentId, request);
+      await updateCommentUseCase(commentId, request);
       await fetchComments(postId: postId, skip: 0, limit: 10);
     } catch (e) {
       debugPrint("Error updating comment: $e");
@@ -243,7 +274,7 @@ class PostViewModel extends ChangeNotifier {
     required String commentId,
   }) async {
     try {
-      await repository.deleteCommentById(commentId);
+      await deleteCommentUseCase(commentId);
       final commentsOfThisPost = commentsMap[postId];
       if (commentsOfThisPost != null) {
         commentsOfThisPost.removeWhere((c) => c.id == commentId);
@@ -261,7 +292,7 @@ class PostViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final res = await repository.getPostById(postId);
+      final res = await getPostByIdUseCase(postId);
 
       postDetail = res;
       print("Lấy bài viết chi tiết thành công: ${res.id}");
@@ -279,7 +310,7 @@ class PostViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final response = await repository.getSimilarPosts(
+      final response = await getSimilarPostsUseCase(
         postId: postId,
         limit: 5,
         minSimilarity: 0.6,
@@ -296,7 +327,7 @@ class PostViewModel extends ChangeNotifier {
 
   Future<void> deletePost(String postId) async {
     try {
-      await repository.deletePostById(postId);
+      await deletePostUseCase(postId);
       //Xoá bài viết khỏi danh sách bản tin chung
       posts.removeWhere((post) => post.id == postId);
       // Xoá khỏi các danh sách trang cá nhân (nếu có)
@@ -347,7 +378,7 @@ class PostViewModel extends ChangeNotifier {
         }
       }
 
-      await repository.updatePost(
+      await updatePostUseCase(
         postId: postId,
         content: request.content,
         mediaPaths: videoPaths.isNotEmpty ? videoPaths : null,

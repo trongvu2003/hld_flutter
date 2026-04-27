@@ -10,12 +10,12 @@ class AuthViewModel extends ChangeNotifier {
   final GetCurrentUserUseCase getCurrentUserUseCase;
   final ExtractRoleUseCase extractRoleUseCase;
 
-  AuthViewModel(
-    this.loginUseCase,
-    this.saveTokenUseCase,
-    this.getCurrentUserUseCase,
-    this.extractRoleUseCase,
-  );
+  AuthViewModel({
+    required this.loginUseCase,
+    required this.saveTokenUseCase,
+    required this.getCurrentUserUseCase,
+    required this.extractRoleUseCase,
+  });
 
   String email = '';
   String password = '';
