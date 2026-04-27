@@ -29,7 +29,7 @@ class AppointmentViewModel extends ChangeNotifier {
   });
 
   List<AppointmentResponse> appointments = [];
-  bool isLoading = false;
+  bool isLoading = true;
   bool isError = false;
   String error = '';
 

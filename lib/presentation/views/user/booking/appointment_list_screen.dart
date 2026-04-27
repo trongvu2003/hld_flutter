@@ -36,22 +36,21 @@ class _AppointmentListScreenState extends State<AppointmentListScreen> {
   bool get _isPatient => widget.userRole == 'User';
 
   bool get _isDoctor => widget.userRole == 'Doctor';
-
+  bool _initialLoading = true;
   @override
   void initState() {
     super.initState();
     _roleSelectedTab = _isDoctor ? 1 : 0;
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
       if (!mounted) return;
       if (widget.userId.isNotEmpty) {
-        context.read<AppointmentViewModel>().getAppointmentUser(widget.userId);
-        context.read<AppointmentViewModel>().getAppointmentDoctor(
-          widget.userId,
-        );
-      } else {
-        debugPrint("Lỗi: widget.userId bị rỗng!");
+        await Future.wait([
+          context.read<AppointmentViewModel>().getAppointmentUser(widget.userId),
+          context.read<AppointmentViewModel>().getAppointmentDoctor(widget.userId),
+        ]);
       }
+      if (mounted) setState(() => _initialLoading = false);
     });
   }
 
@@ -224,10 +223,9 @@ class _AppointmentListScreenState extends State<AppointmentListScreen> {
                         _buildStatusDropdown(context),
 
                         Expanded(
-                          child:
-                              vm.isLoading
-                                  ? _buildSkeletonList()
-                                  : _buildAppointmentList(vm),
+                          child: (_initialLoading || vm.isLoading )
+                              ? _buildSkeletonList()
+                              : _buildAppointmentList(vm),
                         ),
                       ],
                     ),
