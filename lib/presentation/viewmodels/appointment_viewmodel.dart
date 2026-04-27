@@ -1,12 +1,32 @@
 import 'package:flutter/cupertino.dart';
 import '../../data/models/requestmodel/appointment.dart';
 import '../../data/models/responsemodel/appointment.dart';
-import '../../domain/repositories/appointment_repository.dart';
+import '../../domain/usecases/appointment/cancel_appointment.dart';
+import '../../domain/usecases/appointment/confirm_appointment.dart';
+import '../../domain/usecases/appointment/create_appointment.dart';
+import '../../domain/usecases/appointment/delete_appointment.dart';
+import '../../domain/usecases/appointment/get_appointment_doctor.dart';
+import '../../domain/usecases/appointment/get_appointment_user.dart';
+import '../../domain/usecases/appointment/update_appointment.dart';
 
 class AppointmentViewModel extends ChangeNotifier {
-  final AppointmentRepository repository;
+  final GetAppointmentUserUseCase getAppointmentUserUC;
+  final GetAppointmentDoctorUseCase getAppointmentDoctorUC;
+  final CreateAppointmentUseCase createAppointmentUC;
+  final CancelAppointmentUseCase cancelAppointmentUC;
+  final UpdateAppointmentUseCase updateAppointmentUC;
+  final DeleteAppointmentUseCase deleteAppointmentUC;
+  final ConfirmAppointmentUseCase confirmAppointmentUC;
 
-  AppointmentViewModel(this.repository);
+  AppointmentViewModel(
+    this.getAppointmentUserUC,
+    this.getAppointmentDoctorUC,
+    this.createAppointmentUC,
+    this.cancelAppointmentUC,
+    this.updateAppointmentUC,
+    this.deleteAppointmentUC,
+    this.confirmAppointmentUC,
+  );
 
   List<AppointmentResponse> appointments = [];
   bool isLoading = false;
@@ -20,7 +40,7 @@ class AppointmentViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final res = await repository.getAppointmentUser(userId);
+      final res = await getAppointmentUserUC(userId);
       appointments = res;
       print("LẤY LỊCH SỬ THÀNH CÔNG: ${appointments.length} items");
       return appointments;
@@ -45,7 +65,7 @@ class AppointmentViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final res = await repository.createAppointment(accessToken, request);
+      final res = await createAppointmentUC(accessToken, request);
       print("ĐẶT LỊCH THÀNH CÔNG: ${res.message}");
       return res;
     } catch (e) {
@@ -66,7 +86,7 @@ class AppointmentViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final res = await repository.cancelAppointment(appointmentId);
+      final res = await cancelAppointmentUC(appointmentId);
       print("HUỶ LỊCH THÀNH CÔNG: ${res.message}");
 
       // CẬP NHẬT GIAO DIỆN NGAY LẬP TỨC
@@ -101,7 +121,7 @@ class AppointmentViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      await repository.updateAppointment(id, request);
+      await updateAppointmentUC(id, request);
       // Cập nhật lại danh sách appointments đang có trong RAM
       final index = appointments.indexWhere((element) => element.id == id);
       if (index != -1) {
@@ -139,7 +159,7 @@ class AppointmentViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final res = await repository.deleteAppointmentById(id);
+      final res = await deleteAppointmentUC(id);
       print("XOÁ LỊCH THÀNH CÔNG: ${res.message}");
       appointments.removeWhere((item) => item.id == id);
       appointmentsfordoctor.removeWhere((item) => item.id == id);
@@ -162,7 +182,7 @@ class AppointmentViewModel extends ChangeNotifier {
     isLoading = true;
     notifyListeners();
     try {
-      final res = await repository.getAppointmentDoctor(doctorId);
+      final res = await getAppointmentDoctorUC(doctorId);
       print(
         "LẤY LỊCH SỬ THÀNH CÔNG cho bác sĩ: ${appointmentsfordoctor.length} items",
       );
@@ -187,7 +207,7 @@ class AppointmentViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final res = await repository.confirmAppointment(appointmentId);
+      final res = await confirmAppointmentUC(appointmentId);
       print("Xác nhận đã hoàn thành: ${res.message}");
       await getAppointmentUser(userId);
       await getAppointmentDoctor(userId);
@@ -207,7 +227,7 @@ class AppointmentViewModel extends ChangeNotifier {
     isLoading = true;
     notifyListeners();
     try {
-      appointmentsfordoctor = await repository.getAppointmentDoctor(doctorId);
+      appointmentsfordoctor = await getAppointmentDoctorUC(doctorId);
     } finally {
       isLoading = false;
       notifyListeners();

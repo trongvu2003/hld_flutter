@@ -27,6 +27,13 @@ import '../../domain/repositories/report_repository.dart';
 import '../../domain/repositories/review_repository.dart';
 import '../../domain/repositories/specialty_repository.dart';
 import '../../domain/repositories/user_repository.dart';
+import '../../domain/usecases/appointment/cancel_appointment.dart';
+import '../../domain/usecases/appointment/confirm_appointment.dart';
+import '../../domain/usecases/appointment/create_appointment.dart';
+import '../../domain/usecases/appointment/delete_appointment.dart';
+import '../../domain/usecases/appointment/get_appointment_doctor.dart';
+import '../../domain/usecases/appointment/get_appointment_user.dart';
+import '../../domain/usecases/appointment/update_appointment.dart';
 import '../../presentation/viewmodels/appointment_viewmodel.dart';
 import '../../presentation/viewmodels/auth_viewmodel.dart';
 import '../../presentation/viewmodels/doctor_viewmodel.dart';
@@ -51,11 +58,17 @@ void setupLocator() {
   getIt.registerLazySingleton<AuthService>(() => AuthService(getIt()));
   getIt.registerLazySingleton<UserService>(() => UserService(getIt()));
   getIt.registerLazySingleton<PostService>(() => PostService(getIt()));
-  getIt.registerLazySingleton<SpecialtyService>(() => SpecialtyService(getIt()));
+  getIt.registerLazySingleton<SpecialtyService>(
+    () => SpecialtyService(getIt()),
+  );
   getIt.registerLazySingleton<DoctorService>(() => DoctorService(getIt()));
   getIt.registerLazySingleton<ReviewService>(() => ReviewService(getIt()));
-  getIt.registerLazySingleton<AppointmentService>(() => AppointmentService(getIt()));
-  getIt.registerLazySingleton<NotificationService>(() => NotificationService(getIt()));
+  getIt.registerLazySingleton<AppointmentService>(
+    () => AppointmentService(getIt()),
+  );
+  getIt.registerLazySingleton<NotificationService>(
+    () => NotificationService(getIt()),
+  );
   getIt.registerLazySingleton<ReportService>(() => ReportService(getIt()));
 
   // 2. TẦNG REPOSITORIES (Nhận inject từ Services)
@@ -88,6 +101,15 @@ void setupLocator() {
     () => ReportRepositoryImpl(getIt()),
   );
 
+  // USECASES - Appointment
+  getIt.registerLazySingleton(() => GetAppointmentUserUseCase(getIt()));
+  getIt.registerLazySingleton(() => GetAppointmentDoctorUseCase(getIt()));
+  getIt.registerLazySingleton(() => CreateAppointmentUseCase(getIt()));
+  getIt.registerLazySingleton(() => CancelAppointmentUseCase(getIt()));
+  getIt.registerLazySingleton(() => UpdateAppointmentUseCase(getIt()));
+  getIt.registerLazySingleton(() => DeleteAppointmentUseCase(getIt()));
+  getIt.registerLazySingleton(() => ConfirmAppointmentUseCase(getIt()));
+
   // 3. TẦNG VIEWMODELS (Nhận inject từ Repositories)
   // Vì hiện tại bạn đang bỏ tất cả ViewModel vào main.dart (Global),
   getIt.registerFactory<AuthViewModel>(() => AuthViewModel(getIt()));
@@ -97,7 +119,21 @@ void setupLocator() {
   getIt.registerFactory<DoctorViewModel>(() => DoctorViewModel(getIt()));
   getIt.registerFactory<ReviewViewModel>(() => ReviewViewModel(getIt()));
   getIt.registerFactory<AppointmentViewModel>(
-    () => AppointmentViewModel(getIt()),
+    () => AppointmentViewModel(
+      getIt(),
+      // GetAppointmentUserUseCase
+      getIt(),
+      // GetAppointmentDoctorUseCase
+      getIt(),
+      // CreateAppointmentUseCase
+      getIt(),
+      // CancelAppointmentUseCase
+      getIt(),
+      // UpdateAppointmentUseCase
+      getIt(),
+      // DeleteAppointmentUseCase
+      getIt(), // ConfirmAppointmentUseCase
+    ),
   );
   getIt.registerFactory<NotificationViewModel>(
     () => NotificationViewModel(getIt()),
