@@ -502,7 +502,6 @@ class _HomeScreenState extends State<HomeScreen> {
             height: 55,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: Theme.of(context).colorScheme.primary,
               border: Border.all(color: Colors.black, width: 2),
               boxShadow: const [
                 BoxShadow(blurRadius: 8, color: Colors.black26),

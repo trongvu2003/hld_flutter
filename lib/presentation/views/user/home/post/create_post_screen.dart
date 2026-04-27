@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hld_flutter/presentation/theme/app_colors.dart';
@@ -103,23 +104,37 @@ class _CreatePostScreenState extends State<CreatePostScreen>
 
   Future<void> _pickMedia() async {
     try {
-      // Xin quyền
-      PermissionStatus status;
+      bool granted = false;
 
       if (Platform.isAndroid) {
-        status = await Permission.photos.request();
+        // Thử photos trước (API 33+), nếu denied thì thử storage (API < 33)
+        final photosStatus = await Permission.photos.request();
+        if (photosStatus.isGranted || photosStatus.isLimited) {
+          granted = true;
+        } else {
+          final storageStatus = await Permission.storage.request();
+          granted = storageStatus.isGranted;
+        }
       } else {
-        status = await Permission.photos.request();
+        final status = await Permission.photos.request();
+        granted = status.isGranted || status.isLimited;
       }
 
-      if (!status.isGranted) {
-        _showSnack('Bạn cần cấp quyền truy cập ảnh');
+      if (!granted) {
+        final isPermanent =
+            await Permission.photos.isPermanentlyDenied ||
+            await Permission.storage.isPermanentlyDenied;
+
+        if (isPermanent) {
+          _showSnack('Vui lòng cấp quyền trong Cài đặt');
+          await openAppSettings();
+        } else {
+          _showSnack('Bạn cần cấp quyền truy cập ảnh');
+        }
         return;
       }
 
-      // Chỉ mở thư viện (KHÔNG phải Google Drive)
       final List<XFile> picked = await _picker.pickMultiImage();
-
       if (picked.isNotEmpty) {
         setState(() {
           _selectedMedia = [..._selectedMedia, ...picked];
@@ -127,7 +142,7 @@ class _CreatePostScreenState extends State<CreatePostScreen>
         _buttonAnimCtrl.forward();
       }
     } catch (e) {
-      _showSnack('Không thể truy cập thư viện ảnh.');
+      _showSnack('Không thể truy cập thư viện ảnh: $e');
     }
   }
 
@@ -172,14 +187,13 @@ class _CreatePostScreenState extends State<CreatePostScreen>
         await postVM.createPost(request);
       }
 
-
       if (mounted) {
         // Lệnh này sẽ xoá sạch các trang trung gian (trang Sửa, trang Chi tiết)
         // và đưa thẳng người dùng về màn hình Home
         Navigator.pushNamedAndRemoveUntil(
           context,
           AppRoutes.main,
-              (route) => false,
+          (route) => false,
         );
       }
     } catch (e) {
