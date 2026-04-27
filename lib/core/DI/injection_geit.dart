@@ -141,7 +141,13 @@ void setupLocator() {
       deleteCommentUseCase: getIt(),
     ),
   );
-  getIt.registerFactory<SpecialtyViewModel>(() => SpecialtyViewModel(getIt()));
+  getIt.registerFactory<SpecialtyViewModel>(
+    () => SpecialtyViewModel(
+      getSpecialtiesUseCase: getIt(),
+      getSpecialtyByIdUseCase: getIt(),
+      getSpecialtyByNameUseCase: getIt(),
+    ),
+  );
   getIt.registerFactory<DoctorViewModel>(
     () => DoctorViewModel(
       getDoctorsUseCase: getIt(),

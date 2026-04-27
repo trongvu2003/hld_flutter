@@ -1,12 +1,20 @@
 import 'package:flutter/cupertino.dart';
 import '../../data/models/responsemodel/doctor.dart';
 import '../../data/models/responsemodel/specialty.dart';
-import '../../domain/repositories/specialty_repository.dart';
+import '../../domain/usecases/specialty/get_specialties_usecase.dart';
+import '../../domain/usecases/specialty/get_specialty_by_id_usecase.dart';
+import '../../domain/usecases/specialty/get_specialty_by_name_usecase.dart';
 
 class SpecialtyViewModel extends ChangeNotifier {
-  final SpecialtyRepository repository;
+  final GetSpecialtiesUseCase getSpecialtiesUseCase;
+  final GetSpecialtyByIdUseCase getSpecialtyByIdUseCase;
+  final GetSpecialtyByNameUseCase getSpecialtyByNameUseCase;
 
-  SpecialtyViewModel(this.repository);
+  SpecialtyViewModel({
+    required this.getSpecialtiesUseCase,
+    required this.getSpecialtyByIdUseCase,
+    required this.getSpecialtyByNameUseCase,
+  });
 
   List<GetSpecialtyResponse> specialties = [];
   List<Doctor> doctors = [];
@@ -29,11 +37,9 @@ class SpecialtyViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      specialties = await repository.getAllSpecialties();
-      print("Thành công: ${specialties.length}");
+      specialties = await getSpecialtiesUseCase();
     } catch (e) {
       error = e.toString();
-      print("Lỗi: $error");
     } finally {
       isLoading = false;
       notifyListeners();
@@ -45,7 +51,7 @@ class SpecialtyViewModel extends ChangeNotifier {
 
     _setLoading(true);
     try {
-      final result = await repository.getSpecialtyById(specialtyId);
+      final result = await getSpecialtyByIdUseCase(specialtyId);
 
       selectedSpecialty = result;
       doctors = result.doctors;
@@ -65,7 +71,7 @@ class SpecialtyViewModel extends ChangeNotifier {
 
     _setLoading(true);
     try {
-      final result = await repository.getSpecialtyByName(name);
+      final result = await getSpecialtyByNameUseCase(name);
 
       selectedSpecialty = result;
       doctors = result.doctors;
@@ -85,11 +91,12 @@ class SpecialtyViewModel extends ChangeNotifier {
     if (location.isEmpty) {
       filteredDoctors = List.from(doctors);
     } else {
-      filteredDoctors = doctors.where((d) {
-        return d.address?.toLowerCase().contains(location.toLowerCase()) == true;
-      }).toList();
+      filteredDoctors =
+          doctors.where((d) {
+            return d.address?.toLowerCase().contains(location.toLowerCase()) ==
+                true;
+          }).toList();
     }
     notifyListeners();
   }
-
 }
