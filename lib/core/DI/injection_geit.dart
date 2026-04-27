@@ -35,7 +35,6 @@ import '../../domain/usecases/appointment/get_appointment_doctor_usecase.dart';
 import '../../domain/usecases/appointment/get_appointment_user_usecase.dart';
 import '../../domain/usecases/appointment/update_appointment_usecase.dart';
 import '../../domain/usecases/auth/extract_role_usecase.dart';
-import '../../domain/usecases/auth/get_current_user_usecase.dart';
 import '../../domain/usecases/auth/login_usecase.dart';
 import '../../domain/usecases/auth/save_token_usecase.dart';
 import '../../domain/usecases/doctor/apply_doctor_usecase.dart';
@@ -49,6 +48,26 @@ import '../../domain/usecases/notification/get_notifications_usecase.dart';
 import '../../domain/usecases/notification/get_unread_notifications_usecase.dart';
 import '../../domain/usecases/notification/mark_all_as_read_usecase.dart';
 import '../../domain/usecases/notification/mark_as_read_usecase.dart';
+import '../../domain/usecases/post/comment/create_comment_usecase.dart';
+import '../../domain/usecases/post/comment/delete_comment_usecase.dart';
+import '../../domain/usecases/post/comment/get_comments_usecase.dart';
+import '../../domain/usecases/post/comment/update_comment_usecase.dart';
+import '../../domain/usecases/post/create_post_usecase.dart';
+import '../../domain/usecases/post/delete_post_usecase.dart';
+import '../../domain/usecases/post/get_post_by_id_usecase.dart';
+import '../../domain/usecases/post/get_posts_by_user_usecase.dart';
+import '../../domain/usecases/post/get_posts_usecase.dart';
+import '../../domain/usecases/post/get_similar_posts_usecase.dart';
+import '../../domain/usecases/post/update_post_usecase.dart';
+import '../../domain/usecases/report/send_report_usecase.dart';
+import '../../domain/usecases/review/get_reviews_by_doctor_usecase.dart';
+import '../../domain/usecases/specialty/get_specialties_usecase.dart';
+import '../../domain/usecases/specialty/get_specialty_by_id_usecase.dart';
+import '../../domain/usecases/specialty/get_specialty_by_name_usecase.dart';
+import '../../domain/usecases/user/get_current_user_usecase.dart';
+import '../../domain/usecases/user/get_user_by_id_usecase.dart';
+import '../../domain/usecases/user/send_fcm_token_usecase.dart';
+import '../../domain/usecases/user/update_user_usecase.dart';
 import '../../presentation/viewmodels/appointment_viewmodel.dart';
 import '../../presentation/viewmodels/auth_viewmodel.dart';
 import '../../presentation/viewmodels/doctor_viewmodel.dart';
@@ -115,16 +134,75 @@ void setupLocator() {
   getIt.registerLazySingleton<ReportRepository>(
     () => ReportRepositoryImpl(getIt()),
   );
+
+  // USECASES
+  // Auth
+  getIt.registerLazySingleton(() => LoginUseCase(getIt()));
+  getIt.registerLazySingleton(() => SaveTokenUseCase());
+  getIt.registerLazySingleton(() => ExtractRoleUseCase());
+  // User
+  getIt.registerLazySingleton(() => GetCurrentUserUseCase());
+  getIt.registerLazySingleton(() => GetUserByIdUseCase(getIt()));
+  getIt.registerLazySingleton(() => UpdateUserUseCase(getIt()));
+  getIt.registerLazySingleton(() => SendFcmTokenUseCase(getIt()));
+  // Post
+  getIt.registerLazySingleton(() => GetPostsUseCase(getIt()));
+  getIt.registerLazySingleton(() => CreatePostUseCase(getIt()));
+  getIt.registerLazySingleton(() => DeletePostUseCase(getIt()));
+  getIt.registerLazySingleton(() => UpdatePostUseCase(getIt()));
+  getIt.registerLazySingleton(() => GetPostByIdUseCase(getIt()));
+  getIt.registerLazySingleton(() => GetSimilarPostsUseCase(getIt()));
+  getIt.registerLazySingleton(() => GetPostsByUserUseCase(getIt()));
+  getIt.registerLazySingleton(() => GetCommentsUseCase(getIt()));
+  getIt.registerLazySingleton(() => CreateCommentUseCase(getIt()));
+  getIt.registerLazySingleton(() => UpdateCommentUseCase(getIt()));
+  getIt.registerLazySingleton(() => DeleteCommentUseCase(getIt()));
+
+  // Specialty
+  getIt.registerLazySingleton(() => GetSpecialtiesUseCase(getIt()));
+  getIt.registerLazySingleton(() => GetSpecialtyByIdUseCase(getIt()));
+  getIt.registerLazySingleton(() => GetSpecialtyByNameUseCase(getIt()));
+
+  // Doctor
+  getIt.registerLazySingleton(() => GetDoctorsUseCase(getIt()));
+  getIt.registerLazySingleton(() => GetDoctorByIdUseCase(getIt()));
+  getIt.registerLazySingleton(() => GetAvailableSlotsUseCase(getIt()));
+  getIt.registerLazySingleton(() => ApplyDoctorUseCase(getIt()));
+  getIt.registerLazySingleton(() => UpdateClinicUseCase(getIt()));
+
+  // Review
+  getIt.registerLazySingleton(() => GetReviewsByDoctorUseCase(getIt()));
+
+  // Appointment
+  getIt.registerLazySingleton(() => GetAppointmentUserUseCase(getIt()));
+  getIt.registerLazySingleton(() => GetAppointmentDoctorUseCase(getIt()));
+  getIt.registerLazySingleton(() => CreateAppointmentUseCase(getIt()));
+  getIt.registerLazySingleton(() => CancelAppointmentUseCase(getIt()));
+  getIt.registerLazySingleton(() => UpdateAppointmentUseCase(getIt()));
+  getIt.registerLazySingleton(() => DeleteAppointmentUseCase(getIt()));
+  getIt.registerLazySingleton(() => ConfirmAppointmentUseCase(getIt()));
+
+  // Notification
+  getIt.registerLazySingleton(() => GetNotificationsUseCase(getIt()));
+  getIt.registerLazySingleton(() => GetUnreadNotificationsUseCase(getIt()));
+  getIt.registerLazySingleton(() => MarkAsReadUseCase(getIt()));
+  getIt.registerLazySingleton(() => MarkAllAsReadUseCase(getIt()));
+  getIt.registerLazySingleton(() => DeleteNotificationUseCase(getIt()));
+  getIt.registerLazySingleton(() => CreateNotificationUseCase(getIt()));
+
+  // Report
+  getIt.registerLazySingleton(() => SendReportUseCase(getIt()));
+
   // 3. TẦNG VIEWMODELS (Nhận inject từ Repositories)
   // Vì hiện tại bạn đang bỏ tất cả ViewModel vào main.dart (Global),
   getIt.registerFactory<AuthViewModel>(
     () => AuthViewModel(
       loginUseCase: getIt(),
       saveTokenUseCase: getIt(),
-      getCurrentUserUseCase: getIt(),
       extractRoleUseCase: getIt(),
     ),
   );
+
   getIt.registerFactory<UserViewModel>(
     () => UserViewModel(
       getCurrentUserUseCase: getIt(),

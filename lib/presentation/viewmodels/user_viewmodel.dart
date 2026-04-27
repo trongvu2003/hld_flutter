@@ -1,8 +1,6 @@
 import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:jwt_decoder/jwt_decoder.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import '../../data/models/responsemodel/user_response.dart';
 import '../../domain/usecases/user/get_current_user_usecase.dart';
 import '../../domain/usecases/user/get_user_by_id_usecase.dart';
@@ -53,7 +51,6 @@ class UserViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      // Gọi API lấy user theo ID truyền vào, không dùng Token ID
       userOfThisProfile = await getUserByIdUseCase(userId);
     } catch (e) {
       print("LOAD OTHER USER ERROR: $e");
@@ -74,11 +71,12 @@ class UserViewModel extends ChangeNotifier {
     isLoading = true;
     notifyListeners();
     try {
-      final prefs = await SharedPreferences.getInstance();
-      final token = prefs.getString('accessToken');
-      if (token == null) return;
-      final decoded = JwtDecoder.decode(token);
-      final userId = decoded['userId'];
+      final userId = await getCurrentUserUseCase();
+      if (userId == null) {
+        isLoading = false;
+        notifyListeners();
+        return;
+      }
       MultipartFile? avatarMultipart;
       if (avatarFile != null) {
         avatarMultipart = await MultipartFile.fromFile(

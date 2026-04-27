@@ -1,19 +1,16 @@
 import 'package:flutter/material.dart';
 import '../../domain/usecases/auth/extract_role_usecase.dart';
-import '../../domain/usecases/auth/get_current_user_usecase.dart';
 import '../../domain/usecases/auth/login_usecase.dart';
 import '../../domain/usecases/auth/save_token_usecase.dart';
 
 class AuthViewModel extends ChangeNotifier {
   final LoginUseCase loginUseCase;
   final SaveTokenUseCase saveTokenUseCase;
-  final GetCurrentUserUseCase getCurrentUserUseCase;
   final ExtractRoleUseCase extractRoleUseCase;
 
   AuthViewModel({
     required this.loginUseCase,
     required this.saveTokenUseCase,
-    required this.getCurrentUserUseCase,
     required this.extractRoleUseCase,
   });
 
@@ -23,12 +20,7 @@ class AuthViewModel extends ChangeNotifier {
   bool isAuthenticated = false;
   String? role;
   String? errorMessage;
-  Map<String, dynamic>? currentUser;
 
-  Future<void> fetchCurrentUser() async {
-    currentUser = await getCurrentUserUseCase();
-    notifyListeners();
-  }
 
   Future<bool> signIn() async {
     if (email.trim().isEmpty || password.trim().isEmpty) {
@@ -52,8 +44,6 @@ class AuthViewModel extends ChangeNotifier {
       role = extractRoleUseCase(token);
 
       isAuthenticated = true;
-
-      await fetchCurrentUser();
 
       notifyListeners();
       return true;
