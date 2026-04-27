@@ -173,7 +173,9 @@ void setupLocator() {
       createNotificationUseCase: getIt(),
     ),
   );
-  getIt.registerFactory<ReportViewModel>(() => ReportViewModel(getIt()));
+  getIt.registerFactory<ReportViewModel>(
+    () => ReportViewModel(sendReportUseCase: getIt()),
+  );
 }
 
 /// Áp dụng gelt+ ListenableBuilder

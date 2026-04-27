@@ -1,16 +1,18 @@
 import 'package:flutter/cupertino.dart';
 import '../../data/models/requestmodel/report.dart';
-import '../../domain/repositories/report_repository.dart';
+import '../../domain/usecases/report/send_report_usecase.dart';
 
 class ReportViewModel extends ChangeNotifier {
-  final ReportRepository repository;
+  final SendReportUseCase sendReportUseCase;
 
-  ReportViewModel(this.repository);
+  ReportViewModel({required this.sendReportUseCase});
 
   bool _isLoading = false;
+
   bool get isLoading => _isLoading;
 
   String _error = '';
+
   String get error => _error;
 
   Future<bool> sendReport(ReportRequest reportRequest) async {
@@ -19,7 +21,7 @@ class ReportViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      await repository.sendReport(reportRequest);
+      await sendReportUseCase(reportRequest);
       _isLoading = false;
       notifyListeners();
       return true;
