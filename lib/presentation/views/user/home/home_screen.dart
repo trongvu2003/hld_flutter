@@ -89,7 +89,6 @@ class _HomeScreenState extends State<HomeScreen> {
   void _showReportDialog(BuildContext context, PostResponse post) {
     final TextEditingController reportController = TextEditingController();
     final userVM = context.read<UserViewModel>();
-    final reportVM = context.read<ReportViewModel>();
     final currentUser = userVM.currentUser;
 
     showDialog(
@@ -306,56 +305,66 @@ class _HomeScreenState extends State<HomeScreen> {
 
                     // Render danh sách post
                     return SliverList(
-                      delegate: SliverChildBuilderDelegate((context, i) {
-                        final post = vm.posts[i];
-                        return PostCard(
-                          post: post,
-                          currentUserId: userVM.currentUser!.id ?? "",
-                          onReport: () {
-                            _showReportDialog(context, post);
-                          },
-                          onDelete: () {
-                            AppDialog.show(
-                              context: context,
-                              title: 'Xoá bài viết',
-                              content:
-                                  'Bạn có chắc muốn xoá bài viết này không?',
-                              cancelText: 'Huỷ',
-                              cancelBgColor: Colors.grey[200],
-                              cancelColor: Colors.black,
-                              confirmText: 'Xoá',
-                              confirmBgColor: Colors.red,
-                              confirmColor: Colors.white,
-                              onConfirm: () {
-                                final postId = post.id;
-                                if (postId != null && postId.isNotEmpty) {
-                                  context.read<PostViewModel>().deletePost(
-                                    postId,
-                                  );
-                                }
+                      delegate: SliverChildBuilderDelegate(
+                        (context, i) {
+                          final post = vm.posts[i];
+                          return RepaintBoundary(
+                            // ← thêm
+                            key: ValueKey(post.id),
+                            child: PostCard(
+                              post: post,
+                              currentUserId: userVM.currentUser!.id ?? "",
+                              onReport: () => _showReportDialog(context, post),
+                              onDelete: () {
+                                AppDialog.show(
+                                  context: context,
+                                  title: 'Xoá bài viết',
+                                  content:
+                                      'Bạn có chắc muốn xoá bài viết này không?',
+                                  cancelText: 'Huỷ',
+                                  cancelBgColor: Colors.grey[200],
+                                  cancelColor: Colors.black,
+                                  confirmText: 'Xoá',
+                                  confirmBgColor: Colors.red,
+                                  confirmColor: Colors.white,
+                                  onConfirm: () {
+                                    final postId = post.id;
+                                    if (postId != null && postId.isNotEmpty) {
+                                      context.read<PostViewModel>().deletePost(
+                                        postId,
+                                      );
+                                    }
+                                  },
+                                );
                               },
-                            );
-                          },
-                          onEdit: () {
-                            Navigator.pushNamed(
-                              context,
-                              AppRoutes.createpost,
-                              arguments: {
-                                'postId': post.id,
-                                'userId': userVM.currentUser?.id,
-                                'userRole': userVM.currentUser?.role,
+                              onEdit: () {
+                                Navigator.pushNamed(
+                                  context,
+                                  AppRoutes.createpost,
+                                  arguments: {
+                                    'postId': post.id,
+                                    'userId': userVM.currentUser?.id,
+                                    'userRole': userVM.currentUser?.role,
+                                  },
+                                );
                               },
-                            );
-                          },
-
-                          onNavigateToDetail: () {
-                            Navigator.pushNamed(
-                              context,
-                              '/postdetail/${post.id}',
-                            );
-                          },
-                        );
-                      }, childCount: vm.posts.length),
+                              onNavigateToDetail: () {
+                                Navigator.pushNamed(
+                                  context,
+                                  '/postdetail/${post.id}',
+                                );
+                              },
+                            ),
+                          );
+                        },
+                        childCount: vm.posts.length,
+                        findChildIndexCallback: (key) {
+                          final valueKey = key as ValueKey;
+                          return vm.posts.indexWhere(
+                            (p) => p.id == valueKey.value,
+                          );
+                        },
+                      ),
                     );
                   },
                 ),
@@ -440,7 +449,7 @@ class _HomeScreenState extends State<HomeScreen> {
         children: [
           const WelcomeBanner(),
           const SizedBox(height: 10),
-          _buildGreetingRow(context),
+          _GreetingRow(),
           const SizedBox(height: 16),
           AiSearchBar(
             onSubmit:
@@ -462,61 +471,6 @@ class _HomeScreenState extends State<HomeScreen> {
                       arguments: news,
                     ),
               ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildGreetingRow(BuildContext context) {
-    final vm = context.watch<UserViewModel>();
-    final user = vm.currentUser;
-
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 16),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Chào mừng quay lại, 👋',
-                style: TextStyle(
-                  fontSize: 16,
-                  color: Colors.black.withOpacity(0.8),
-                ),
-              ),
-
-              Text(
-                user?.name ?? 'Người dùng',
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 28,
-                ),
-              ),
-            ],
-          ),
-
-          Container(
-            width: 55,
-            height: 55,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              border: Border.all(color: Colors.black, width: 2),
-              boxShadow: const [
-                BoxShadow(blurRadius: 8, color: Colors.black26),
-              ],
-            ),
-            child: ClipOval(
-              child:
-                  user?.avatarURL != null && user!.avatarURL!.isNotEmpty
-                      ? Image.network(user.avatarURL!, fit: BoxFit.cover)
-                      : Image.asset(
-                        'assets/images/avatar_doctor.jpg',
-                        fit: BoxFit.cover,
-                      ),
-            ),
-          ),
         ],
       ),
     );
@@ -614,6 +568,65 @@ class _DoctorSkeletonList extends StatelessWidget {
                       ],
                     ),
                   ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _GreetingRow extends StatelessWidget {
+  const _GreetingRow();
+
+  @override
+  Widget build(BuildContext context) {
+    final user = context.select<UserViewModel, dynamic>((vm) => vm.currentUser);
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Chào mừng quay lại, 👋',
+                style: TextStyle(
+                  fontSize: 16,
+                  color: Colors.black.withOpacity(0.8),
+                ),
+              ),
+
+              Text(
+                user?.name ?? 'Người dùng',
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 28,
+                ),
+              ),
+            ],
+          ),
+
+          Container(
+            width: 55,
+            height: 55,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(color: Colors.black, width: 2),
+              boxShadow: const [
+                BoxShadow(blurRadius: 8, color: Colors.black26),
+              ],
+            ),
+            child: ClipOval(
+              child:
+                  user?.avatarURL != null && user!.avatarURL!.isNotEmpty
+                      ? Image.network(user.avatarURL!, fit: BoxFit.cover)
+                      : Image.asset(
+                        'assets/images/avatar_doctor.jpg',
+                        fit: BoxFit.cover,
+                      ),
             ),
           ),
         ],
