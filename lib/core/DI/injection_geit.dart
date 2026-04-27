@@ -38,6 +38,11 @@ import '../../domain/usecases/auth/extract_role_usecase.dart';
 import '../../domain/usecases/auth/get_current_user_usecase.dart';
 import '../../domain/usecases/auth/login_usecase.dart';
 import '../../domain/usecases/auth/save_token_usecase.dart';
+import '../../domain/usecases/doctor/apply_doctor_usecase.dart';
+import '../../domain/usecases/doctor/get_available_slots_usecase.dart';
+import '../../domain/usecases/doctor/get_doctor_by_id_usecase.dart';
+import '../../domain/usecases/doctor/get_doctors_usecase.dart';
+import '../../domain/usecases/doctor/update_clinic_usecase.dart';
 import '../../presentation/viewmodels/appointment_viewmodel.dart';
 import '../../presentation/viewmodels/auth_viewmodel.dart';
 import '../../presentation/viewmodels/doctor_viewmodel.dart';
@@ -118,6 +123,14 @@ void setupLocator() {
   getIt.registerLazySingleton(() => SaveTokenUseCase());
   getIt.registerLazySingleton(() => GetCurrentUserUseCase());
   getIt.registerLazySingleton(() => ExtractRoleUseCase());
+
+  // USECASES - Doctor
+  getIt.registerLazySingleton(() => GetDoctorsUseCase(getIt()));
+  getIt.registerLazySingleton(() => GetDoctorByIdUseCase(getIt()));
+  getIt.registerLazySingleton(() => GetAvailableSlotsUseCase(getIt()));
+  getIt.registerLazySingleton(() => ApplyDoctorUseCase(getIt()));
+  getIt.registerLazySingleton(() => UpdateClinicUseCase(getIt()));
+
   // 3. TẦNG VIEWMODELS (Nhận inject từ Repositories)
   // Vì hiện tại bạn đang bỏ tất cả ViewModel vào main.dart (Global),
   getIt.registerFactory<AuthViewModel>(
@@ -131,7 +144,9 @@ void setupLocator() {
   getIt.registerFactory<UserViewModel>(() => UserViewModel(getIt()));
   getIt.registerFactory<PostViewModel>(() => PostViewModel(getIt()));
   getIt.registerFactory<SpecialtyViewModel>(() => SpecialtyViewModel(getIt()));
-  getIt.registerFactory<DoctorViewModel>(() => DoctorViewModel(getIt()));
+  getIt.registerFactory<DoctorViewModel>(
+    () => DoctorViewModel(getIt(), getIt(), getIt(), getIt(), getIt()),
+  );
   getIt.registerFactory<ReviewViewModel>(() => ReviewViewModel(getIt()));
   getIt.registerFactory<AppointmentViewModel>(
     () => AppointmentViewModel(

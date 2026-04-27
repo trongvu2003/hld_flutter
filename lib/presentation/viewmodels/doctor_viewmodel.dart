@@ -4,12 +4,26 @@ import 'package:flutter/material.dart';
 import '../../data/models/requestmodel/doctor.dart';
 import '../../data/models/responsemodel/doctor.dart';
 import '../../domain/repositories/doctor_repository.dart';
-
+import '../../domain/usecases/doctor/apply_doctor_usecase.dart';
+import '../../domain/usecases/doctor/get_available_slots_usecase.dart';
+import '../../domain/usecases/doctor/get_doctor_by_id_usecase.dart';
+import '../../domain/usecases/doctor/get_doctors_usecase.dart';
+import '../../domain/usecases/doctor/update_clinic_usecase.dart';
 
 class DoctorViewModel extends ChangeNotifier {
-  final DoctorRepository repository;
+  final GetDoctorsUseCase getDoctorsUseCase;
+  final GetDoctorByIdUseCase getDoctorByIdUseCase;
+  final GetAvailableSlotsUseCase getAvailableSlotsUseCase;
+  final ApplyDoctorUseCase applyDoctorUseCase;
+  final UpdateClinicUseCase updateClinicUseCase;
 
-  DoctorViewModel(this.repository);
+  DoctorViewModel(
+    this.getDoctorsUseCase,
+    this.getDoctorByIdUseCase,
+    this.getAvailableSlotsUseCase,
+    this.applyDoctorUseCase,
+    this.updateClinicUseCase,
+  );
 
   List<GetDoctorResponse> doctors = [];
   GetDoctorResponse? selectedDoctor;
@@ -26,7 +40,7 @@ class DoctorViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final res = await repository.getDoctors();
+      final res = await getDoctorsUseCase();
       doctors = res;
       print('LẤY BÁC SĨ THÀNH CÔNG: ${doctors.length} người');
     } catch (e) {
@@ -46,7 +60,7 @@ class DoctorViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      selectedDoctor = await repository.getDoctorById(doctorId);
+      selectedDoctor = await getDoctorByIdUseCase(doctorId);
       print('LẤY BÁC SĨ THÀNH CÔNG: ${selectedDoctor?.name}');
       return selectedDoctor;
     } catch (e) {
@@ -69,7 +83,7 @@ class DoctorViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final res = await repository.getAvailableSlots(doctorId);
+      final res = await getAvailableSlotsUseCase(doctorId);
       doctorSlots = res;
       return res;
     } catch (e) {
@@ -103,7 +117,7 @@ class DoctorViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final response = await repository.applyForDoctor(userId, request);
+      final response = await applyDoctorUseCase(userId, request);
       _handleSuccess(response.message, context);
     } on DioException catch (e) {
       _handleApiError(e, context);
@@ -161,7 +175,7 @@ class DoctorViewModel extends ChangeNotifier {
     updateSuccess = null;
     notifyListeners();
     try {
-      final isSuccess = await repository.updateClinicInfo(doctorId, request);
+      final isSuccess = await updateClinicUseCase(doctorId, request);
       if (isSuccess) {
         updateSuccess = true;
         if (context.mounted) {
@@ -186,6 +200,7 @@ class DoctorViewModel extends ChangeNotifier {
       notifyListeners();
     }
   }
+
   // Hàm này gọi sau khi chuyển trang thành công để reset lại biến
   void resetUpdateStatus() {
     updateSuccess = null;
