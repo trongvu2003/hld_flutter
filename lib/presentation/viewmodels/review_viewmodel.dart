@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import '../../data/models/responsemodel/review_response.dart';
-import '../../domain/repositories/review_repository.dart';
+import '../../domain/usecases/review/get_reviews_by_doctor_usecase.dart';
 
 class ReviewViewModel extends ChangeNotifier {
-  final ReViewRepository repository;
+  final GetReviewsByDoctorUseCase getReviewsByDoctorUseCase;
 
-  ReviewViewModel(this.repository);
+  ReviewViewModel({
+    required this.getReviewsByDoctorUseCase,
+  });
 
   List<ReviewResponse> reviews = [];
   bool isLoading = false;
@@ -22,7 +24,7 @@ class ReviewViewModel extends ChangeNotifier {
     reviews = [];
     notifyListeners();
     try {
-      final res = await repository.getReviewsByDoctor(doctorId);
+      final res = await getReviewsByDoctorUseCase(doctorId);
       reviews = res;
     } catch (e) {
       isError = true;

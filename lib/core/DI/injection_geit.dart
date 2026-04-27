@@ -151,7 +151,9 @@ void setupLocator() {
       updateClinicUseCase: getIt(),
     ),
   );
-  getIt.registerFactory<ReviewViewModel>(() => ReviewViewModel(getIt()));
+  getIt.registerFactory<ReviewViewModel>(
+    () => ReviewViewModel(getReviewsByDoctorUseCase: getIt()),
+  );
   getIt.registerFactory<AppointmentViewModel>(
     () => AppointmentViewModel(
       getAppointmentUserUC: getIt(),
