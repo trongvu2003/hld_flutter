@@ -1,11 +1,29 @@
 import 'package:flutter/cupertino.dart';
 import '../../data/models/responsemodel/notification.dart';
 import '../../domain/repositories/notification_repository.dart';
+import '../../domain/usecases/notification/create_notification_usecase.dart';
+import '../../domain/usecases/notification/delete_notification_usecase.dart';
+import '../../domain/usecases/notification/get_notifications_usecase.dart';
+import '../../domain/usecases/notification/get_unread_notifications_usecase.dart';
+import '../../domain/usecases/notification/mark_all_as_read_usecase.dart';
+import '../../domain/usecases/notification/mark_as_read_usecase.dart';
 
 class NotificationViewModel extends ChangeNotifier {
-  final NotificationRepository repository;
+  final GetNotificationsUseCase getNotificationsUseCase;
+  final GetUnreadNotificationsUseCase getUnreadNotificationsUseCase;
+  final MarkAsReadUseCase markAsReadUseCase;
+  final MarkAllAsReadUseCase markAllAsReadUseCase;
+  final DeleteNotificationUseCase deleteNotificationUseCase;
+  final CreateNotificationUseCase createNotificationUseCase;
 
-  NotificationViewModel(this.repository);
+  NotificationViewModel(
+    this.getNotificationsUseCase,
+    this.getUnreadNotificationsUseCase,
+    this.markAsReadUseCase,
+    this.markAllAsReadUseCase,
+    this.deleteNotificationUseCase,
+    this.createNotificationUseCase,
+  );
 
   List<NotificationResponse> notifications = [];
   int unreadCount = 0; // Thêm biến đếm số thông báo chưa đọc
@@ -26,7 +44,7 @@ class NotificationViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final res = await repository.getNotificationByUserId(userId);
+      final res = await getNotificationsUseCase(userId);
       notifications = res;
       _updateUnreadCount();
     } catch (e) {
@@ -47,7 +65,7 @@ class NotificationViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final res = await repository.getUnreadNotifications(userId);
+      final res = await getUnreadNotificationsUseCase(userId);
       notifications = res;
       _updateUnreadCount();
     } catch (e) {
@@ -63,7 +81,7 @@ class NotificationViewModel extends ChangeNotifier {
   //  ĐÁNH DẤU 1 THÔNG BÁO LÀ ĐÃ ĐỌC
   Future<void> markAsRead(String notificationId) async {
     try {
-      await repository.markAsRead(notificationId);
+      await markAsReadUseCase(notificationId);
 
       // Cập nhật UI ngay lập tức trên RAM
       final index = notifications.indexWhere((n) => n.id == notificationId);
@@ -88,7 +106,7 @@ class NotificationViewModel extends ChangeNotifier {
   //  ĐÁNH DẤU TẤT CẢ LÀ ĐÃ ĐỌC
   Future<void> markAllAsRead(String userId) async {
     try {
-      await repository.markAllAsRead(userId);
+      await markAllAsReadUseCase(userId);
 
       // Map toàn bộ danh sách thành isRead = true
       notifications =
@@ -115,7 +133,7 @@ class NotificationViewModel extends ChangeNotifier {
   // XÓA THÔNG BÁO
   Future<void> deleteNotification(String notificationId) async {
     try {
-      await repository.deleteNotification(notificationId);
+      await deleteNotificationUseCase(notificationId);
       notifications.removeWhere((n) => n.id == notificationId);
       _updateUnreadCount();
     } catch (e) {
@@ -131,7 +149,7 @@ class NotificationViewModel extends ChangeNotifier {
     required String navigatePath,
   }) async {
     try {
-      final newNotification = await repository.createNotification(
+      final newNotification = await createNotificationUseCase(
         userId,
         userModel,
         type,
