@@ -125,7 +125,14 @@ void setupLocator() {
       extractRoleUseCase: getIt(),
     ),
   );
-  getIt.registerFactory<UserViewModel>(() => UserViewModel(getIt()));
+  getIt.registerFactory<UserViewModel>(
+    () => UserViewModel(
+      getCurrentUserUseCase: getIt(),
+      getUserByIdUseCase: getIt(),
+      updateUserUseCase: getIt(),
+      sendFcmTokenUseCase: getIt(),
+    ),
+  );
   getIt.registerFactory<PostViewModel>(
     () => PostViewModel(
       getPostsUseCase: getIt(),

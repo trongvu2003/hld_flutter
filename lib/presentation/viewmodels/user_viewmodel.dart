@@ -4,12 +4,23 @@ import 'package:flutter/material.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../data/models/responsemodel/user_response.dart';
-import '../../domain/repositories/user_repository.dart';
+import '../../domain/usecases/user/get_current_user_usecase.dart';
+import '../../domain/usecases/user/get_user_by_id_usecase.dart';
+import '../../domain/usecases/user/send_fcm_token_usecase.dart';
+import '../../domain/usecases/user/update_user_usecase.dart';
 
 class UserViewModel extends ChangeNotifier {
-  final UserRepository repository;
+  final GetCurrentUserUseCase getCurrentUserUseCase;
+  final GetUserByIdUseCase getUserByIdUseCase;
+  final UpdateUserUseCase updateUserUseCase;
+  final SendFcmTokenUseCase sendFcmTokenUseCase;
 
-  UserViewModel(this.repository);
+  UserViewModel({
+    required this.getCurrentUserUseCase,
+    required this.getUserByIdUseCase,
+    required this.updateUserUseCase,
+    required this.sendFcmTokenUseCase,
+  });
 
   User? currentUser; // Thông tin của chính mình
   User? userOfThisProfile; // Thông tin của người khác
@@ -20,17 +31,17 @@ class UserViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final prefs = await SharedPreferences.getInstance();
-      final token = prefs.getString('accessToken');
+      final userId = await getCurrentUserUseCase();
 
-      if (token == null) return;
+      if (userId == null) {
+        isLoading = false;
+        notifyListeners();
+        return;
+      }
 
-      final decoded = JwtDecoder.decode(token);
-      final userId = decoded['userId'];
-
-      currentUser = await repository.getUser(userId);
+      currentUser = await getUserByIdUseCase(userId);
     } catch (e) {
-      print("LOAD CURRENT USER ERROR: $e");
+      debugPrint("LOAD CURRENT USER ERROR: $e");
     }
 
     isLoading = false;
@@ -43,7 +54,7 @@ class UserViewModel extends ChangeNotifier {
 
     try {
       // Gọi API lấy user theo ID truyền vào, không dùng Token ID
-      userOfThisProfile = await repository.getUser(userId);
+      userOfThisProfile = await getUserByIdUseCase(userId);
     } catch (e) {
       print("LOAD OTHER USER ERROR: $e");
     }
@@ -76,7 +87,7 @@ class UserViewModel extends ChangeNotifier {
         );
       }
 
-      final updatedUser = await repository.updateUserByID(
+      final updatedUser = await updateUserUseCase(
         id: userId,
         avatarURL: avatarMultipart,
         name: name,
@@ -99,7 +110,7 @@ class UserViewModel extends ChangeNotifier {
 
   Future<void> sendFcmToken(String userId, String role, String token) async {
     try {
-      final res = await repository.updateFcmToken(userId, token, role);
+      final res = await sendFcmTokenUseCase(userId, token, role);
 
       if (res.statusCode == 200 || res.statusCode == 204) {
         debugPrint("FCM: Gửi token thành công");
